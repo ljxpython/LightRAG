@@ -1,3 +1,48 @@
+# LightRAG 生产底座与平台外挂网关开发规范 (AGENTS Constitution)
+
+> **最高宪法**：
+> 1. **平台端 0 代码修改**：上层 ai-agent-platform（runtime-service / platform-api）绝不修改一行代码，FastMCP 网关必须 100% 模拟并兼容旧契约（工具名 mcp_query_project_knowledge、sources_version=1|2、_ResultV2 / _Locator）。
+> 2. **LightRAG 核心 0 侵入**：严禁侵入修改 lightrag/ 官方内部源码，所有租户隔离、鉴权、Docling 定位、收据核验全部收敛在外挂网关中。
+> 3. **真实环境必须可复现**：所有验证、测试、守护进程必须在 sshmy2（Ubuntu 24.04）上真实执行通过，严禁伪造。
+
+## 模块边界与端口分工
+
+| 组件 | 监听端口 | 职责 | 访问控制 |
+|---|---|---|---|
+| **FastMCP 生产网关** | 8001/tcp（或生产 8000） | FastMCP 4.1.0 协议端点；处理平台 Token 鉴权；多租户/项目物理隔离；_ResultV2 组装；Docling Locator 反查 | 仅平台访问，Bearer Token 鉴权 |
+| **LightRAG 原生服务** | 9621/tcp | 原生 WebUI（图谱可视化与后台探查）；原生 REST API | 管理员访问，原生 API-Key 鉴权 |
+| **外挂租约与工作区** | - | TenantWorkspaceManager POSIX CAS 零锁原子切换；ReaderLeaseManager 读租约引用计数与优雅退役 | 内部模块依赖 |
+
+## 验证流水线
+
+```bash
+# Level 1: 运行单元与契约测试
+.venv/bin/pytest tests/test_fastmcp_gateway.py tests/test_lease_manager.py tests/test_locator_multiformat.py -v
+
+# Level 2: 平台端到端契约测试（验证 _ResultV2 / _Locator Pydantic 模型）
+.venv/bin/python test_contract_client.py
+
+# Level 3: 双轨服务探活
+curl -sI http://127.0.0.1:9621/webui/ | head -n 1
+curl -sI http://127.0.0.1:8001/sse || curl -sI http://127.0.0.1:8001/
+```
+
+## 研发 Skills（位于 .agents/skills/）
+
+- plan-project：涉及 FastMCP 签名、平台契约、多租户结构改动时，在 docs/projects/{YYYYMMDD}-{slug}/ 下立项。
+- implement-feature：开发过程中每完成一个 Task 输出标准 Task Completion Card（附 sshmy2 真实执行日志）。
+- verify-change：收尾时执行 4 级生产流水线验证，输出四态判定。
+- upstream-guard：随时检查 git status lightrag/，严禁污染上游核心算法。
+
+## 严禁行为
+
+- ❌ 严禁在 lightrag/ 官方代码中添加平台特定逻辑或私货
+- ❌ 严禁向平台暴露宿主机真实绝对物理路径
+- ❌ 严禁破坏 FastMCP 的 _ResultV2 / _Locator 数据模型
+- ❌ 严禁在未经过 sshmy2 真实执行的情况下假报测试通过
+
+---
+
 # Repository Guidelines
 
 ## Project Overview
