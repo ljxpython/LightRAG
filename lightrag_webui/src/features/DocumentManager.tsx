@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSettingsStore } from '@/stores/settings'
 import Button from '@/components/ui/Button'
-import { cn } from '@/lib/utils'
+import { cn, extractDocumentTitle } from '@/lib/utils'
 import {
   Table,
   TableBody,
@@ -17,6 +17,7 @@ import Checkbox from '@/components/ui/Checkbox'
 import UploadDocumentsDialog from '@/components/documents/UploadDocumentsDialog'
 import ClearDocumentsDialog from '@/components/documents/ClearDocumentsDialog'
 import DeleteDocumentsDialog from '@/components/documents/DeleteDocumentsDialog'
+import DocumentContentDialog from '@/components/documents/DocumentContentDialog'
 import PaginationControls from '@/components/ui/PaginationControls'
 import {
   Dialog,
@@ -91,25 +92,11 @@ const hasActiveDocumentsStatus = (counts: Record<string, number>): boolean =>
   getCountValue(counts, 'PENDING', 'pending') > 0 ||
   getCountValue(counts, 'PREPROCESSED', 'preprocessed') > 0
 
-const getDisplayFileName = (doc: DocStatusResponse, maxLength: number = 20): string => {
-  // Check if file_path exists and is a non-empty string
-  if (!doc.file_path || typeof doc.file_path !== 'string' || doc.file_path.trim() === '') {
-    return doc.id;
-  }
-
-  // Try to extract filename from path
-  const parts = doc.file_path.split('/');
-  const fileName = parts[parts.length - 1];
-
-  // Ensure extracted filename is valid
-  if (!fileName || fileName.trim() === '') {
-    return doc.id;
-  }
-
-  // If filename is longer than maxLength, truncate it and add ellipsis
-  return fileName.length > maxLength
-    ? fileName.slice(0, maxLength) + '...'
-    : fileName;
+const getDisplayFileName = (doc: DocStatusResponse, maxLength: number = 28): string => {
+  const title = extractDocumentTitle(doc);
+  return title.length > maxLength
+    ? title.slice(0, maxLength) + '...'
+    : title;
 };
 
 const formatMetadata = (metadata: Record<string, any>): string => {
@@ -1767,33 +1754,22 @@ export default function DocumentManager() {
                       <TableBody className="text-sm overflow-auto">
                         {filteredAndSortedDocs.map((doc) => (
                           <TableRow key={doc.id}>
-                            <TableCell className="truncate font-mono overflow-visible max-w-[250px]">
-                              {showFileName ? (
-                                <>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="truncate">
-                                        {getDisplayFileName(doc, 30)}
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
-                                      {doc.file_path}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                  <div className="text-xs text-gray-500">{doc.id}</div>
-                                </>
-                              ) : (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className="truncate">
-                                      {doc.id}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
-                                    {doc.file_path}
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
+                            <TableCell className="overflow-visible max-w-[280px]">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="truncate font-semibold text-foreground text-sm cursor-default hover:text-emerald-500 transition-colors">
+                                    {getDisplayFileName(doc, 32)}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
+                                  <div className="font-semibold text-sm">{extractDocumentTitle(doc)}</div>
+                                  <div className="text-[11px] font-mono text-muted-foreground mt-0.5">ID: {doc.id}</div>
+                                  {doc.file_path && doc.file_path !== 'unknown_source' && (
+                                    <div className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">{doc.file_path}</div>
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
+                              <div className="text-[11px] font-mono text-muted-foreground/75 truncate mt-0.5">{doc.id}</div>
                             </TableCell>
                             <TableCell className="max-w-xs min-w-45 truncate overflow-visible">
                               <Tooltip>
@@ -1808,7 +1784,7 @@ export default function DocumentManager() {
                               </Tooltip>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center">
+                              <div className="flex items-center gap-1.5">
                                 {(() => {
                                   const statusDisplay = getStatusDisplay(doc.status)
                                   return (
@@ -1819,6 +1795,7 @@ export default function DocumentManager() {
                                 })()}
 
                                 {hasDocumentDetails(doc) && <DocumentStatusDetailsDialog doc={doc} />}
+                                <DocumentContentDialog docId={doc.id} fileName={extractDocumentTitle(doc)} />
                               </div>
                             </TableCell>
                             <TableCell>{doc.content_length ?? '-'}</TableCell>

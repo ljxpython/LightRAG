@@ -102,4 +102,5 @@ memory-bank
 
 # Local sandbox storage and temp artifacts
 sandbox_storage/
+eval_data/__parsed__/
 

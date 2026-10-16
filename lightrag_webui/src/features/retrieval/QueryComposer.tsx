@@ -19,6 +19,8 @@ export interface QueryComposerProps {
   onSend: (input: string) => string | null
   onStop: () => void
   onClear: () => void
+  /** Optional prefilled prompt from starter chips */
+  prefilledPrompt?: string
 }
 
 export default function QueryComposer({
@@ -26,12 +28,20 @@ export default function QueryComposer({
   stopDisabled,
   onSend,
   onStop,
-  onClear
+  onClear,
+  prefilledPrompt
 }: QueryComposerProps) {
   const { t } = useTranslation()
   const [inputValue, setInputValue] = useState('')
   const [inputError, setInputError] = useState('')
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (prefilledPrompt) {
+      setInputValue(prefilledPrompt)
+      requestAnimationFrame(() => inputRef.current?.focus())
+    }
+  }, [prefilledPrompt])
 
   const dismissInputError = useCallback(() => {
     setInputError('')
@@ -168,7 +178,7 @@ export default function QueryComposer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative flex shrink-0 items-center gap-2"
+      className="relative flex shrink-0 items-center gap-2 rounded-xl border border-border/70 bg-card/60 p-1.5 shadow-xs backdrop-blur-md transition-colors focus-within:border-border"
       autoComplete="on"
       method="post"
       action="#"
@@ -196,14 +206,14 @@ export default function QueryComposer({
       )}
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         onClick={onClear}
         disabled={isLoading}
         size="sm"
-        className="min-h-11"
+        className="min-h-10 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg px-2.5"
       >
-        <EraserIcon />
-        {t('retrievePanel.retrieval.clear')}
+        <EraserIcon className="size-4" />
+        <span className="hidden sm:inline text-xs">{t('retrievePanel.retrieval.clear')}</span>
       </Button>
       <div className="relative flex-1">
         <label htmlFor="query-input" className="sr-only">
@@ -214,7 +224,7 @@ export default function QueryComposer({
             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
             id="query-input"
             autoComplete="on"
-            className="max-h-[120px] min-h-[44px] w-full overflow-y-auto"
+            className="max-h-[120px] min-h-[40px] w-full overflow-y-auto border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
             value={inputValue}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
@@ -227,7 +237,7 @@ export default function QueryComposer({
             style={{
               resize: 'none',
               height: 'auto',
-              minHeight: '44px',
+              minHeight: '40px',
               maxHeight: '120px'
             }}
             onInput={(e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -243,7 +253,7 @@ export default function QueryComposer({
             ref={inputRef as React.RefObject<HTMLInputElement>}
             id="query-input"
             autoComplete="on"
-            className="min-h-11 w-full"
+            className="min-h-10 w-full border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm"
             value={inputValue}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
@@ -264,22 +274,22 @@ export default function QueryComposer({
           onClick={onStop}
           disabled={stopDisabled}
           size="sm"
-          className="min-h-11 min-w-11"
+          className="min-h-10 min-w-10 rounded-lg"
           aria-label={t('retrievePanel.retrieval.stop')}
         >
-          <SquareIcon />
-          {t('retrievePanel.retrieval.stop')}
+          <SquareIcon className="size-4" />
+          <span className="sr-only">{t('retrievePanel.retrieval.stop')}</span>
         </Button>
       ) : (
         <Button
           type="submit"
           variant="default"
           size="sm"
-          className="min-h-11 min-w-11"
+          className="min-h-10 min-w-10 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-95"
           aria-label={t('retrievePanel.retrieval.send')}
         >
-          <SendIcon />
-          {t('retrievePanel.retrieval.send')}
+          <SendIcon className="size-4" />
+          <span className="sr-only">{t('retrievePanel.retrieval.send')}</span>
         </Button>
       )}
     </form>

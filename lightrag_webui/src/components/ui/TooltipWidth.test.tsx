@@ -262,7 +262,6 @@ describe('tooltip width call sites', () => {
   const REQUIRED_WIDTHS: Record<string, string[]> = {
     'features/DocumentManager.tsx': [
       'max-w-[min(42rem,calc(100vw-2rem))]',
-      'max-w-[min(42rem,calc(100vw-2rem))]',
       'max-w-[min(42rem,calc(100vw-2rem))]'
     ],
     'components/graph/PropertiesView.tsx': ['max-w-[min(24rem,calc(100vw-2rem))]'],

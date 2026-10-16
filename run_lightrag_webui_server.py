@@ -415,6 +415,90 @@ async def rollback_snapshot(payload: RollbackRequest):
     }
 
 
+@ops_router.get("/documents/{doc_id}/content")
+async def get_document_content(
+    doc_id: str,
+    tenant_id: Optional[str] = None,
+    project_id: Optional[str] = None
+):
+    """Retrieves full parsed document content and corresponding chunks with smart workspace discovery."""
+    curr_tenant, curr_project = current_workspace_ctx.get()
+    t_id = tenant_id or curr_tenant
+    p_id = project_id or curr_project
+    target_dir = resolve_project_working_dir(t_id, p_id)
+
+    def load_from_dir(d: Path):
+        full_content = ""
+        found = False
+        full_docs_file = d / "kv_store_full_docs.json"
+        if full_docs_file.exists():
+            try:
+                with open(full_docs_file, "r", encoding="utf-8") as f:
+                    full_docs = json.load(f)
+                    if doc_id in full_docs:
+                        found = True
+                        rec = full_docs[doc_id]
+                        if isinstance(rec, dict):
+                            full_content = rec.get("content", "")
+                        elif isinstance(rec, str):
+                            full_content = rec
+            except Exception as e:
+                logger.warning(f"Failed to read full_docs in {d}: {e}")
+
+        chunks = []
+        chunks_file = d / "kv_store_text_chunks.json"
+        if chunks_file.exists():
+            try:
+                with open(chunks_file, "r", encoding="utf-8") as f:
+                    all_chunks = json.load(f)
+                    for cid, cval in all_chunks.items():
+                        if cid.startswith(doc_id) or (isinstance(cval, dict) and cval.get("full_doc_id") == doc_id):
+                            found = True
+                            tokens = cval.get("tokens", 0) if isinstance(cval, dict) else 0
+                            content = cval.get("content", "") if isinstance(cval, dict) else str(cval)
+                            order_idx = cval.get("chunk_order_index", 0) if isinstance(cval, dict) else 0
+                            chunks.append({
+                                "chunk_id": cid,
+                                "tokens": tokens,
+                                "content": content,
+                                "chunk_order_index": order_idx
+                            })
+            except Exception as e:
+                logger.warning(f"Failed to read text_chunks in {d}: {e}")
+
+        chunks.sort(key=lambda x: (x.get("chunk_order_index", 0), x["chunk_id"]))
+        return found, full_content, chunks
+
+    # 1. First probe targeted workspace
+    found, full_content, chunks = load_from_dir(target_dir)
+    source_dir = str(target_dir)
+
+    # 2. If not found in target_dir, search across all candidate workspace revisions under storage_root
+    if not found:
+        logger.info(f"Doc {doc_id} not found in {target_dir}, searching other workspaces...")
+        for cand_dir in storage_root.glob("**/kv_store_full_docs.json"):
+            wdir = cand_dir.parent
+            f, fc, ch = load_from_dir(wdir)
+            if f:
+                found = True
+                full_content = fc
+                chunks = ch
+                source_dir = str(wdir)
+                logger.info(f"Found doc {doc_id} in {wdir}")
+                break
+
+    return {
+        "status": "success",
+        "doc_id": doc_id,
+        "tenant_id": t_id,
+        "project_id": p_id,
+        "found": found,
+        "source_workspace": source_dir,
+        "full_content": full_content,
+        "chunks_count": len(chunks),
+        "chunks": chunks,
+    }
+
 app.include_router(ops_router)
 
 

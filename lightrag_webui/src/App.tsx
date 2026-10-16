@@ -192,18 +192,20 @@ function App() {
           // Loading state while initializing with simplified header
           <div className="flex h-screen w-screen flex-col">
             {/* Simplified header during initialization - matches SiteHeader structure */}
-            <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-10 w-full border-b px-4 backdrop-blur">
+            <header className="border-border/60 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 w-full border-b px-4 backdrop-blur-md">
               <div className="min-w-[200px] w-auto flex items-center">
                 {/* Document-relative brand link — resolves to this entry's own
                     root (see SiteHeader / entryHomeHref). */}
                 <a href={entryHomeHref(window.location.pathname)} className="flex items-center gap-2">
-                  <ZapIcon className="size-4 text-emerald-400" aria-hidden="true" />
-                  <span className="font-bold md:inline-block">{SiteInfo.name}</span>
+                  <div className="flex size-6 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 text-emerald-400">
+                    <ZapIcon className="size-3.5 text-emerald-400" aria-hidden="true" />
+                  </div>
+                  <span className="font-semibold text-sm tracking-tight text-foreground">{SiteInfo.name}</span>
                 </a>
               </div>
 
               {/* Empty middle section to maintain layout */}
-              <div className="flex h-10 flex-1 items-center justify-center">
+              <div className="flex h-12 flex-1 items-center justify-center">
               </div>
 
               {/* Empty right section to maintain layout */}

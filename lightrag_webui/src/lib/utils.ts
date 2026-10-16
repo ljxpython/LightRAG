@@ -65,3 +65,43 @@ export const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_stor
 
   return store
 }
+
+/**
+ * Robustly extracts human-readable document title from content_summary, file_path or doc id.
+ */
+export function extractDocumentTitle(doc: { file_path?: string | null; content_summary?: string | null; id?: string }): string {
+  // 1. Try to extract Title: from content_summary (Docling & API batch insert standard)
+  if (doc.content_summary && typeof doc.content_summary === 'string') {
+    const titleMatch = doc.content_summary.match(/(?:^|\b)Title:\s*([^\r\n|]+?)(?:\s*(?:\||\bType:|\bOriginal Path:|\r|\n|$))/i)
+    if (titleMatch && titleMatch[1] && titleMatch[1].trim()) {
+      const extracted = titleMatch[1].trim()
+      if (extracted !== 'unknown_source' && extracted !== 'Untitled') {
+        return extracted
+      }
+    }
+  }
+
+  // 2. Check if file_path is valid and not unknown_source
+  if (doc.file_path && typeof doc.file_path === 'string' && doc.file_path.trim() !== '' && doc.file_path !== 'unknown_source') {
+    const parts = doc.file_path.split(/[/\\\\]/)
+    const fileName = parts[parts.length - 1]?.trim()
+    if (fileName && fileName !== 'unknown_source') {
+      return fileName
+    }
+  }
+
+  // 3. Fallback to Original Path in content_summary
+  if (doc.content_summary && typeof doc.content_summary === 'string') {
+    const pathMatch = doc.content_summary.match(/(?:^|\b)Original Path:\s*([^\\r\\n|]+)/i)
+    if (pathMatch && pathMatch[1] && pathMatch[1].trim()) {
+      const parts = pathMatch[1].trim().split(/[/\\\\]/)
+      const fileName = parts[parts.length - 1]?.trim()
+      if (fileName && fileName !== 'unknown_source') {
+        return fileName
+      }
+    }
+  }
+
+  // 4. Fallback to doc ID
+  return doc.id || 'Untitled'
+}

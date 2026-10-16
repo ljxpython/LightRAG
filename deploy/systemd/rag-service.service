@@ -1,0 +1,21 @@
+[Unit]
+Description=LightRAG Production FastMCP Gateway Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/lightrag-v2-exploration/LightRAG
+EnvironmentFile=/home/ubuntu/lightrag-v2-exploration/LightRAG/.env
+ExecStart=/home/ubuntu/.local/bin/uv run python gateway_mcp_server.py
+Restart=always
+RestartSec=5s
+KillMode=mixed
+TimeoutStopSec=30
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

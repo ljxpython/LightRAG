@@ -204,14 +204,14 @@ export const ChatMessage = ({
   // pushing the row past a phone-width bubble.
   const timingRow =
     message.role === 'assistant' && typeof responseTime === 'number' ? (
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-muted-foreground/80 pt-1">
         <span className="flex items-center gap-1 tabular-nums">
           <ClockIcon className={cn('size-3', isQuerying && 'animate-spin')} />
           {t('retrievePanel.chatMessage.responseTime', { time: responseTime.toFixed(1) })}
         </span>
         {typeof firstTokenTime === 'number' && (
           <span className="flex items-center gap-1 tabular-nums">
-            <ZapIcon className="size-3" />
+            <ZapIcon className="size-3 text-emerald-400" />
             {t('retrievePanel.chatMessage.firstTokenTime', { time: firstTokenTime.toFixed(1) })}
           </span>
         )}
@@ -236,11 +236,11 @@ export const ChatMessage = ({
     <div
       className={`${
         message.role === 'user'
-          ? 'max-w-[80%] bg-primary text-primary-foreground'
+          ? 'max-w-[85%] bg-primary text-primary-foreground shadow-xs'
           : message.isError
-            ? 'w-[95%] bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400'
-            : 'w-[95%] bg-muted'
-      } min-w-0 rounded-lg px-4 py-2`}
+            ? 'w-[95%] bg-destructive/10 border border-destructive/30 text-destructive shadow-xs'
+            : 'w-[95%] bg-card/80 border border-border/70 text-card-foreground shadow-xs backdrop-blur-xs'
+      } min-w-0 rounded-2xl px-4 py-3`}
     >
       {/* Before any answer text: the timing row sits on top and the thinking
           hint appears beneath it, so the time doesn't jump when "Thinking..."
@@ -250,7 +250,7 @@ export const ChatMessage = ({
       {/* Always render to prevent layout shift when switching tabs */}
       {message.role === 'assistant' && (isThinking || thinkingTime !== null) && (
         <div className={cn(
-          'mb-2',
+          'mb-2.5',
           // Reduce visual priority in inactive tabs while maintaining layout
           !isTabActive && 'opacity-50'
         )}>
@@ -263,7 +263,7 @@ export const ChatMessage = ({
             // and aligns left with the answer instead. (The thinking spinner is
             // dropped — the timing row's clock already animates while thinking.)
             className={cn(
-              'flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 text-sm cursor-pointer select-none',
+              'inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 text-xs font-mono text-muted-foreground hover:border-border hover:text-foreground transition-all duration-150 cursor-pointer select-none',
               !hasContent && 'ml-4'
             )}
             onClick={() => {
@@ -274,16 +274,26 @@ export const ChatMessage = ({
             }}
           >
             {isThinking ? (
-              <span>{t('retrievePanel.chatMessage.thinking')}</span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{t('retrievePanel.chatMessage.thinking')}</span>
+              </span>
             ) : (
-              typeof thinkingTime === 'number' && <span>{t('retrievePanel.chatMessage.thinkingTime', { time: thinkingTime })}</span>
+              typeof thinkingTime === 'number' && (
+                <span className="flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-muted-foreground/40" />
+                  <span>{t('retrievePanel.chatMessage.thinkingTime', { time: thinkingTime })}</span>
+                </span>
+              )
             )}
             {/* Show chevron when there's thinking content, even during thinking process */}
-            {finalThinkingContent && finalThinkingContent.trim() !== '' && <ChevronDownIcon className={`ml-2 size-4 shrink-0 transition-transform ${isThinkingExpanded ? 'rotate-180' : ''}`} />}
+            {finalThinkingContent && finalThinkingContent.trim() !== '' && (
+              <ChevronDownIcon className={`size-3.5 shrink-0 transition-transform duration-200 ${isThinkingExpanded ? 'rotate-180' : ''}`} />
+            )}
           </div>
           {/* Show thinking content when expanded and content exists, even during thinking process */}
           {isThinkingExpanded && finalThinkingContent && finalThinkingContent.trim() !== '' && (
-            <div className="mt-2 pl-4 border-l-2 border-primary/20 dark:border-primary/40 text-sm prose dark:prose-invert max-w-none break-words prose-p:my-1 prose-headings:my-2 [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-6 [&_.footnotes]:pt-3 [&_.footnotes]:border-t [&_.footnotes]:border-border [&_.footnotes_ol]:text-xs [&_.footnotes_li]:my-0.5 [&_a[href^='#fn']]:text-primary [&_a[href^='#fn']]:no-underline [&_a[href^='#fn']]:hover:underline [&_a[href^='#fnref']]:text-primary [&_a[href^='#fnref']]:no-underline [&_a[href^='#fnref']]:hover:underline text-foreground">
+            <div className="mt-2.5 pl-3 border-l-2 border-emerald-500/30 text-xs font-mono text-muted-foreground/90 bg-muted/20 p-2.5 rounded-r-xl max-w-none break-words">
               {isThinking && (
                 <div className="mb-2 text-xs text-gray-400 dark:text-gray-300 italic">
                   {t('retrievePanel.chatMessage.thinkingInProgress', 'Thinking in progress...')}
@@ -390,14 +400,10 @@ const MessageMarkdown = memo(function MessageMarkdown({
 }) {
   return (
     <div className="relative">
-      <div className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t [&_.footnotes_ol]:text-sm [&_.footnotes_li]:my-1 ${
+      <div className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-6 [&_.footnotes]:pt-3 [&_.footnotes]:border-t [&_.footnotes]:border-border/60 [&_.footnotes_ol]:text-xs [&_.footnotes_li]:my-1.5 [&_.footnotes_li]:text-muted-foreground [&_a[href^='#fn']]:inline-flex [&_a[href^='#fn']]:items-center [&_a[href^='#fn']]:justify-center [&_a[href^='#fn']]:px-1.5 [&_a[href^='#fn']]:h-4 [&_a[href^='#fn']]:text-[10px] [&_a[href^='#fn']]:font-mono [&_a[href^='#fn']]:rounded [&_a[href^='#fn']]:border [&_a[href^='#fn']]:border-emerald-500/30 [&_a[href^='#fn']]:bg-emerald-500/10 [&_a[href^='#fn']]:text-emerald-400 [&_a[href^='#fn']]:no-underline [&_a[href^='#fn']]:hover:bg-emerald-500/20 [&_a[href^='#fn']]:transition-colors [&_a[href^='#fn']]:mx-0.5 ${
         role === 'user'
-          ? 'text-primary-foreground prose-inherit-color'
-          : 'text-foreground'
-      } ${
-        role === 'user'
-          ? '[&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
-          : '[&_.footnotes]:border-border [&_a[href^="#fn"]]:text-primary [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
+          ? 'text-primary-foreground prose-inherit-color [&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:border-primary-foreground/40 [&_a[href^="#fn"]]:bg-primary-foreground/15 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
+          : 'text-foreground [&_.footnotes]:border-border/60 [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
       }`}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFootnotes, remarkMath]}
@@ -682,20 +688,28 @@ const CodeHighlight = memo(({ inline, className, children, renderAsDiagram = fal
 
   // Handle non-Mermaid code blocks
   return !isInline ? (
-    <SyntaxHighlighter
-      style={theme === 'dark' ? oneDark : oneLight}
-      PreTag="div"
-      language={language}
-      {...props}
-    >
-      {contentStr}
-    </SyntaxHighlighter>
+    <div className="my-3 overflow-hidden rounded-xl border border-border/70 bg-card/60 shadow-xs">
+      {language && (
+        <div className="flex items-center justify-between border-b border-border/60 bg-muted/50 px-3.5 py-1.5 text-[11px] font-mono text-muted-foreground select-none">
+          <span>{language}</span>
+        </div>
+      )}
+      <SyntaxHighlighter
+        style={theme === 'dark' ? oneDark : oneLight}
+        PreTag="div"
+        language={language}
+        customStyle={{ margin: 0, padding: '0.875rem', background: 'transparent' }}
+        {...props}
+      >
+        {contentStr}
+      </SyntaxHighlighter>
+    </div>
   ) : (
     // Handle inline code with context-aware styling
     <code
       className={cn(
         className,
-        'mx-1 rounded-sm px-1 py-0.5 font-mono text-sm',
+        'mx-1 rounded-md px-1.5 py-0.5 font-mono text-xs',
         getInlineCodeStyles()
       )}
       {...props}

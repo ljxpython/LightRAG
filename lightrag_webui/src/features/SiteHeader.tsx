@@ -21,12 +21,15 @@ interface NavigationTabProps {
 }
 
 function NavigationTab({ value, currentTab, children }: NavigationTabProps) {
+  const isActive = currentTab === value
   return (
     <TabsTrigger
       value={value}
       className={cn(
-        'cursor-pointer px-2 py-1 transition-all',
-        currentTab === value ? '!bg-emerald-400 !text-zinc-50' : 'hover:bg-background/60'
+        'cursor-pointer px-3 py-1 text-xs font-medium rounded-md transition-all duration-150',
+        isActive
+          ? 'bg-card text-foreground shadow-xs border border-border/80'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
       )}
     >
       {children}
@@ -39,8 +42,8 @@ function TabsNavigation() {
   const { t } = useTranslation()
 
   return (
-    <div className="flex h-8 self-center">
-      <TabsList className="h-full gap-2">
+    <div className="flex self-center">
+      <TabsList className="h-8 gap-1 rounded-lg border border-border/60 bg-muted/40 p-1 backdrop-blur-xs">
         <NavigationTab value="documents" currentTab={currentTab}>
           {t('header.documents')}
         </NavigationTab>
@@ -77,7 +80,7 @@ export default function SiteHeader() {
     : versionDisplay ? `v${versionDisplay}` : '';
 
   return (
-    <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-10 w-full border-b px-4 backdrop-blur">
+    <header className="border-border/60 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 w-full border-b px-4 backdrop-blur-md">
       <div className="min-w-[200px] w-auto flex items-center">
         {/* Document-relative brand link: under HashRouter the pathname always
             names this entry, so this resolves back to THIS entry — never a
@@ -86,13 +89,15 @@ export default function SiteHeader() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <a href={entryHomeHref(window.location.pathname)} className="flex items-center">
-                <ZapIcon className="mr-2 size-4 text-emerald-400" aria-hidden="true" />
-                <span className="font-bold md:inline-block">{SiteInfo.name}</span>
+              <a href={entryHomeHref(window.location.pathname)} className="flex items-center gap-2 group">
+                <div className="flex size-6 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 transition-colors group-hover:border-emerald-500/40">
+                  <ZapIcon className="size-3.5 text-emerald-400" aria-hidden="true" />
+                </div>
+                <span className="font-semibold text-sm tracking-tight text-foreground">{SiteInfo.name}</span>
                 {webuiTitle && (
                   <>
-                    <span className="mx-1 text-xs text-gray-500 dark:text-gray-400" aria-hidden="true">|</span>
-                    <span className="text-sm font-medium">{webuiTitle}</span>
+                    <span className="mx-0.5 text-xs text-muted-foreground/50" aria-hidden="true">/</span>
+                    <span className="text-xs font-medium text-muted-foreground">{webuiTitle}</span>
                   </>
                 )}
               </a>
@@ -107,24 +112,24 @@ export default function SiteHeader() {
         <TouchDescriptionPopover description={webuiDescription} />
       </div>
 
-      <div className="flex h-10 flex-1 items-center justify-center">
+      <div className="flex h-12 flex-1 items-center justify-center">
         <TabsNavigation />
         {isGuestMode && (
-          <div className="ml-2 self-center px-2 py-1 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded-md">
+          <div className="ml-2.5 inline-flex items-center gap-1.5 self-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-500 dark:text-amber-400">
+            <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
             {t('login.guestMode', 'Guest Mode')}
           </div>
         )}
       </div>
 
       <nav className="flex items-center justify-end">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <ProjectSelector />
-          <UserAccountMenu />
           {versionDisplay && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mr-1 cursor-default hidden xl:inline-block">
+                  <span className="text-xs font-mono text-muted-foreground/70 mr-1 cursor-default hidden xl:inline-block">
                     v{versionDisplay}
                   </span>
                 </TooltipTrigger>
@@ -135,18 +140,20 @@ export default function SiteHeader() {
             </TooltipProvider>
           )}
           {apiDocsCapability === 'available' && (
-            <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.apiDocs')}>
+            <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.apiDocs')} className="size-8">
               <a href={apiDocsUrl} target="_blank" rel="noopener noreferrer">
                 <BookOpenIcon className="size-4" aria-hidden="true" />
               </a>
             </Button>
           )}
-          <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.projectRepository')}>
+          <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.projectRepository')} className="size-8">
             <a href={SiteInfo.github} target="_blank" rel="noopener noreferrer">
               <GithubIcon className="size-4" />
             </a>
           </Button>
           <AppSettings />
+          <div className="h-4 w-px bg-border/60 mx-1 hidden sm:block" />
+          <UserAccountMenu />
         </div>
       </nav>
     </header>
