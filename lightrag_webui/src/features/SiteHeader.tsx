@@ -2,13 +2,14 @@ import Button from '@/components/ui/Button'
 import { entryHomeHref } from '@/lib/pathPrefix'
 import { SiteInfo, backendBaseUrl } from '@/lib/constants'
 import AppSettings from '@/components/AppSettings'
+import ProjectSelector from '@/components/ProjectSelector'
+import UserAccountMenu from '@/components/UserAccountMenu'
 import { TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { useSettingsStore } from '@/stores/settings'
 import { useAuthStore, useBackendState } from '@/stores/state'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { navigationService } from '@/services/navigation'
-import { ZapIcon, LogOutIcon, BookOpenIcon } from 'lucide-react'
+import { ZapIcon, BookOpenIcon } from 'lucide-react'
 import GithubIcon from '@/components/icons/GithubIcon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip'
 import TouchDescriptionPopover from '@/components/ui/TouchDescriptionPopover'
@@ -56,7 +57,7 @@ function TabsNavigation() {
 
 export default function SiteHeader() {
   const { t } = useTranslation()
-  const { isGuestMode, coreVersion, apiVersion, username, webuiTitle, webuiDescription } = useAuthStore()
+  const { isGuestMode, coreVersion, apiVersion, webuiTitle, webuiDescription } = useAuthStore()
   const theme = useSettingsStore.use.theme()
   // Tri-state on purpose — 'unknown' (no successful /health yet) hides the
   // entry point rather than guessing; see apiDocsCapability in stores/state.ts.
@@ -74,10 +75,6 @@ export default function SiteHeader() {
   const versionTooltip = hasWarning
     ? t('header.frontendNeedsRebuild')
     : versionDisplay ? `v${versionDisplay}` : '';
-
-  const handleLogout = () => {
-    navigationService.navigateToUnauthenticated();
-  }
 
   return (
     <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-10 w-full border-b px-4 backdrop-blur">
@@ -119,13 +116,15 @@ export default function SiteHeader() {
         )}
       </div>
 
-      <nav className="w-[200px] flex items-center justify-end">
+      <nav className="flex items-center justify-end">
         <div className="flex items-center gap-2">
+          <ProjectSelector />
+          <UserAccountMenu />
           {versionDisplay && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mr-1 cursor-default">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 mr-1 cursor-default hidden xl:inline-block">
                     v{versionDisplay}
                   </span>
                 </TooltipTrigger>
@@ -148,17 +147,6 @@ export default function SiteHeader() {
             </a>
           </Button>
           <AppSettings />
-          {!isGuestMode && (
-            <Button
-              variant="ghost"
-              size="icon"
-              side="bottom"
-              tooltip={`${t('header.logout')} (${username})`}
-              onClick={handleLogout}
-            >
-              <LogOutIcon className="size-4" aria-hidden="true" />
-            </Button>
-          )}
         </div>
       </nav>
     </header>

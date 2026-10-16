@@ -153,7 +153,7 @@ class IngestJobTracker:
                 }
                 return receipt, True
 
-            job_id = f"job_{uuid.uuid4().hex}"
+            job_id = f"kj_{uuid.uuid4().hex}"
             conn.execute(
                 """
                 INSERT INTO ingest_jobs (
@@ -229,6 +229,44 @@ class IngestJobTracker:
             )
             conn.commit()
 
+    def list_jobs(
+        self,
+        tenant_id: str,
+        project_id: str,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> Tuple[list[Dict[str, Any]], int]:
+        with self._get_conn() as conn:
+            cur_count = conn.execute(
+                "SELECT COUNT(*) FROM ingest_jobs WHERE tenant_id = ? AND project_id = ? AND status != 'deleted'",
+                (tenant_id, project_id),
+            )
+            total = cur_count.fetchone()[0]
+            cur = conn.execute(
+                """
+                SELECT * FROM ingest_jobs
+                WHERE tenant_id = ? AND project_id = ? AND status != 'deleted'
+                ORDER BY created_at DESC LIMIT ? OFFSET ?
+                """,
+                (tenant_id, project_id, limit, offset),
+            )
+            items = []
+            for row in cur.fetchall():
+                items.append(
+                    {
+                        "version": 1,
+                        "job_id": row["job_id"],
+                        "document_id": row["document_id"],
+                        "file_name": row["file_name"],
+                        "status": row["status"],
+                        "searchable": bool(row["searchable"]),
+                        "error_code": row["error_code"],
+                        "created_at": row["created_at"],
+                        "updated_at": row["updated_at"],
+                    }
+                )
+            return items, total
+
     def mark_document_deleted(self, tenant_id: str, project_id: str, document_id: str) -> None:
         now = datetime.now(timezone.utc).isoformat()
         with self._get_conn() as conn:
@@ -278,6 +316,15 @@ class KnowledgeIngestService:
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
         return self.tracker.get_job(job_id)
 
+    def list_jobs(
+        self,
+        tenant_id: str,
+        project_id: str,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> Tuple[list[Dict[str, Any]], int]:
+        return self.tracker.list_jobs(tenant_id, project_id, limit=limit, offset=offset)
+
     async def _process_document_job(
         self,
         job_id: str,
@@ -286,7 +333,7 @@ class KnowledgeIngestService:
         file_ref: Dict[str, Any],
     ) -> None:
         """Executes candidate build pipeline in an isolated directory and activates via CAS."""
-        self.tracker.update_job_status(job_id, status="processing")
+        self.tracker.update_job_status(job_id, status="indexing")
         cand_id = f"cand_{uuid.uuid4().hex[:12]}"
         cand_dir = (
             self.workspace_mgr.get_project_dir(tenant_id, project_id)

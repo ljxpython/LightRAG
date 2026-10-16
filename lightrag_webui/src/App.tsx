@@ -27,6 +27,7 @@ import RetrievalView from '@/features/RetrievalView'
 import { Tabs, TabsContent } from '@/components/ui/Tabs'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import usePageRestoreGeneration from '@/hooks/usePageRestoreGeneration'
+import { useWorkspaceStore } from '@/stores/workspace'
 
 function App() {
   const message = useBackendState.use.message()
@@ -37,6 +38,7 @@ function App() {
   // Bumped by the cross-tab identity watch: remounting the retrieval view
   // drops the live session state that belonged to the previous identity.
   const identityEpoch = useIdentityEpochStore((s) => s.epoch)
+  const workspaceEpoch = useWorkspaceStore((s) => s.workspaceEpoch)
   const versionCheckRef = useRef(false); // Prevent duplicate calls in Vite dev mode
   const healthCheckInitializedRef = useRef(false); // Prevent duplicate health checks in Vite dev mode
   const pageRestoreGeneration = usePageRestoreGeneration()
@@ -225,21 +227,23 @@ function App() {
               className="!m-0 flex grow flex-col !p-0 overflow-hidden"
               onValueChange={handleTabChange}
             >
-              <SiteHeader />
+              <ErrorBoundary>
+                <SiteHeader />
+              </ErrorBoundary>
               <div className="relative grow">
                 <TabsContent value="documents" className="absolute top-0 right-0 bottom-0 left-0 overflow-auto">
                   <ErrorBoundary>
-                    <DocumentManager />
+                    <DocumentManager key={workspaceEpoch} />
                   </ErrorBoundary>
                 </TabsContent>
                 <TabsContent value="knowledge-graph" className="absolute top-0 right-0 bottom-0 left-0 overflow-hidden">
                   <ErrorBoundary>
-                    <GraphViewer />
+                    <GraphViewer key={workspaceEpoch} />
                   </ErrorBoundary>
                 </TabsContent>
                 <TabsContent value="retrieval" className="absolute top-0 right-0 bottom-0 left-0 overflow-hidden">
                   <ErrorBoundary>
-                    <RetrievalView key={identityEpoch} />
+                    <RetrievalView key={`${identityEpoch}-${workspaceEpoch}`} />
                   </ErrorBoundary>
                 </TabsContent>
               </div>

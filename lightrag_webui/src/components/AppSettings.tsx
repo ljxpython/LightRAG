@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import Button from '@/components/ui/Button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { useSettingsStore } from '@/stores/settings'
 import { PaletteIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -21,12 +20,12 @@ export default function AppSettings({ className }: AppSettingsProps) {
   const theme = useSettingsStore.use.theme()
   const setTheme = useSettingsStore.use.setTheme()
 
-  const handleLanguageChange = useCallback((value: string) => {
-    setLanguage(value as 'en' | 'zh' | 'fr' | 'ar' | 'zh_TW' | 'ru' | 'ja' | 'de' | 'uk' | 'ko' | 'vi' | 'id')
+  const handleLanguageChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value as 'en' | 'zh' | 'fr' | 'ar' | 'zh_TW' | 'ru' | 'ja' | 'de' | 'uk' | 'ko' | 'vi' | 'id')
   }, [setLanguage])
 
-  const handleThemeChange = useCallback((value: string) => {
-    setTheme(value as 'light' | 'dark' | 'system')
+  const handleThemeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTheme(e.target.value as 'light' | 'dark' | 'system')
   }, [setTheme])
 
   return (
@@ -37,11 +36,7 @@ export default function AppSettings({ className }: AppSettingsProps) {
           size="icon"
           side="bottom"
           tooltip={t('header.appSettings')}
-          // A tooltip is only a description, never the accessible name — an
-          // icon-only button needs the explicit aria-label.
           aria-label={t('header.appSettings')}
-          // 36px visual size; the ::after overlay widens the TOUCH target to
-          // 44px (PRD: primary touch targets ≥44px) without moving layout.
           className={cn(
             'relative h-9 w-9 after:absolute after:-inset-1 after:content-[\'\']',
             className
@@ -50,43 +45,41 @@ export default function AppSettings({ className }: AppSettingsProps) {
           <PaletteIcon className="h-5 w-5" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="end" className="w-56">
+      <PopoverContent side="bottom" align="end" className="w-56 p-4">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">{t('settings.language')}</label>
-            <Select value={language} onValueChange={handleLanguageChange}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="zh">中文</SelectItem>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="ar">العربية</SelectItem>
-                <SelectItem value="zh_TW">繁體中文</SelectItem>
-                <SelectItem value="ru">Русский</SelectItem>
-                <SelectItem value="ja">日本語</SelectItem>
-                <SelectItem value="de">Deutsch</SelectItem>
-                <SelectItem value="uk">Українська</SelectItem>
-                <SelectItem value="ko">한국어</SelectItem>
-                <SelectItem value="vi">Tiếng Việt</SelectItem>
-                <SelectItem value="id">Bahasa Indonesia</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">{t('settings.language')}</label>
+            <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+            >
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+              <option value="fr">Français</option>
+              <option value="ar">العربية</option>
+              <option value="zh_TW">繁體中文</option>
+              <option value="ru">Русский</option>
+              <option value="ja">日本語</option>
+              <option value="de">Deutsch</option>
+              <option value="uk">Українська</option>
+              <option value="ko">한국어</option>
+              <option value="vi">Tiếng Việt</option>
+              <option value="id">Bahasa Indonesia</option>
+            </select>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">{t('settings.theme')}</label>
-            <Select value={theme} onValueChange={handleThemeChange}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">{t('settings.light')}</SelectItem>
-                <SelectItem value="dark">{t('settings.dark')}</SelectItem>
-                <SelectItem value="system">{t('settings.system')}</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">{t('settings.theme')}</label>
+            <select
+              value={theme}
+              onChange={handleThemeChange}
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+            >
+              <option value="light">{t('settings.light')}</option>
+              <option value="dark">{t('settings.dark')}</option>
+              <option value="system">{t('settings.system')}</option>
+            </select>
           </div>
         </div>
       </PopoverContent>

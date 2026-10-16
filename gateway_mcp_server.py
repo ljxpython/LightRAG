@@ -30,7 +30,12 @@ import sys
 from typing import Any, Dict, List, Optional
 import uuid
 
+from datetime import datetime, timezone
 from dotenv import load_dotenv
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from fastmcp import FastMCP
 from lightrag import QueryParam
 
@@ -43,7 +48,7 @@ load_dotenv(repo_root / ".env")
 
 from auth_middleware import KnowledgeScope, KnowledgeTokenVerifier
 from graph_explorer import GraphExplorer
-from ingest_service import KnowledgeIngestService
+from ingest_service import KnowledgeIngestService, MIME_EXT
 from locator_resolver import LocatorResolver
 from workspace_manager import TenantWorkspaceManager
 
@@ -358,6 +363,149 @@ def create_mcp_server(
                 "message": str(e),
             }
 
+
+    def _resolve_scope_from_request(req: Request) -> KnowledgeScope:
+        auth_header = req.headers.get("authorization", "")
+        token = ""
+        if auth_header.lower().startswith("bearer "):
+            token = auth_header[7:].strip()
+        if token:
+            sc = verifier.verify_token(token)
+            if sc:
+                return sc
+        t_param = req.query_params.get("tenant_id")
+        p_param = req.query_params.get("project_id")
+        if t_param and p_param:
+            return KnowledgeScope(tenant_id=t_param, project_id=p_param)
+        return verifier.resolve_default_or_first_scope()
+
+    # REST Endpoint 1: Capabilities
+    @server.custom_route("/internal/knowledge/capabilities", methods=["GET"])
+    async def get_capabilities_route(req: Request) -> JSONResponse:
+        return JSONResponse({
+            "version": 1,
+            "read_enabled": True,
+            "upload_enabled": True,
+            "supported_mime_types": [
+                "application/pdf",
+                "text/plain",
+                "text/markdown",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            ],
+            "max_file_bytes": 20 * 1024 * 1024,
+            "disabled_reason": None,
+        })
+
+    # REST Endpoint 2: Documents list (platform OffsetPage compliant)
+    @server.custom_route("/internal/knowledge/documents", methods=["GET"])
+    async def get_documents_route(req: Request) -> JSONResponse:
+        scope = _resolve_scope_from_request(req)
+        limit = max(1, min(int(req.query_params.get("limit", 20)), 100))
+        offset = max(0, int(req.query_params.get("offset", 0)))
+        project_dir = mgr.get_project_dir(scope.tenant_id, scope.project_id)
+        managed_dir = project_dir / "managed_assets"
+
+        all_docs = []
+        if managed_dir.exists():
+            for f in sorted(managed_dir.iterdir()):
+                if f.is_file() and not f.name.startswith("."):
+                    ext = f.suffix.lower()
+                    mime = "application/octet-stream"
+                    for m, e in MIME_EXT.items():
+                        if f".{e}" == ext:
+                            mime = m
+                            break
+                    st = f.stat()
+                    doc_id = f"kd_{uuid.uuid5(uuid.NAMESPACE_DNS, f.name).hex[:32]}"
+                    all_docs.append({
+                        "document_id": doc_id,
+                        "file_name": f.name,
+                        "mime_type": mime,
+                        "size_bytes": st.st_size if st.st_size > 0 else 1,
+                        "status": "ready",
+                        "searchable": True,
+                        "published_at": datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat(),
+                    })
+        page_items = all_docs[offset : offset + limit]
+        return JSONResponse({"items": page_items, "total": len(all_docs)})
+
+    # REST Endpoint 3: Ingest Jobs list
+    @server.custom_route("/internal/knowledge/jobs", methods=["GET"])
+    async def get_jobs_route(req: Request) -> JSONResponse:
+        scope = _resolve_scope_from_request(req)
+        limit = max(1, min(int(req.query_params.get("limit", 20)), 100))
+        offset = max(0, int(req.query_params.get("offset", 0)))
+        items, total = ingest_service.list_jobs(scope.tenant_id, scope.project_id, limit=limit, offset=offset)
+        return JSONResponse({"items": items, "total": total})
+
+    # REST Endpoint 4: Single Ingest Job status
+    @server.custom_route("/internal/knowledge/jobs/{job_id}", methods=["GET"])
+    async def get_single_job_route(req: Request) -> JSONResponse:
+        job_id = req.path_params.get("job_id", "")
+        job = ingest_service.get_job_status(job_id)
+        if not job:
+            return JSONResponse({"error": "not_found", "message": "Job not found"}, status_code=404)
+        return JSONResponse(job)
+
+    # REST Endpoint 5: Project health stats & observability
+    @server.custom_route("/internal/knowledge/stats", methods=["GET"])
+    async def get_stats_route(req: Request) -> JSONResponse:
+        scope = _resolve_scope_from_request(req)
+        try:
+            stats = ingest_service.get_project_stats(
+                tenant_id=scope.tenant_id,
+                project_id=scope.project_id,
+            )
+            return JSONResponse(stats)
+        except Exception as e:
+            return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+    # REST Endpoint 6: Subgraph graph traversal
+    @server.custom_route("/internal/knowledge/graph", methods=["GET"])
+    async def get_graph_route(req: Request) -> JSONResponse:
+        scope = _resolve_scope_from_request(req)
+        entity_name = req.query_params.get("entity_name", "").strip()
+        depth = max(1, min(int(req.query_params.get("depth", 1)), 3))
+        max_nodes = max(1, min(int(req.query_params.get("max_nodes", 30)), 100))
+        subgraph = graph_explorer.query_subgraph(
+            tenant_id=scope.tenant_id,
+            project_id=scope.project_id,
+            entity_name=entity_name,
+            depth=depth,
+            max_nodes=max_nodes,
+        )
+        return JSONResponse(subgraph)
+
+    # REST Endpoint 7: Direct query endpoint for playground
+    @server.custom_route("/internal/knowledge/query", methods=["POST", "OPTIONS"])
+    async def query_knowledge_route(req: Request) -> JSONResponse:
+        if req.method == "OPTIONS":
+            resp = JSONResponse({})
+            resp.headers["Access-Control-Allow-Origin"] = "*"
+            resp.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+            resp.headers["Access-Control-Allow-Headers"] = "*"
+            return resp
+        try:
+            body = await req.json()
+        except Exception:
+            return JSONResponse({"status": "error", "message": "Invalid JSON"}, status_code=400)
+        query = body.get("query", "")
+        top_k = body.get("top_k", 8)
+        sources_version = body.get("sources_version", 2)
+        mode = body.get("mode", "hybrid")
+        doc_ids = body.get("document_ids")
+        history = body.get("history_messages")
+        res = await mcp_query_project_knowledge(
+            query=query,
+            top_k=top_k,
+            sources_version=sources_version,
+            mode=mode,
+            document_ids=doc_ids,
+            history_messages=history,
+        )
+        return JSONResponse(res)
+
     return server
 
 
@@ -367,4 +515,5 @@ if __name__ == "__main__":
     host = os.environ.get("GATEWAY_HOST", "0.0.0.0")
     port = int(os.environ.get("GATEWAY_PORT", "8001"))
     print(f"Starting FastMCP Production Streamable HTTP Gateway (8 Tools) on {host}:{port}/mcp...")
-    mcp.run(transport="http", host=host, port=port, path="/mcp")
+    cors = [Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])]
+    mcp.run(transport="http", host=host, port=port, path="/mcp", middleware=cors)
