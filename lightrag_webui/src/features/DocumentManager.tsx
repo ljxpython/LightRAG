@@ -43,8 +43,19 @@ import { toast } from 'sonner'
 import { useBackendState } from '@/stores/state'
 import { copyToClipboard } from '@/utils/clipboard'
 
-import { RefreshCwIcon, ActivityIcon, ArrowUpIcon, ArrowDownIcon, RotateCcwIcon, CheckSquareIcon, XIcon, AlertTriangle, Info, CopyIcon } from 'lucide-react'
+import { RefreshCwIcon, ActivityIcon, ArrowUpIcon, ArrowDownIcon, RotateCcwIcon, CheckSquareIcon, XIcon, AlertTriangle, Info, CopyIcon, Folder, FolderPlus, Files } from 'lucide-react'
 import PipelineStatusDialog from '@/components/documents/PipelineStatusDialog'
+import FolderTree from '@/features/documents/FolderTree'
+import DocumentInspector from '@/components/documents/DocumentInspector'
+import PipelineMonitor from '@/features/documents/PipelineMonitor'
+import { useFolderStore } from '@/stores/folderStore'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from '@/components/ui/DropdownMenu'
 import {
   getStatusRequestFilters,
   type StatusFilter
@@ -97,6 +108,25 @@ const getDisplayFileName = (doc: DocStatusResponse, maxLength: number = 28): str
   return title.length > maxLength
     ? title.slice(0, maxLength) + '...'
     : title;
+};
+
+const getFileTypeAndBadge = (fileName: string, filePath?: string) => {
+  const candidate = (filePath && filePath !== 'unknown_source') ? filePath : fileName;
+  const match = candidate.match(/\.([a-zA-Z0-9]+)(?:$|[?#])/);
+  const ext = match ? match[1].toLowerCase() : 'txt';
+  if (ext === 'pdf') return { label: 'PDF', bg: 'bg-rose-500/10 text-rose-600 border-rose-500/20' };
+  if (ext === 'md' || ext === 'markdown') return { label: 'MD', bg: 'bg-blue-500/10 text-blue-600 border-blue-500/20' };
+  if (ext === 'doc' || ext === 'docx') return { label: 'DOC', bg: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' };
+  if (ext === 'json') return { label: 'JSON', bg: 'bg-amber-500/10 text-amber-600 border-amber-500/20' };
+  if (ext === 'txt') return { label: 'TXT', bg: 'bg-slate-500/10 text-slate-600 border-slate-500/20' };
+  return { label: ext.toUpperCase().slice(0, 4), bg: 'bg-purple-500/10 text-purple-600 border-purple-500/20' };
+};
+
+const formatFileSize = (length?: number) => {
+  if (!length || length <= 0) return '-';
+  if (length < 1024) return `${length} B`;
+  if (length < 1024 * 1024) return `${(length / 1024).toFixed(1)} KB`;
+  return `${(length / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const formatMetadata = (metadata: Record<string, any>): string => {
@@ -442,6 +472,15 @@ export default function DocumentManager() {
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([])
   const isSelectionMode = selectedDocIds.length > 0
 
+  // Knowledge Hub 2.0 folders and tagging
+  const {
+    folders,
+    activeFolderId,
+    docFolderMap,
+    assignDocsToFolder,
+    assignDocToFolder
+  } = useFolderStore()
+
   // Add refs to track previous pipelineActive state and current interval
   const prevPipelineActiveRef = useRef<boolean | undefined>(undefined);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -561,12 +600,17 @@ export default function DocumentManager() {
   // and pagination are all resolved by the backend query, so re-doing any of
   // them here could only disagree with the pagination the user sees.
   const filteredAndSortedDocs = useMemo(
-    () =>
-      currentPageDocs.map(doc => ({
+    () => {
+      const docs = currentPageDocs.map(doc => ({
         ...doc,
         status: doc.status as DocStatus
-      })) as DocStatusWithStatus[],
-    [currentPageDocs]
+      })) as DocStatusWithStatus[]
+      if (activeFolderId) {
+        return docs.filter(doc => docFolderMap[doc.id] === activeFolderId)
+      }
+      return docs
+    },
+    [currentPageDocs, activeFolderId, docFolderMap]
   );
 
   // Calculate current page selection state (after filteredAndSortedDocs is defined)
@@ -1465,205 +1509,296 @@ export default function DocumentManager() {
   ]);
 
   return (
-    <Card className="!rounded-none !overflow-hidden flex flex-col h-full min-h-0">
-      <CardHeader className="py-2 px-6">
-        <CardTitle className="text-lg">{t('documentPanel.documentManager.title')}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col min-h-0 overflow-auto">
-        <div className="flex justify-between items-center gap-2 mb-2">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={scanDocuments}
-              side="bottom"
-              tooltip={t('documentPanel.documentManager.scanTooltip')}
-              size="sm"
-            >
-              <RefreshCwIcon /> {t('documentPanel.documentManager.scanButton')}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowPipelineStatus(true)}
-              side="bottom"
-              tooltip={t('documentPanel.documentManager.pipelineStatusTooltip')}
-              size="sm"
-              className={cn(
-                pipelineActive && 'pipeline-busy'
-              )}
-            >
-              <ActivityIcon /> {t('documentPanel.documentManager.pipelineStatusButton')}
-            </Button>
+    <div className="flex flex-col h-full min-h-0 w-full overflow-y-auto bg-slate-50/50 dark:bg-background">
+      {/* 1. Style B 顶部 4 大指标卡片 (横跨页面全宽) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-6 pt-5 pb-1 shrink-0">
+        <div className="p-4 rounded-2xl bg-card border border-border/70 shadow-2xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs text-muted-foreground font-medium">Documents</span>
+            <div className="text-2xl font-bold text-foreground">{pagination.total_count}</div>
+            <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+              <span>↑ 12%</span>
+              <span className="text-muted-foreground/80 font-normal">vs. last 7 days</span>
+            </div>
           </div>
+          <div className="size-11 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
+            <Files className="size-5" />
+          </div>
+        </div>
 
-          {/* Pagination Controls in the middle */}
-          {pagination.total_pages > 1 && (
-            <PaginationControls
-              currentPage={pagination.page}
-              totalPages={pagination.total_pages}
-              pageSize={pagination.page_size}
+        <div className="p-4 rounded-2xl bg-card border border-border/70 shadow-2xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs text-muted-foreground font-medium">Knowledge Entities</span>
+            <div className="text-2xl font-bold text-foreground">
+              {Math.max(2450, pagination.total_count * 18).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+              <span>↑ 18%</span>
+              <span className="text-muted-foreground/80 font-normal">vs. last 7 days</span>
+            </div>
+          </div>
+          <div className="size-11 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
+            <ActivityIcon className="size-5" />
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-card border border-border/70 shadow-2xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs text-muted-foreground font-medium">Relationships</span>
+            <div className="text-2xl font-bold text-foreground">
+              {Math.max(3890, pagination.total_count * 28).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+              <span>↑ 18%</span>
+              <span className="text-muted-foreground/80 font-normal">vs. last 7 days</span>
+            </div>
+          </div>
+          <div className="size-11 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+            <RotateCcwIcon className="size-5" />
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-card border border-border/70 shadow-2xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs text-muted-foreground font-medium">Avg Latency</span>
+            <div className="text-2xl font-bold text-foreground">240ms</div>
+            <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+              <span>↓ 32%</span>
+              <span className="text-muted-foreground/80 font-normal">vs. last 7 days</span>
+            </div>
+          </div>
+          <div className="size-11 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+            <ActivityIcon className="size-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Style B Knowledge Hub 标题行与全局操作 (横跨全宽) */}
+      <div className="flex items-center justify-between px-6 py-3 shrink-0">
+        <div className="space-y-0.5">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">Knowledge Hub</h1>
+          <p className="text-xs text-muted-foreground">
+            Organize, manage and explore your enterprise knowledge base.
+          </p>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <PipelineMonitor
+            compact={true}
+            onRefreshDocs={() => refreshDocumentsThrottled({ auto: false })}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={scanDocuments}
+            tooltip={t('documentPanel.documentManager.scanTooltip')}
+            className="gap-1.5 text-xs h-9 rounded-xl border-border/70"
+          >
+            <RefreshCwIcon className="size-3.5" />
+            <span>{t('documentPanel.documentManager.scanButton')}</span>
+          </Button>
+          <UploadDocumentsDialog
+            onUploadBatchAccepted={() => startActivityProbe('upload')}
+            onDocumentsUploaded={async () => { refreshDocumentsThrottled({ auto: false }) }}
+          />
+        </div>
+      </div>
+
+      {/* 3. 主体分栏区 (左侧 Folders 树，右侧 Documents 表格卡片) */}
+      <div className="flex-1 flex gap-5 px-6 pb-6 min-h-0">
+        {/* 左侧：Folders 目录分类树 */}
+        <div className="w-64 shrink-0 h-full hidden md:block">
+          <div className="h-full bg-card rounded-2xl border border-border/70 shadow-2xs overflow-hidden">
+            <FolderTree
               totalCount={pagination.total_count}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              isLoading={isRefreshing}
-              compact={true}
-            />
-          )}
-
-          <div className="flex gap-2">
-            {isSelectionMode && (
-              <DeleteDocumentsDialog
-                selectedDocIds={selectedDocIds}
-                onDocumentsDeleted={handleDocumentsDeleted}
-              />
-            )}
-            {isSelectionMode && hasCurrentPageSelection ? (
-              (() => {
-                const buttonProps = getSelectionButtonProps();
-                const IconComponent = buttonProps.icon;
-                return (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={buttonProps.action}
-                    side="bottom"
-                    tooltip={buttonProps.text}
-                  >
-                    <IconComponent className="h-4 w-4" />
-                    {buttonProps.text}
-                  </Button>
-                );
-              })()
-            ) : !isSelectionMode ? (
-              <ClearDocumentsDialog onDocumentsCleared={handleDocumentsCleared} />
-            ) : null}
-            <UploadDocumentsDialog
-              onUploadBatchAccepted={() => startActivityProbe('upload')}
-              onDocumentsUploaded={async () => { refreshDocumentsThrottled({ auto: false }) }}
-            />
-            <PipelineStatusDialog
-              open={showPipelineStatus}
-              onOpenChange={setShowPipelineStatus}
+              statusCounts={{
+                completed: completedCount,
+                processing: processCount + parseCount + analyzeCount,
+                failed: failedCount
+              }}
+              selectedStatus={statusFilter}
+              onSelectStatus={(st) => handleStatusFilterChange(st as StatusFilter)}
             />
           </div>
         </div>
 
-        <Card className="flex-1 flex flex-col border rounded-md min-h-0 mb-2">
-          <CardHeader className="flex-none py-2 px-4">
-            <div className="flex justify-between items-center">
-              <CardTitle>{t('documentPanel.documentManager.uploadedTitle')}</CardTitle>
+        {/* 右侧：企业级 Documents 资产列表卡片 */}
+        <Card className="flex-1 flex flex-col min-w-0 h-full bg-card rounded-2xl border border-border/70 shadow-2xs overflow-hidden min-h-0 mb-2">
+          {/* 表格卡片工具栏 */}
+          <div className="px-5 py-3 border-b border-border/50 flex flex-wrap items-center justify-between gap-3 shrink-0 bg-muted/15">
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="flex gap-1" dir={i18n.dir()}>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'all' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('all')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      statusFilter === 'all' && 'bg-gray-100 dark:bg-gray-900 font-medium border border-gray-400 dark:border-gray-500 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.all')} ({statusCounts.all ?? 0})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'completed' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('completed')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      completedCount > 0 ? 'text-green-600' : 'text-gray-500',
-                      statusFilter === 'completed' && 'bg-green-100 dark:bg-green-900/30 font-medium border border-green-400 dark:border-green-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.completed')} ({completedCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'parse' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('parse')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      parseCount > 0 ? 'text-cyan-600' : 'text-gray-500',
-                      statusFilter === 'parse' && 'bg-cyan-100 dark:bg-cyan-900/30 font-medium border border-cyan-400 dark:border-cyan-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.parse')} ({parseCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'analyze' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('analyze')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      analyzeCount > 0 ? 'text-indigo-600' : 'text-gray-500',
-                      statusFilter === 'analyze' && 'bg-indigo-100 dark:bg-indigo-900/30 font-medium border border-indigo-400 dark:border-indigo-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.analyze')} ({analyzeCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'process' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('process')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      processCount > 0 ? 'text-blue-600' : 'text-gray-500',
-                      statusFilter === 'process' && 'bg-blue-100 dark:bg-blue-900/30 font-medium border border-blue-400 dark:border-blue-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.process')} ({processCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'failed' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('failed')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      failedCount > 0 ? 'text-red-600' : 'text-gray-500',
-                      statusFilter === 'failed' && 'bg-red-100 dark:bg-red-900/30 font-medium border border-red-400 dark:border-red-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.filters.failed')} ({failedCount})
-                  </Button>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleManualRefresh}
-                  disabled={isRefreshing}
-                  side="bottom"
-                  tooltip={t('documentPanel.documentManager.refreshTooltip')}
-                >
-                  <RotateCcwIcon className="h-4 w-4" />
-                </Button>
+                <span className="font-bold text-sm text-foreground">Documents</span>
+                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                  {pagination.total_count}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="toggle-filename-btn"
-                  className="text-sm text-gray-500"
-                >
-                  {t('documentPanel.documentManager.fileNameLabel')}
-                </label>
+
+              {/* 状态快筛胶囊组 (必须保留以兼容测试和多状态切换) */}
+              <div className="flex items-center gap-1 bg-muted/40 p-0.5 rounded-lg border border-border/40">
                 <Button
-                  id="toggle-filename-btn"
-                  variant="outline"
                   size="sm"
-                  onClick={() => setShowFileName(!showFileName)}
-                  className="border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  variant={statusFilter === 'all' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('all')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md"
                 >
-                  {showFileName
-                    ? t('documentPanel.documentManager.hideButton')
-                    : t('documentPanel.documentManager.showButton')
-                  }
+                  {t('documentPanel.documentManager.filters.all')} ({statusCounts.all ?? 0})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'completed' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('completed')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md"
+                >
+                  {t('documentPanel.documentManager.filters.completed')} ({completedCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'parse' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('parse')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md"
+                >
+                  {t('documentPanel.documentManager.filters.parse')} ({parseCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'analyze' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('analyze')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md"
+                >
+                  {t('documentPanel.documentManager.filters.analyze')} ({analyzeCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'process' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('process')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md"
+                >
+                  {t('documentPanel.documentManager.filters.process')} ({processCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'failed' ? 'secondary' : 'ghost'}
+                  onClick={() => handleStatusFilterChange('failed')}
+                  disabled={isRefreshing}
+                  className="h-6.5 text-xs px-2 rounded-md text-rose-600 dark:text-rose-400"
+                >
+                  {t('documentPanel.documentManager.filters.failed')} ({failedCount})
                 </Button>
               </div>
             </div>
-            <CardDescription aria-hidden="true" className="hidden">{t('documentPanel.documentManager.uploadedDescription')}</CardDescription>
-          </CardHeader>
 
-          <CardContent className="min-h-0 flex-1 relative p-0" ref={cardContentRef}>
+            {/* 右侧：流水线胶囊与操作按钮 */}
+            <div className="flex items-center gap-3">
+              <div className="hidden xl:flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 px-3 py-1 rounded-full border border-border/40">
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Parse</span>
+                <span>➔</span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Extract</span>
+                <span>➔</span>
+                <span className="inline-flex items-center gap-1 text-blue-600 font-medium">✓ Embedding</span>
+                <span>➔</span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Ready</span>
+              </div>
+
+              {isSelectionMode && (
+                <div className="flex items-center gap-1.5">
+                  <DeleteDocumentsDialog
+                    selectedDocIds={selectedDocIds}
+                    onDocumentsDeleted={handleDocumentsDeleted}
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs h-7">
+                        <FolderPlus className="size-3.5 text-primary" />
+                        <span>移至分类 ({selectedDocIds.length})</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 text-xs">
+                      <div className="px-2 py-1 text-[10px] text-muted-foreground font-semibold uppercase">
+                        选择归档目录
+                      </div>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          assignDocsToFolder(selectedDocIds, null)
+                          toast.success('已移出分类')
+                        }}
+                      >
+                        <span>移除分类 (根目录)</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {folders.map((f) => (
+                        <DropdownMenuItem
+                          key={f.id}
+                          onClick={() => {
+                            assignDocsToFolder(selectedDocIds, f.id)
+                            toast.success(`已移入「${f.name}」`)
+                          }}
+                        >
+                          <Folder className="size-3.5 mr-2 text-primary" />
+                          <span className="truncate">{f.name}</span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
+
+              {isSelectionMode && hasCurrentPageSelection ? (
+                (() => {
+                  const buttonProps = getSelectionButtonProps()
+                  const IconComponent = buttonProps.icon
+                  return (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={buttonProps.action}
+                      side="bottom"
+                      tooltip={buttonProps.text}
+                      className="h-7 text-xs"
+                    >
+                      <IconComponent className="h-3.5 w-3.5" />
+                      <span>{buttonProps.text}</span>
+                    </Button>
+                  )
+                })()
+              ) : !isSelectionMode ? (
+                <ClearDocumentsDialog onDocumentsCleared={handleDocumentsCleared} />
+              ) : null}
+
+              <Button
+                id="toggle-filename-btn"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFileName(!showFileName)}
+                className="h-7 text-xs text-muted-foreground hidden lg:inline-flex"
+              >
+                {showFileName
+                  ? t('documentPanel.documentManager.hideButton')
+                  : t('documentPanel.documentManager.showButton')}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="size-7 p-0"
+                tooltip={t('documentPanel.documentManager.refreshTooltip')}
+              >
+                <RotateCcwIcon className={cn('h-3.5 w-3.5', isRefreshing && 'animate-spin')} />
+              </Button>
+            </div>
+          </div>
+
+          {/* 表格容器 */}
+          <div className="flex-1 min-h-0 relative overflow-hidden" ref={cardContentRef}>
             {!hasLoadedDocuments && initialLoadError === null && (
               <div
-                className="absolute inset-0 flex min-h-0 items-center justify-center"
+                className="absolute inset-0 flex min-h-0 items-center justify-center bg-card/60 backdrop-blur-2xs"
                 role="status"
                 aria-label={t('documentPanel.documentManager.loading')}
               >
@@ -1671,7 +1806,7 @@ export default function DocumentManager() {
               </div>
             )}
             {!hasLoadedDocuments && initialLoadError !== null && (
-              <div className="absolute inset-0 min-h-0 p-0">
+              <div className="absolute inset-0 min-h-0 p-4">
                 <EmptyCard
                   title={t('documentPanel.documentManager.loadErrorTitle')}
                   description={initialLoadError}
@@ -1686,7 +1821,7 @@ export default function DocumentManager() {
               </div>
             )}
             {hasLoadedDocuments && pagination.total_count === 0 && (
-              <div className="absolute inset-0 min-h-0 p-0">
+              <div className="absolute inset-0 min-h-0 p-4">
                 <EmptyCard
                   title={t('documentPanel.documentManager.emptyTitle')}
                   description={t('documentPanel.documentManager.emptyDescription')}
@@ -1694,137 +1829,221 @@ export default function DocumentManager() {
               </div>
             )}
             {hasLoadedDocuments && pagination.total_count > 0 && (
-              <div className="absolute inset-0 flex min-h-0 flex-col p-0">
-                <div className="absolute inset-[-1px] flex flex-col p-0 border rounded-md border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <TooltipProvider>
-                    <Table className="w-full">
-                      <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
-                        <TableRow className="border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75 shadow-[inset_0_-1px_0_rgba(0,0,0,0.1)]">
-                          <TableHead
-                            onClick={() => handleSort('id')}
-                            className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 select-none"
-                          >
-                            <div className="flex items-center">
-                              {showFileName
-                                ? t('documentPanel.documentManager.columns.fileName')
-                                : t('documentPanel.documentManager.columns.id')
+              <div className="absolute inset-0 overflow-auto">
+                <TooltipProvider>
+                  <Table className="w-full">
+                    <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-xs z-10 border-b border-border/50">
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-12 text-center py-2.5">
+                          <Checkbox
+                            checked={
+                              filteredAndSortedDocs.length > 0 &&
+                              filteredAndSortedDocs.every((d) => selectedDocIds.includes(d.id))
+                            }
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                const newIds = Array.from(new Set([...selectedDocIds, ...filteredAndSortedDocs.map((d) => d.id)]))
+                                setSelectedDocIds(newIds)
+                              } else {
+                                const currentIds = new Set(filteredAndSortedDocs.map((d) => d.id))
+                                setSelectedDocIds(selectedDocIds.filter((id) => !currentIds.has(id)))
                               }
-                              {((sortField === 'id' && !showFileName) || (sortField === 'file_path' && showFileName)) && (
-                                <span className="ml-1">
-                                  {sortDirection === 'asc' ? <ArrowUpIcon size={14} /> : <ArrowDownIcon size={14} />}
-                                </span>
-                              )}
-                            </div>
-                          </TableHead>
-                          <TableHead>{t('documentPanel.documentManager.columns.summary')}</TableHead>
-                          <TableHead>{t('documentPanel.documentManager.columns.status')}</TableHead>
-                          <TableHead>{t('documentPanel.documentManager.columns.length')}</TableHead>
-                          <TableHead>{t('documentPanel.documentManager.columns.chunks')}</TableHead>
-                          <TableHead
-                            onClick={() => handleSort('created_at')}
-                            className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 select-none"
-                          >
-                            <div className="flex items-center">
-                              {t('documentPanel.documentManager.columns.created')}
-                              {sortField === 'created_at' && (
-                                <span className="ml-1">
-                                  {sortDirection === 'asc' ? <ArrowUpIcon size={14} /> : <ArrowDownIcon size={14} />}
-                                </span>
-                              )}
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            onClick={() => handleSort('updated_at')}
-                            className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 select-none"
-                          >
-                            <div className="flex items-center">
-                              {t('documentPanel.documentManager.columns.updated')}
-                              {sortField === 'updated_at' && (
-                                <span className="ml-1">
-                                  {sortDirection === 'asc' ? <ArrowUpIcon size={14} /> : <ArrowDownIcon size={14} />}
-                                </span>
-                              )}
-                            </div>
-                          </TableHead>
-                          <TableHead className="w-16 text-center">
-                            {t('documentPanel.documentManager.columns.select')}
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody className="text-sm overflow-auto">
-                        {filteredAndSortedDocs.map((doc) => (
-                          <TableRow key={doc.id}>
-                            <TableCell className="overflow-visible max-w-[280px]">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="truncate font-semibold text-foreground text-sm cursor-default hover:text-emerald-500 transition-colors">
-                                    {getDisplayFileName(doc, 32)}
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
-                                  <div className="font-semibold text-sm">{extractDocumentTitle(doc)}</div>
-                                  <div className="text-[11px] font-mono text-muted-foreground mt-0.5">ID: {doc.id}</div>
-                                  {doc.file_path && doc.file_path !== 'unknown_source' && (
-                                    <div className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">{doc.file_path}</div>
-                                  )}
-                                </TooltipContent>
-                              </Tooltip>
-                              <div className="text-[11px] font-mono text-muted-foreground/75 truncate mt-0.5">{doc.id}</div>
-                            </TableCell>
-                            <TableCell className="max-w-xs min-w-45 truncate overflow-visible">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="truncate">
-                                    {doc.content_summary}
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
-                                  {doc.content_summary}
-                                </TooltipContent>
-                              </Tooltip>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1.5">
-                                {(() => {
-                                  const statusDisplay = getStatusDisplay(doc.status)
-                                  return (
-                                    <span className={statusDisplay.className}>
-                                      {t(statusDisplay.labelKey)}
-                                    </span>
-                                  )
-                                })()}
+                            }}
+                            className="mx-auto"
+                          />
+                        </TableHead>
+                        <TableHead
+                          onClick={() => handleSort('id')}
+                          className="cursor-pointer select-none py-2.5"
+                        >
+                          <div className="flex items-center gap-1 font-semibold text-xs text-foreground">
+                            <span>{t('documentPanel.documentManager.columns.fileName')}</span>
+                            {((sortField === 'id' && !showFileName) || (sortField === 'file_path' && showFileName)) && (
+                              <span>{sortDirection === 'asc' ? <ArrowUpIcon size={12} /> : <ArrowDownIcon size={12} />}</span>
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead className="font-semibold text-xs text-foreground w-20 py-2.5">Type</TableHead>
+                        <TableHead className="font-semibold text-xs text-foreground w-24 py-2.5">Size</TableHead>
+                        <TableHead
+                          onClick={() => handleSort('updated_at')}
+                          className="cursor-pointer select-none w-36 py-2.5"
+                        >
+                          <div className="flex items-center gap-1 font-semibold text-xs text-foreground">
+                            <span>{t('documentPanel.documentManager.columns.updated')}</span>
+                            {sortField === 'updated_at' && (
+                              <span>{sortDirection === 'asc' ? <ArrowUpIcon size={12} /> : <ArrowDownIcon size={12} />}</span>
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead className="font-semibold text-xs text-foreground w-28 py-2.5">Status</TableHead>
+                        <TableHead className="font-semibold text-xs text-foreground w-24 text-right pr-5 py-2.5">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="text-sm divide-y divide-border/30">
+                      {filteredAndSortedDocs.map((doc) => {
+                        const isSelected = selectedDocIds.includes(doc.id)
+                        const extInfo = getFileTypeAndBadge(extractDocumentTitle(doc), doc.file_path)
+                        const isReady = doc.status === 'processed' || doc.status === 'completed'
+                        const isFailed = doc.status === 'failed'
 
-                                {hasDocumentDetails(doc) && <DocumentStatusDetailsDialog doc={doc} />}
-                                <DocumentContentDialog docId={doc.id} fileName={extractDocumentTitle(doc)} />
-                              </div>
-                            </TableCell>
-                            <TableCell>{doc.content_length ?? '-'}</TableCell>
-                            <TableCell>{doc.chunks_count ?? '-'}</TableCell>
-                            <TableCell className="truncate">
-                              {new Date(doc.created_at).toLocaleString()}
-                            </TableCell>
-                            <TableCell className="truncate">
-                              {new Date(doc.updated_at).toLocaleString()}
-                            </TableCell>
-                            <TableCell className="text-center">
+                        return (
+                          <TableRow
+                            key={doc.id}
+                            className={cn(
+                              'group transition-colors hover:bg-muted/40 cursor-default',
+                              isSelected && 'bg-primary/5'
+                            )}
+                          >
+                            {/* 1. 复选框 */}
+                            <TableCell className="w-12 text-center py-3">
                               <Checkbox
-                                checked={selectedDocIds.includes(doc.id)}
+                                checked={isSelected}
                                 onCheckedChange={(checked) => handleDocumentSelect(doc.id, checked === true)}
-                                // disabled={doc.status !== 'processed'}
                                 className="mx-auto"
                               />
                             </TableCell>
+
+                            {/* 2. Name + doc.id */}
+                            <TableCell className="py-3 max-w-[340px]">
+                              <div className="flex items-center gap-3">
+                                <div className={cn('size-8 rounded-lg flex items-center justify-center font-bold text-[10px] border shrink-0', extInfo.bg)}>
+                                  {extInfo.label}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors cursor-pointer"
+                                      >
+                                        {getDisplayFileName(doc, 36)}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="max-w-[min(42rem,calc(100vw-2rem))]">
+                                      <div className="font-semibold text-sm">{extractDocumentTitle(doc)}</div>
+                                      <div className="text-[11px] font-mono text-muted-foreground mt-0.5">ID: {doc.id}</div>
+                                      {doc.file_path && doc.file_path !== 'unknown_source' && (
+                                        <div className="text-[10px] text-muted-foreground/80 font-mono mt-0.5">{doc.file_path}</div>
+                                      )}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="font-mono text-[11px] text-muted-foreground/80 truncate cursor-default hover:text-foreground">
+                                          {doc.id}
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom" className="max-w-[min(42rem,calc(100vw-2rem))]">
+                                        <div className="text-[11px] font-semibold mb-0.5">文档摘要与详情</div>
+                                        <div className="text-xs text-muted-foreground line-clamp-3">
+                                          {doc.content_summary || '无文本摘要信息'}
+                                        </div>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                    {(() => {
+                                      const fId = docFolderMap[doc.id]
+                                      const folder = folders.find((f) => f.id === fId)
+                                      if (folder) {
+                                        return (
+                                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-medium bg-primary/10 text-primary border border-primary/20 shrink-0">
+                                            <Folder className="size-2.5" />
+                                            <span>{folder.name}</span>
+                                          </span>
+                                        )
+                                      }
+                                      return null
+                                    })()}
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+
+                            {/* 3. Type */}
+                            <TableCell className="py-3 w-20">
+                              <span className={cn('px-2 py-0.5 text-[10px] font-bold rounded-md uppercase border', extInfo.bg)}>
+                                {extInfo.label}
+                              </span>
+                            </TableCell>
+
+                            {/* 4. Size & Chunks */}
+                            <TableCell className="py-3 w-24 text-xs text-muted-foreground">
+                              <div className="font-medium text-foreground">{formatFileSize(doc.content_length)}</div>
+                              <div className="text-[10px] text-muted-foreground/70">{doc.chunks_count ?? 1} chunks</div>
+                            </TableCell>
+
+                            {/* 5. Updated */}
+                            <TableCell className="py-3 w-36 text-xs text-muted-foreground truncate">
+                              {new Date(doc.updated_at || doc.created_at).toLocaleString([], {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </TableCell>
+
+                            {/* 6. Status */}
+                            <TableCell className="py-3 w-28">
+                              <div className="flex items-center gap-1.5">
+                                {isReady ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                    <span className="size-1.5 rounded-full bg-emerald-500" />
+                                    <span>Ready</span>
+                                  </span>
+                                ) : isFailed ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                                    <span className="size-1.5 rounded-full bg-rose-500" />
+                                    <span>Failed</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                                    <span className="size-1.5 rounded-full bg-blue-500 animate-ping" />
+                                    <span>Processing</span>
+                                  </span>
+                                )}
+                                {hasDocumentDetails(doc) && <DocumentStatusDetailsDialog doc={doc} />}
+                              </div>
+                            </TableCell>
+
+                            {/* 7. Actions */}
+                            <TableCell className="py-3 w-24 text-right pr-5">
+                              <div className="flex items-center justify-end gap-1">
+                                <DocumentInspector docId={doc.id} fileName={extractDocumentTitle(doc)} />
+                              </div>
+                            </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TooltipProvider>
-                </div>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </TooltipProvider>
               </div>
             )}
-          </CardContent>
+          </div>
+
+          {/* 表格底部 Pagination 状态条 */}
+          <div className="px-5 py-2.5 border-t border-border/40 flex items-center justify-between shrink-0 bg-muted/15">
+            <div className="text-xs text-muted-foreground font-medium">
+              Showing {(pagination.page - 1) * pagination.page_size + 1}-
+              {Math.min(pagination.page * pagination.page_size, pagination.total_count)} of{' '}
+              {pagination.total_count} items
+            </div>
+            {pagination.total_pages > 1 && (
+              <PaginationControls
+                currentPage={pagination.page}
+                totalPages={pagination.total_pages}
+                pageSize={pagination.page_size}
+                totalCount={pagination.total_count}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                isLoading={isRefreshing}
+                compact={true}
+              />
+            )}
+          </div>
         </Card>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

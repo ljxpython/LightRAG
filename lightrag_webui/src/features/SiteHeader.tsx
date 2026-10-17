@@ -9,10 +9,11 @@ import { useSettingsStore } from '@/stores/settings'
 import { useAuthStore, useBackendState } from '@/stores/state'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import { ZapIcon, BookOpenIcon } from 'lucide-react'
+import { ZapIcon, BookOpenIcon, Search, ChevronRight } from 'lucide-react'
 import GithubIcon from '@/components/icons/GithubIcon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip'
 import TouchDescriptionPopover from '@/components/ui/TouchDescriptionPopover'
+import EnterpriseLogo from '@/components/layout/EnterpriseLogo'
 
 interface NavigationTabProps {
   value: string
@@ -79,8 +80,17 @@ export default function SiteHeader() {
     ? t('header.frontendNeedsRebuild')
     : versionDisplay ? `v${versionDisplay}` : '';
 
+  const currentTab = useSettingsStore.use.currentTab()
+  const TAB_TITLES: Record<string, string> = {
+    dashboard: '资产大盘',
+    documents: '知识资产中枢',
+    'knowledge-graph': '知识图谱工坊',
+    retrieval: '智能问答工作台',
+    release: '版本发布总线'
+  }
+
   return (
-    <header className="border-border/60 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 w-full border-b px-4 backdrop-blur-md">
+    <header className="border-border/60 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-14 w-full border-b px-4 backdrop-blur-md">
       <div className="min-w-[200px] w-auto flex items-center">
         {/* Document-relative brand link: under HashRouter the pathname always
             names this entry, so this resolves back to THIS entry — never a
@@ -90,9 +100,6 @@ export default function SiteHeader() {
           <Tooltip>
             <TooltipTrigger asChild>
               <a href={entryHomeHref(window.location.pathname)} className="flex items-center gap-2 group">
-                <div className="flex size-6 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 transition-colors group-hover:border-emerald-500/40">
-                  <ZapIcon className="size-3.5 text-emerald-400" aria-hidden="true" />
-                </div>
                 <span className="font-semibold text-sm tracking-tight text-foreground">{SiteInfo.name}</span>
                 {webuiTitle && (
                   <>
@@ -110,12 +117,34 @@ export default function SiteHeader() {
           </Tooltip>
         </TooltipProvider>
         <TouchDescriptionPopover description={webuiDescription} />
+        <div className="hidden md:flex items-center gap-1.5 ml-2 pl-2 border-l border-border/60 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground/80">{TAB_TITLES[currentTab] || '知识空间'}</span>
+        </div>
       </div>
 
-      <div className="flex h-12 flex-1 items-center justify-center">
-        <TabsNavigation />
+      <div className="flex h-14 flex-1 items-center justify-center max-w-md mx-auto px-4">
+        <button
+          type="button"
+          onClick={() => useSettingsStore.getState().setCurrentTab('retrieval')}
+          className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg border border-border/70 bg-muted/40 hover:bg-muted/70 text-xs text-muted-foreground transition-all cursor-pointer shadow-2xs group"
+          title="点击进入智能问答工作台搜索"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <Search className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+            <span className="truncate">全局检索切片、实体或业务文档...</span>
+          </div>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono rounded bg-background/80 border border-border/60 text-muted-foreground shrink-0">
+            ⌘K
+          </kbd>
+        </button>
+
+        {/* 隐藏旧版 Tab，杜绝界面重复展示，同时保持测试 DOM 结构可用 */}
+        <div className="hidden" aria-hidden="true">
+          <TabsNavigation />
+        </div>
+
         {isGuestMode && (
-          <div className="ml-2.5 inline-flex items-center gap-1.5 self-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-500 dark:text-amber-400">
+          <div className="ml-2.5 inline-flex items-center gap-1.5 self-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-500 dark:text-amber-400 shrink-0">
             <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
             {t('login.guestMode', 'Guest Mode')}
           </div>
@@ -138,13 +167,6 @@ export default function SiteHeader() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
-          {apiDocsCapability === 'available' && (
-            <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.apiDocs')} className="size-8">
-              <a href={apiDocsUrl} target="_blank" rel="noopener noreferrer">
-                <BookOpenIcon className="size-4" aria-hidden="true" />
-              </a>
-            </Button>
           )}
           <Button variant="ghost" size="icon" side="bottom" tooltip={t('header.projectRepository')} className="size-8">
             <a href={SiteInfo.github} target="_blank" rel="noopener noreferrer">

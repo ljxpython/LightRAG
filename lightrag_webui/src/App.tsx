@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import ThemeProvider from '@/components/ThemeProvider'
 import TabVisibilityProvider from '@/contexts/TabVisibilityProvider'
 import ApiKeyAlert from '@/components/ApiKeyAlert'
-import StatusIndicator from '@/components/status/StatusIndicator'
 import { SiteInfo } from '@/lib/constants'
 import { entryHomeHref } from '@/lib/pathPrefix'
 import { useBackendState, useAuthStore } from '@/stores/state'
@@ -19,10 +18,15 @@ import {
 import SiteHeader from '@/features/SiteHeader'
 import { InvalidApiKeyError, RequireApiKeError } from '@/api/lightrag'
 import { ZapIcon } from 'lucide-react'
+import EnterpriseLogo from '@/components/layout/EnterpriseLogo'
 
-import GraphViewer from '@/features/GraphViewer'
+import GraphStudio from '@/features/graph/GraphStudio'
 import DocumentManager from '@/features/DocumentManager'
 import RetrievalView from '@/features/RetrievalView'
+import DashboardOverview from '@/features/dashboard/DashboardOverview'
+import ReleaseConsole from '@/features/release/ReleaseConsole'
+import AppSidebar from '@/components/layout/AppSidebar'
+import type { Tab } from '@/stores/settings'
 
 import { Tabs, TabsContent } from '@/components/ui/Tabs'
 import ErrorBoundary from '@/components/ErrorBoundary'
@@ -170,8 +174,26 @@ function App() {
     checkVersion();
   }, []); // Empty dependency array ensures it only runs once on mount
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('lightrag-sidebar-collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('lightrag-sidebar-collapsed', String(next))
+      } catch {}
+      return next
+    })
+  }, [])
+
   const handleTabChange = useCallback(
-    (tab: string) => useSettingsStore.getState().setCurrentTab(tab as any),
+    (tab: string) => useSettingsStore.getState().setCurrentTab(tab as Tab),
     []
   )
 
@@ -197,9 +219,7 @@ function App() {
                 {/* Document-relative brand link — resolves to this entry's own
                     root (see SiteHeader / entryHomeHref). */}
                 <a href={entryHomeHref(window.location.pathname)} className="flex items-center gap-2">
-                  <div className="flex size-6 items-center justify-center rounded-md border border-emerald-500/25 bg-emerald-500/10 text-emerald-400">
-                    <ZapIcon className="size-3.5 text-emerald-400" aria-hidden="true" />
-                  </div>
+                  <EnterpriseLogo size={22} />
                   <span className="font-semibold text-sm tracking-tight text-foreground">{SiteInfo.name}</span>
                 </a>
               </div>
@@ -222,35 +242,56 @@ function App() {
             </div>
           </div>
         ) : (
-          // Main content after initialization
-          <main className="flex h-screen w-screen overflow-hidden">
+          // Enterprise App Shell: Modern Collapsible Sidebar + Workspace Area
+          <main className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
             <Tabs
               defaultValue={currentTab}
-              className="!m-0 flex grow flex-col !p-0 overflow-hidden"
+              value={currentTab}
+              className="!m-0 flex h-full w-full !p-0 overflow-hidden"
               onValueChange={handleTabChange}
             >
-              <ErrorBoundary>
-                <SiteHeader />
-              </ErrorBoundary>
-              <div className="relative grow">
-                <TabsContent value="documents" className="absolute top-0 right-0 bottom-0 left-0 overflow-auto">
-                  <ErrorBoundary>
-                    <DocumentManager key={workspaceEpoch} />
-                  </ErrorBoundary>
-                </TabsContent>
-                <TabsContent value="knowledge-graph" className="absolute top-0 right-0 bottom-0 left-0 overflow-hidden">
-                  <ErrorBoundary>
-                    <GraphViewer key={workspaceEpoch} />
-                  </ErrorBoundary>
-                </TabsContent>
-                <TabsContent value="retrieval" className="absolute top-0 right-0 bottom-0 left-0 overflow-hidden">
-                  <ErrorBoundary>
-                    <RetrievalView key={`${identityEpoch}-${workspaceEpoch}`} />
-                  </ErrorBoundary>
-                </TabsContent>
+              {/* 1. Enterprise App Sidebar */}
+              <AppSidebar
+                currentTab={currentTab}
+                onTabChange={handleTabChange}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={toggleSidebar}
+              />
+
+              {/* 2. Main Workspace Viewport */}
+              <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+                <ErrorBoundary>
+                  <SiteHeader />
+                </ErrorBoundary>
+                <div className="relative flex-1 overflow-hidden bg-muted/15">
+                  <TabsContent value="dashboard" className="absolute inset-0 overflow-auto">
+                    <ErrorBoundary>
+                      <DashboardOverview onNavigateToTab={handleTabChange} />
+                    </ErrorBoundary>
+                  </TabsContent>
+                  <TabsContent value="documents" className="absolute inset-0 overflow-auto">
+                    <ErrorBoundary>
+                      <DocumentManager key={workspaceEpoch} />
+                    </ErrorBoundary>
+                  </TabsContent>
+                  <TabsContent value="knowledge-graph" className="absolute inset-0 overflow-hidden">
+                    <ErrorBoundary>
+                      <GraphStudio key={workspaceEpoch} />
+                    </ErrorBoundary>
+                  </TabsContent>
+                  <TabsContent value="retrieval" className="absolute inset-0 overflow-hidden">
+                    <ErrorBoundary>
+                      <RetrievalView key={`${identityEpoch}-${workspaceEpoch}`} />
+                    </ErrorBoundary>
+                  </TabsContent>
+                  <TabsContent value="release" className="absolute inset-0 overflow-auto">
+                    <ErrorBoundary>
+                      <ReleaseConsole />
+                    </ErrorBoundary>
+                  </TabsContent>
+                </div>
               </div>
             </Tabs>
-            {enableHealthCheck && <StatusIndicator />}
             <ApiKeyAlert open={apiKeyAlertOpen} onOpenChange={handleApiKeyAlertOpenChange} />
           </main>
         )}
