@@ -299,7 +299,7 @@ export default function MessageList({
         // the very first short message.
         className="bg-primary-foreground/60 absolute inset-0 flex flex-col overflow-y-auto overflow-x-hidden rounded-lg border p-2"
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 w-full max-w-4xl mx-auto px-1 sm:px-3 py-3">
           {messages.length === 0 ? (
             <div className="flex h-full items-center justify-center">
               {emptyState}
@@ -309,14 +309,14 @@ export default function MessageList({
               return (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2`}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2 w-full`}
                 >
                   {message.role === 'user' && (
                     <Button
                       onClick={() => handleCopyMessage(message)}
                       // 24px visual; ::after widens the TOUCH target to 44px
                       // (PRD ≥44px) without inflating the message layout.
-                      className="relative mb-2 size-6 shrink-0 rounded-md opacity-60 transition-opacity after:absolute after:-inset-2.5 after:content-[''] hover:opacity-100"
+                      className="relative mb-2 size-6 shrink-0 rounded-md opacity-60 transition-opacity after:absolute after:-inset-2.5 after:content-[''] hover:opacity-100 cursor-pointer"
                       tooltip={t('retrievePanel.chatMessage.copyTooltip')}
                       aria-label={t('retrievePanel.chatMessage.copyTooltip')}
                       variant="ghost"
@@ -339,18 +339,6 @@ export default function MessageList({
                       isLoading
                     }
                   />
-                  {message.role === 'assistant' && (
-                    <Button
-                      onClick={() => handleCopyMessage(message)}
-                      className="relative mb-2 size-6 shrink-0 rounded-md opacity-60 transition-opacity after:absolute after:-inset-2.5 after:content-[''] hover:opacity-100"
-                      tooltip={t('retrievePanel.chatMessage.copyTooltip')}
-                      aria-label={t('retrievePanel.chatMessage.copyTooltip')}
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <CopyIcon className="size-4" aria-hidden="true" />
-                    </Button>
-                  )}
                 </div>
               )
             })

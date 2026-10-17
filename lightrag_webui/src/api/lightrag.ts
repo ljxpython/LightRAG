@@ -12,6 +12,7 @@ import { errorMessage } from '@/lib/utils'
 import { decodeBase64Url } from '@/lib/base64url'
 import { useSettingsStore } from '@/stores/settings'
 import { useAuthStore } from '@/stores/state'
+import { useWorkspaceStore } from '@/stores/workspace'
 import { applyAiContentNoticeFlag } from '@/stores/aiContentNotice'
 import { navigationService } from '@/services/navigation'
 import { AuthenticationRequiredError, isAuthenticationRequiredError } from '@/api/errors'
@@ -453,6 +454,7 @@ axiosInstance.interceptors.request.use((config) => {
 
   const apiKey = useSettingsStore.getState().apiKey
   const token = localStorage.getItem('LIGHTRAG-API-TOKEN');
+  const { currentTenantId, currentProjectId } = useWorkspaceStore.getState();
 
   // Always include token if it exists, regardless of path
   if (token) {
@@ -460,6 +462,12 @@ axiosInstance.interceptors.request.use((config) => {
   }
   if (apiKey) {
     config.headers['X-API-Key'] = apiKey
+  }
+  if (currentProjectId) {
+    config.headers['X-Project-Id'] = currentProjectId
+  }
+  if (currentTenantId) {
+    config.headers['X-Tenant-Id'] = currentTenantId
   }
   return config
 })
@@ -781,6 +789,7 @@ async function _readNdjsonStream(
 function _buildStreamHeaders(): HeadersInit {
   const apiKey = useSettingsStore.getState().apiKey;
   const token = localStorage.getItem('LIGHTRAG-API-TOKEN');
+  const { currentTenantId, currentProjectId } = useWorkspaceStore.getState();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     Accept: 'application/x-ndjson',
@@ -790,6 +799,12 @@ function _buildStreamHeaders(): HeadersInit {
   }
   if (apiKey) {
     headers['X-API-Key'] = apiKey;
+  }
+  if (currentProjectId) {
+    headers['X-Project-Id'] = currentProjectId;
+  }
+  if (currentTenantId) {
+    headers['X-Tenant-Id'] = currentTenantId;
   }
   return headers;
 }
@@ -894,6 +909,7 @@ export const queryTextStream = async (
     const response = await fetch(`${backendBaseUrl}/query/stream`, {
       method: 'POST',
       headers,
+      credentials: 'include',
       body: JSON.stringify(request),
       signal,
     });
@@ -925,6 +941,7 @@ export const queryTextStream = async (
             retryResponse = await fetch(`${backendBaseUrl}/query/stream`, {
               method: 'POST',
               headers: retryHeaders,
+              credentials: 'include',
               body: JSON.stringify(request),
               signal,
             });

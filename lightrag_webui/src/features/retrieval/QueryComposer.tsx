@@ -4,6 +4,7 @@ import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { CircleAlertIcon, EraserIcon, SendIcon, SquareIcon, XIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
 /**
  * Shared input layer: single/multi-line switching, draft handling, clear,
@@ -23,6 +24,15 @@ export interface QueryComposerProps {
   prefilledPrompt?: string
 }
 
+const MODE_PILLS = [
+  { mode: 'mix', label: 'Mix 融合' },
+  { mode: 'hybrid', label: 'Hybrid 混合' },
+  { mode: 'global', label: 'Global 全局' },
+  { mode: 'local', label: 'Local 局部' },
+  { mode: 'naive', label: 'Naive 切片' },
+  { mode: 'bypass', label: 'Bypass 直通' }
+]
+
 export default function QueryComposer({
   isLoading,
   stopDisabled,
@@ -35,6 +45,26 @@ export default function QueryComposer({
   const [inputValue, setInputValue] = useState('')
   const [inputError, setInputError] = useState('')
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+
+  const currentModeMatch = inputValue.match(/^\/([a-zA-Z0-9_-]+)/)
+  const activePillMode = currentModeMatch ? currentModeMatch[1].toLowerCase() : null
+
+  const handleSelectModePill = useCallback((mode: string) => {
+    const prefixRegex = /^\/([a-zA-Z0-9_-]+)\s*/
+    let nextValue = ''
+    if (prefixRegex.test(inputValue)) {
+      nextValue = inputValue.replace(prefixRegex, `/${mode} `)
+    } else {
+      nextValue = `/${mode} ${inputValue.trimStart()}`
+    }
+    setInputValue(nextValue)
+    requestAnimationFrame(() => {
+      inputRef.current?.focus()
+      if (inputRef.current?.setSelectionRange) {
+        inputRef.current.setSelectionRange(nextValue.length, nextValue.length)
+      }
+    })
+  }, [inputValue])
 
   useEffect(() => {
     if (prefilledPrompt) {
@@ -176,14 +206,40 @@ export default function QueryComposer({
   }, [hasMultipleLines, inputValue, adjustTextareaHeight])
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="relative flex shrink-0 items-center gap-2 rounded-xl border border-border/70 bg-card/60 p-1.5 shadow-xs backdrop-blur-md transition-colors focus-within:border-border"
-      autoComplete="on"
-      method="post"
-      action="#"
-      role="search"
-    >
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-2">
+      {/* 快捷模式胶囊 */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs select-none scrollbar-none">
+        <span className="text-[11px] font-mono text-muted-foreground/70 mr-1 hidden sm:inline shrink-0">
+          检索模式:
+        </span>
+        {MODE_PILLS.map((pill) => {
+          const isActive = activePillMode === pill.mode
+          return (
+            <button
+              key={pill.mode}
+              type="button"
+              onClick={() => handleSelectModePill(pill.mode)}
+              className={cn(
+                'inline-flex items-center rounded-lg border px-2.5 py-1 text-[11px] font-mono transition-all cursor-pointer whitespace-nowrap',
+                isActive
+                  ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-400 font-semibold shadow-xs'
+                  : 'border-border/60 bg-muted/40 text-muted-foreground hover:border-emerald-500/30 hover:bg-muted/70 hover:text-foreground'
+              )}
+            >
+              {pill.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="relative flex shrink-0 items-center gap-2 rounded-xl border border-border/70 bg-card/60 p-1.5 shadow-xs backdrop-blur-md transition-colors focus-within:border-border"
+        autoComplete="on"
+        method="post"
+        action="#"
+        role="search"
+      >
       {/* Hidden submit button to ensure form meets HTML standards */}
       <input type="submit" style={{ display: 'none' }} tabIndex={-1} />
       {inputError && (
@@ -292,6 +348,10 @@ export default function QueryComposer({
           <span className="sr-only">{t('retrievePanel.retrieval.send')}</span>
         </Button>
       )}
-    </form>
+      </form>
+      <div className="flex items-center justify-end px-1 text-[11px] font-mono text-muted-foreground/60 select-none">
+        <span>Enter 发送 · Shift + Enter 换行</span>
+      </div>
+    </div>
   )
 }

@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useSettingsStore } from '@/stores/settings'
 import { useQuerySettingsStore } from '@/stores/querySettings'
 import { useTranslation } from 'react-i18next'
-import { CircleHelp, RotateCcw } from 'lucide-react'
+import { CircleHelp, RotateCcw, PanelRightClose, PanelRightOpen, Sparkles, Database, Sliders } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ResetButton = ({ onClick, title }: { onClick: () => void; title: string }) => (
@@ -45,6 +45,24 @@ export default function QuerySettings() {
   const querySettings = useQuerySettingsStore((state) => state.querySettings)
   const userPromptHistory = useSettingsStore((state) => state.userPromptHistory)
   const [scopeHelpOpen, setScopeHelpOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('lightrag_retrieval_sidebar_collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
+
+  const toggleCollapsed = useCallback(() => {
+    setIsCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('lightrag_retrieval_sidebar_collapsed', String(next))
+      } catch {}
+      return next
+    })
+  }, [])
+
   // What the tooltip's state was when the tap STARTED. Radix dismisses an open
   // tooltip from a document-level pointerdown listener, so by the time the
   // click lands the state no longer says whether the user meant to open or to
@@ -84,15 +102,69 @@ export default function QuerySettings() {
   const showQualityWarning =
     querySettings.mode !== 'mix' && querySettings.mode !== 'bypass'
 
+  if (isCollapsed) {
+    return (
+      <div className="flex shrink-0 flex-col items-center py-3 w-12 rounded-xl border border-border/70 bg-card/75 backdrop-blur-md transition-all gap-4 select-none">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={toggleCollapsed}
+                className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-xs active:scale-95"
+                aria-label="展开检索参数配置"
+              >
+                <PanelRightOpen className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>展开检索参数配置</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-[10px] font-mono tracking-widest text-muted-foreground [writing-mode:vertical-lr] rotate-180">
+            参数配置
+          </span>
+          <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-1 py-0.5 text-[9px] font-mono text-emerald-400 uppercase font-semibold">
+            {querySettings.mode}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Card className="flex shrink-0 flex-col w-[280px]">
-      <CardHeader className="px-4 pt-4 pb-2">
-        <CardTitle>{t('retrievePanel.querySettings.parametersTitle')}</CardTitle>
+    <Card className="flex shrink-0 flex-col w-[295px] border border-border/70 bg-card/80 backdrop-blur-md transition-all shadow-xs">
+      <CardHeader className="px-3.5 pt-3.5 pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
+            {t('retrievePanel.querySettings.parametersTitle')}
+          </CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleCollapsed}
+                  className="rounded-lg p-1 text-muted-foreground/80 hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+                  aria-label="收起参数侧边栏"
+                >
+                  <PanelRightClose className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p>收起参数侧边栏</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <CardDescription className="sr-only">{t('retrievePanel.querySettings.parametersDescription')}</CardDescription>
         {/* The query entry (/workspace) reads these same settings from this browser's
             storage, so say whose queries they affect right where they are edited.
             One line here, the rest behind the help tooltip. */}
-        <div className="text-muted-foreground flex items-center gap-1 text-[11px] leading-none">
+        <div className="text-muted-foreground flex items-center gap-1 text-[11px] leading-none pt-1">
           {/* One line, always: a longer translation is ellipsized rather than
               pushing the panel's controls down. The full text is in the tooltip. */}
           <span className="min-w-0 truncate">
@@ -126,7 +198,13 @@ export default function QuerySettings() {
       </CardHeader>
       <CardContent className="m-0 flex grow flex-col p-0 text-xs">
         <div className="relative size-full">
-          <div className="absolute inset-0 flex flex-col gap-2 overflow-auto px-2 pr-2">
+          <div className="absolute inset-0 flex flex-col gap-3.5 overflow-auto px-2.5 pb-3">
+            {/* Section 1: 核心模式与预设 */}
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-2.5 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground/90 border-b border-border/40 pb-1.5">
+                <Sparkles className="size-3 text-emerald-400" />
+                <span>核心模式与预设</span>
+              </div>
             {/* User Prompt - Moved to top for better dropdown space */}
             <>
               <TooltipProvider>
@@ -235,6 +313,14 @@ export default function QuerySettings() {
                 </p>
               )}
             </>
+            </div>
+
+            {/* Section 2: 召回配额与 Token 预算 */}
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-2.5 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground/90 border-b border-border/40 pb-1.5">
+                <Database className="size-3 text-primary" />
+                <span>召回配额与 Token</span>
+              </div>
 
             {/* Top K */}
             <>
@@ -435,9 +521,14 @@ export default function QuerySettings() {
                 />
               </div>
             </>
+            </div>
 
-            {/* Toggle Options */}
-            <>
+            {/* Section 3: 调试与流式选项 */}
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-2.5 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground/90 border-b border-border/40 pb-1.5">
+                <Sliders className="size-3 text-muted-foreground" />
+                <span>调试与流式选项</span>
+              </div>
               <div className="flex items-center gap-2">
                 <TooltipProvider>
                   <Tooltip>
@@ -531,7 +622,7 @@ export default function QuerySettings() {
                   onCheckedChange={(checked) => handleChange('stream', checked)}
                 />
               </div>
-            </>
+            </div>
 
           </div>
         </div>

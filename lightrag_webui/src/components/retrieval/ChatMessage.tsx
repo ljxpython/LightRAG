@@ -16,10 +16,13 @@ import { chatMarkdownSanitizeSchema } from '@/utils/markdownSanitizeSchema'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight, oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
-import { LoaderIcon, ChevronDownIcon, ClockIcon, ZapIcon } from 'lucide-react'
+import { LoaderIcon, ChevronDownIcon, ClockIcon, ZapIcon, BotIcon, CopyIcon, CheckIcon, FileSearchIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAiContentNoticeStore } from '@/stores/aiContentNotice'
 import { shouldShowAiContentNotice } from '@/lib/aiContentNotice'
+import { copyToClipboard } from '@/utils/clipboard'
+import { toast } from 'sonner'
+import EvidenceDrawer, { extractEvidenceFromMessage } from './EvidenceDrawer'
 
 // KaTeX configuration options interface
 interface KaTeXOptions {
@@ -76,6 +79,8 @@ export const ChatMessage = ({
   const aiContentNoticeEnabled = useAiContentNoticeStore((state) => state.enabled)
   const [katexPlugin, setKatexPlugin] = useState<((options?: KaTeXOptions) => any) | null>(null)
   const [isThinkingExpanded, setIsThinkingExpanded] = useState<boolean>(false)
+  const [isEvidenceOpen, setIsEvidenceOpen] = useState<boolean>(false)
+  const [isCopied, setIsCopied] = useState<boolean>(false)
 
   // Directly use props passed from the parent.
   const { thinkingContent, displayContent, thinkingTime, responseTime, firstTokenTime, isThinking } = message
@@ -103,6 +108,21 @@ export const ChatMessage = ({
   const finalDisplayContent = message.role === 'user'
     ? message.content
     : (displayContent !== undefined ? displayContent : (message.content || ''))
+
+  const evidence = useMemo(() => extractEvidenceFromMessage(message), [message])
+
+  const handleCopyAssistantMessage = async () => {
+    const textToCopy = finalDisplayContent || ''
+    if (!textToCopy.trim()) return
+    try {
+      await copyToClipboard(textToCopy)
+      setIsCopied(true)
+      toast.success(t('retrievePanel.chatMessage.copySuccess', 'Content copied to clipboard'))
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch {
+      toast.error(t('retrievePanel.chatMessage.copyError', 'Copy operation failed'))
+    }
+  }
 
   // Load KaTeX rehype plugin dynamically
   // Note: KaTeX extensions (mhchem, copy-tex) are imported statically in main.tsx
@@ -236,12 +256,30 @@ export const ChatMessage = ({
     <div
       className={`${
         message.role === 'user'
-          ? 'max-w-[85%] bg-primary text-primary-foreground shadow-xs'
+          ? 'max-w-[85%] bg-primary text-primary-foreground shadow-xs rounded-2xl rounded-tr-xs px-4 py-3'
           : message.isError
-            ? 'w-[95%] bg-destructive/10 border border-destructive/30 text-destructive shadow-xs'
-            : 'w-[95%] bg-card/80 border border-border/70 text-card-foreground shadow-xs backdrop-blur-xs'
-      } min-w-0 rounded-2xl px-4 py-3`}
+            ? 'w-full bg-destructive/10 border border-destructive/30 text-destructive shadow-xs rounded-2xl p-4 sm:p-5'
+            : 'w-full bg-card/85 border border-border/70 text-card-foreground shadow-xs backdrop-blur-xs rounded-2xl p-4 sm:p-5'
+      } min-w-0`}
     >
+      {/* Assistant Header */}
+      {message.role === 'assistant' && (
+        <div className="mb-3 flex items-center justify-between border-b border-border/40 pb-2">
+          <div className="flex items-center gap-2">
+            <div className="flex size-6 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+              <BotIcon className="size-3.5" />
+            </div>
+            <span className="text-xs font-semibold tracking-tight text-foreground">
+              LightRAG Assistant
+            </span>
+            {message.isError && (
+              <span className="rounded-md border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive font-mono">
+                Error
+              </span>
+            )}
+          </div>
+        </div>
+      )}
       {/* Before any answer text: the timing row sits on top and the thinking
           hint appears beneath it, so the time doesn't jump when "Thinking..."
           shows up. Once content arrives, the row moves below the answer. */}
@@ -346,9 +384,44 @@ export const ChatMessage = ({
           role={message.role}
         />
       )}
-      {/* Once answer text has started, the timing row follows at the end of
-          the answer (progress is already hidden by then). */}
-      {hasContent && timingRow}
+      {/* Action Bar for Assistant Messages once content exists */}
+      {message.role === 'assistant' && hasContent && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-3">
+            {timingRow}
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            {evidence.hasEvidence && (
+              <button
+                type="button"
+                onClick={() => setIsEvidenceOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                title="查看本次回答命中的证据文档与知识切片"
+              >
+                <FileSearchIcon className="size-3.5" />
+                <span>证据溯源 ({evidence.documents.length})</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleCopyAssistantMessage}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+              title="复制回答 Markdown 内容"
+            >
+              {isCopied ? <CheckIcon className="size-3.5 text-emerald-400" /> : <CopyIcon className="size-3.5" />}
+              <span>{isCopied ? '已复制' : '复制'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Evidence Drawer for citation and entity inspection */}
+      {message.role === 'assistant' && (
+        <EvidenceDrawer
+          isOpen={isEvidenceOpen}
+          onClose={() => setIsEvidenceOpen(false)}
+          message={message}
+        />
+      )}
       {/* User-terminated hint - response may be incomplete */}
       {message.isAborted && (
         <div className="mt-1 text-xs italic text-muted-foreground">
