@@ -11,7 +11,9 @@
   - 环境管理：`/home/ubuntu/.local/bin/uv`
   - 常驻守护：`rag-service.service` (端口 8001) / `rag-webui.service` (端口 9621)
 - **本地宿主机 (Local Mirror)**：Mac 本地工作区（作为只读观察或镜像同步源）
-- **上层消费平台**：`ai-agent-platform`（通过公网直连 `http://152.136.27.196:8001/mcp`）
+- **上层消费平台**：`ai-agent-platform`
+  - 本地位置：与本项目处于同级目录（`../ai-agent-platform`）
+  - 交互方式：通过 MCP 协议对接 FastMCP 生产网关（端口 8001），消费 8 大核心工具矩阵
 
 ## 开发工作流范式：Remote-First (sshmy2 现场闭环)
 
