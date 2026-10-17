@@ -1,9 +1,12 @@
 import asyncio
+from datetime import datetime, timezone
+import json
+import logging
 import os
 import shutil
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import AsyncGenerator, Dict, Optional, Tuple
+from typing import Any, AsyncGenerator, Dict, Optional, Tuple
 
 from lightrag import LightRAG
 
@@ -12,6 +15,8 @@ from llm_client import (
     create_lightrag_embedding_func,
     unified_llm_func,
 )
+
+logger = logging.getLogger("workspace_manager")
 
 
 class TenantWorkspaceManager:
@@ -35,6 +40,76 @@ class TenantWorkspaceManager:
         p_dir = self.storage_root / tenant_id / project_id
         p_dir.mkdir(parents=True, exist_ok=True)
         return p_dir
+
+    def get_project_meta_path(self, tenant_id: str, project_id: str) -> Path:
+        """Returns physical path of meta.json for a project."""
+        if tenant_id == "__default" and project_id == "eval_benchmark":
+            eval_dir = self.storage_root / "eval_benchmark"
+            if eval_dir.exists():
+                return eval_dir / "meta.json"
+        return self.get_project_dir(tenant_id, project_id) / "meta.json"
+
+    def get_project_meta(self, tenant_id: str, project_id: str) -> Dict[str, Any]:
+        """Loads project metadata with fallback defaults."""
+        meta_path = self.get_project_meta_path(tenant_id, project_id)
+        if meta_path.exists():
+            try:
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        return {
+                            "tenant_id": data.get("tenant_id", tenant_id),
+                            "project_id": data.get("project_id", project_id),
+                            "name": data.get("name") or project_id,
+                            "code": data.get("code"),
+                            "description": data.get("description", ""),
+                            "updated_at": data.get("updated_at"),
+                        }
+            except Exception as e:
+                logger.warning(f"Failed to read project meta at {meta_path}: {e}")
+
+        # Default fallback names
+        name = project_id
+        if project_id == "11111111-1111-4111-8111-111111111111":
+            name = "平台默认项目"
+        elif project_id == "eval_benchmark":
+            name = "评测基准 (eval_benchmark)"
+
+        return {
+            "tenant_id": tenant_id,
+            "project_id": project_id,
+            "name": name,
+            "code": None,
+            "description": "",
+            "updated_at": None,
+        }
+
+    def save_project_meta(
+        self,
+        tenant_id: str,
+        project_id: str,
+        name: str,
+        code: Optional[str] = None,
+        description: str = "",
+    ) -> Dict[str, Any]:
+        """Atomically persists project metadata with POSIX tempfile replacement."""
+        meta_path = self.get_project_meta_path(tenant_id, project_id)
+        meta_path.parent.mkdir(parents=True, exist_ok=True)
+        clean_name = (name or "").strip() or project_id
+        clean_code = (code or "").strip() or None
+        data = {
+            "tenant_id": tenant_id,
+            "project_id": project_id,
+            "name": clean_name,
+            "code": clean_code,
+            "description": description or "",
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        temp_file = meta_path.with_suffix(".tmp")
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(str(temp_file), str(meta_path))
+        return data
 
     def get_active_version_name(self, tenant_id: str, project_id: str) -> str:
         """Resolves the current active version folder name."""

@@ -212,6 +212,12 @@ class WorkspaceSelectRequest(BaseModel):
     project_id: str
 
 
+class WorkspaceMetaUpdateRequest(BaseModel):
+    name: str
+    code: Optional[str] = None
+    description: Optional[str] = ""
+
+
 class RollbackRequest(BaseModel):
     tenant_id: str = "__default"
     project_id: str
@@ -258,7 +264,7 @@ async def get_ops_status(request: Request):
 
 @ops_router.get("/workspaces")
 async def list_workspaces():
-    """Scans and returns all available multi-tenant workspaces."""
+    """Scans and returns all available multi-tenant workspaces with project metadata."""
     workspaces = []
     curr_tenant, curr_project = current_workspace_ctx.get()
 
@@ -269,9 +275,13 @@ async def list_workspaces():
                 continue
             if tenant_dir.name == "eval_benchmark":
                 # Legacy root project
+                meta = workspace_mgr.get_project_meta("__default", "eval_benchmark")
                 workspaces.append({
                     "tenant_id": "__default",
                     "project_id": "eval_benchmark",
+                    "name": meta["name"],
+                    "code": meta.get("code"),
+                    "description": meta.get("description", ""),
                     "active_version": "rev_1",
                     "is_current": (curr_project == "eval_benchmark"),
                 })
@@ -286,14 +296,47 @@ async def list_workspaces():
                         active_rev = active_link.resolve().name
                     except Exception:
                         active_rev = "rev_1"
+                meta = workspace_mgr.get_project_meta(tenant_dir.name, proj_dir.name)
                 workspaces.append({
                     "tenant_id": tenant_dir.name,
                     "project_id": proj_dir.name,
+                    "name": meta["name"],
+                    "code": meta.get("code"),
+                    "description": meta.get("description", ""),
                     "active_version": active_rev,
                     "is_current": (tenant_dir.name == curr_tenant and proj_dir.name == curr_project),
                 })
 
     return {"total": len(workspaces), "workspaces": workspaces}
+
+
+@ops_router.get("/workspaces/{tenant_id}/{project_id}/meta")
+async def get_workspace_meta(tenant_id: str, project_id: str):
+    """Retrieves project metadata."""
+    return workspace_mgr.get_project_meta(tenant_id.strip(), project_id.strip())
+
+
+@ops_router.put("/workspaces/{tenant_id}/{project_id}/meta")
+async def update_workspace_meta(
+    tenant_id: str, project_id: str, payload: WorkspaceMetaUpdateRequest
+):
+    """Updates metadata (friendly name, code, description) for a workspace."""
+    tenant = tenant_id.strip() or "__default"
+    project = project_id.strip()
+    if not project:
+        raise HTTPException(status_code=400, detail="project_id cannot be empty")
+    saved = workspace_mgr.save_project_meta(
+        tenant_id=tenant,
+        project_id=project,
+        name=payload.name,
+        code=payload.code,
+        description=payload.description or "",
+    )
+    return {
+        "status": "success",
+        "message": f"Updated metadata for {tenant}:{project}",
+        "metadata": saved,
+    }
 
 
 @ops_router.post("/workspaces/select")
@@ -525,10 +568,25 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
             or "11111111-1111-4111-8111-111111111111"
         ).strip()
 
-        # 2. Warm up engine for current workspace
+        # 2. Self-healing project metadata if project_name supplied in query parameters
+        project_name = (
+            request.query_params.get("project_name")
+            or request.query_params.get("name")
+        )
+        if project_name and project_name.strip():
+            try:
+                workspace_mgr.save_project_meta(
+                    tenant_id=tenant_id,
+                    project_id=project_id,
+                    name=project_name.strip(),
+                )
+            except Exception as e:
+                logger.warning(f"Failed to auto-heal project meta for {tenant_id}:{project_id}: {e}")
+
+        # 3. Warm up engine for current workspace
         await dynamic_rag_proxy.ensure_instance(tenant_id, project_id)
 
-        # 3. Bind contextvar
+        # 4. Bind contextvar
         token_ctx = current_workspace_ctx.set((tenant_id, project_id))
 
         try:

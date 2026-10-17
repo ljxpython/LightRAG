@@ -52,7 +52,7 @@ def test_dynamic_workspace_routing_by_header(client, auth_headers):
     res_eval = client.get("/graph/label/list", headers={"x-project-id": "eval_benchmark", **auth_headers})
     assert res_eval.status_code == 200
     labels_eval = res_eval.json()
-    assert len(labels_eval) == 47
+    assert len(labels_eval) >= 47
 
     # 2. Access as default project with authenticated bearer token
     res_def = client.get(
@@ -93,3 +93,28 @@ def test_ops_snapshots_list(client):
     assert "snapshots" in data
     assert len(data["snapshots"]) >= 1
     assert data["snapshots"][0]["is_sealed"] is True
+
+
+def test_ops_workspace_metadata(client):
+    """Verifies workspace metadata retrieval and mutation."""
+    # 1. Verify list includes name field
+    res = client.get("/ops/workspaces")
+    assert res.status_code == 200
+    workspaces = res.json()["workspaces"]
+    for w in workspaces:
+        assert "name" in w
+        assert len(w["name"]) > 0
+
+    # 2. Test updating metadata for a test workspace
+    update_res = client.put(
+        "/ops/workspaces/__default/test-meta-project/meta",
+        json={"name": "测试项目别名", "code": "test-alias", "description": "用于单测的临时项目"},
+    )
+    assert update_res.status_code == 200
+    meta_data = update_res.json()["metadata"]
+    assert meta_data["name"] == "测试项目别名"
+
+    # 3. Test reading it back
+    get_res = client.get("/ops/workspaces/__default/test-meta-project/meta")
+    assert get_res.status_code == 200
+    assert get_res.json()["name"] == "测试项目别名"

@@ -251,6 +251,17 @@ def create_mcp_server(
     ) -> Dict[str, Any]:
         """Submits a platform managed file upload for asynchronous indexing."""
         scope = _get_current_scope()
+        if isinstance(file_ref, dict):
+            proj_name = (
+                file_ref.get("project_name")
+                or file_ref.get("metadata", {}).get("project_name")
+            )
+            if proj_name and isinstance(proj_name, str) and proj_name.strip():
+                try:
+                    mgr.save_project_meta(scope.tenant_id, scope.project_id, name=proj_name.strip())
+                except Exception as e:
+                    logger.warning(f"Failed to auto-heal project meta on submit: {e}")
+
         try:
             receipt = ingest_service.submit_document(
                 scope.tenant_id, scope.project_id, file_ref
@@ -354,6 +365,8 @@ def create_mcp_server(
                 tenant_id=scope.tenant_id,
                 project_id=scope.project_id,
             )
+            meta = mgr.get_project_meta(scope.tenant_id, scope.project_id)
+            stats["project_name"] = meta["name"]
             return stats
         except Exception as e:
             logger.error(f"Failed to collect project stats: {e}", exc_info=True)
@@ -375,7 +388,13 @@ def create_mcp_server(
                 return sc
         t_param = req.query_params.get("tenant_id")
         p_param = req.query_params.get("project_id")
+        name_param = req.query_params.get("project_name") or req.query_params.get("name")
         if t_param and p_param:
+            if name_param and name_param.strip():
+                try:
+                    mgr.save_project_meta(t_param, p_param, name=name_param.strip())
+                except Exception:
+                    pass
             return KnowledgeScope(tenant_id=t_param, project_id=p_param)
         return verifier.resolve_default_or_first_scope()
 
