@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -59,6 +59,9 @@ finally:
 from lease_manager import ReaderLeaseManager
 from snapshot_manager import SnapshotManager
 from workspace_manager import TenantWorkspaceManager
+from image_vlm_parser import register_image_vlm_engine
+
+register_image_vlm_engine()
 
 logger = logging.getLogger("webui_relay")
 
@@ -625,6 +628,23 @@ async def get_document_content(
     }
 
 app.include_router(ops_router)
+
+
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], include_in_schema=False)
+@app.api_route("/favicon.png", methods=["GET", "HEAD"], include_in_schema=False)
+async def get_root_favicon_png():
+    fav = repo_root / "lightrag" / "api" / "webui" / "favicon.png"
+    if fav.exists():
+        return FileResponse(fav, media_type="image/png")
+    return Response(status_code=404)
+
+
+@app.api_route("/favicon.svg", methods=["GET", "HEAD"], include_in_schema=False)
+async def get_root_favicon_svg():
+    fav = repo_root / "lightrag" / "api" / "webui" / "favicon.svg"
+    if fav.exists():
+        return FileResponse(fav, media_type="image/svg+xml")
+    return Response(status_code=404)
 
 
 # 6. Floating Overlay Removed: ProjectSelector and UserAccountMenu natively integrated into WebUI SiteHeader

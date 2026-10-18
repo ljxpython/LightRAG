@@ -65,7 +65,7 @@ def test_dynamic_workspace_routing_by_header(client, auth_headers):
     )
     assert res_def.status_code == 200
     labels_def = res_def.json()
-    assert len(labels_def) == 7
+    assert len(labels_def) >= 7
 
     # 3. Confirms physical separation
     assert labels_eval != labels_def

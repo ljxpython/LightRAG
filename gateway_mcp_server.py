@@ -51,6 +51,9 @@ from graph_explorer import GraphExplorer
 from ingest_service import KnowledgeIngestService, MIME_EXT
 from locator_resolver import LocatorResolver
 from workspace_manager import TenantWorkspaceManager
+from image_vlm_parser import register_image_vlm_engine
+
+register_image_vlm_engine()
 
 logger = logging.getLogger("fastmcp_gateway")
 
