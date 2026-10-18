@@ -40,12 +40,20 @@ const ResetButton = ({ onClick, title }: { onClick: () => void; title: string })
   </TooltipProvider>
 )
 
-export default function QuerySettings() {
+interface QuerySettingsProps {
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+}
+
+export default function QuerySettings({
+  collapsed: controlledCollapsed,
+  onToggleCollapse: controlledToggleCollapse
+}: QuerySettingsProps = {}) {
   const { t } = useTranslation()
   const querySettings = useQuerySettingsStore((state) => state.querySettings)
   const userPromptHistory = useSettingsStore((state) => state.userPromptHistory)
   const [scopeHelpOpen, setScopeHelpOpen] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+  const [internalCollapsed, setInternalCollapsed] = useState<boolean>(() => {
     try {
       return localStorage.getItem('lightrag_retrieval_sidebar_collapsed') === 'true'
     } catch {
@@ -53,15 +61,22 @@ export default function QuerySettings() {
     }
   })
 
+  const isCollapsed =
+    controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed
+
   const toggleCollapsed = useCallback(() => {
-    setIsCollapsed((prev) => {
+    if (controlledToggleCollapse) {
+      controlledToggleCollapse()
+      return
+    }
+    setInternalCollapsed((prev) => {
       const next = !prev
       try {
         localStorage.setItem('lightrag_retrieval_sidebar_collapsed', String(next))
       } catch {}
       return next
     })
-  }, [])
+  }, [controlledToggleCollapse])
 
   // What the tooltip's state was when the tap STARTED. Radix dismisses an open
   // tooltip from a document-level pointerdown listener, so by the time the
@@ -104,7 +119,7 @@ export default function QuerySettings() {
 
   if (isCollapsed) {
     return (
-      <div className="flex shrink-0 flex-col items-center py-3 w-12 rounded-xl border border-border/70 bg-card/75 backdrop-blur-md transition-all gap-4 select-none">
+      <div className="flex shrink-0 flex-col items-center py-3 w-12 rounded-xl border border-border/70 bg-card/75 backdrop-blur-md transition-all gap-4 select-none h-full">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -123,10 +138,13 @@ export default function QuerySettings() {
           </Tooltip>
         </TooltipProvider>
 
-        <div className="flex flex-col items-center gap-3">
-          <span className="text-[10px] font-mono tracking-widest text-muted-foreground [writing-mode:vertical-lr] rotate-180">
-            参数配置
-          </span>
+        <div className="flex flex-col items-center gap-2 select-none">
+          <div className="flex flex-col items-center text-[11px] font-medium text-muted-foreground tracking-widest leading-relaxed">
+            <span>参</span>
+            <span>数</span>
+            <span>配</span>
+            <span>置</span>
+          </div>
           <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-1 py-0.5 text-[9px] font-mono text-emerald-400 uppercase font-semibold">
             {querySettings.mode}
           </span>
@@ -136,8 +154,8 @@ export default function QuerySettings() {
   }
 
   return (
-    <Card className="flex shrink-0 flex-col w-[295px] border border-border/70 bg-card/80 backdrop-blur-md transition-all shadow-xs">
-      <CardHeader className="px-3.5 pt-3.5 pb-2">
+    <Card className="flex shrink-0 flex-col w-[295px] h-full max-h-full border border-border/70 bg-card/80 backdrop-blur-md transition-all shadow-xs overflow-hidden">
+      <CardHeader className="px-3.5 pt-3.5 pb-2 shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
             {t('retrievePanel.querySettings.parametersTitle')}
@@ -196,9 +214,9 @@ export default function QuerySettings() {
           </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent className="m-0 flex grow flex-col p-0 text-xs">
-        <div className="relative size-full">
-          <div className="absolute inset-0 flex flex-col gap-3.5 overflow-auto px-2.5 pb-3">
+      <CardContent className="m-0 flex grow flex-col p-0 text-xs min-h-0 overflow-hidden">
+        <div className="relative size-full min-h-0 flex-1">
+          <div className="absolute inset-0 flex flex-col gap-3.5 overflow-y-auto px-2.5 pb-3">
             {/* Section 1: 核心模式与预设 */}
             <div className="rounded-xl border border-border/70 bg-muted/20 p-2.5 space-y-2.5">
               <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground/90 border-b border-border/40 pb-1.5">

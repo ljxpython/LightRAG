@@ -55,7 +55,7 @@ export default function AppSettings({ className }: AppSettingsProps) {
               className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
             >
               <option value="en">English</option>
-              <option value="zh">中文</option>
+              <option value="zh">简体中文</option>
               <option value="fr">Français</option>
               <option value="ar">العربية</option>
               <option value="zh_TW">繁體中文</option>

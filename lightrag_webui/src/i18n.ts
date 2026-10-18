@@ -39,8 +39,12 @@ const resolveInitialLanguage = (): SupportedUiLanguage => {
   // the persisted value has no say — it is itself a browser-derived leftover,
   // and honoring it would keep a stale language after the browser's
   // preferences changed. useCustomizedContent resolves through the very same
-  // function, so UI text and branding can never land on different languages.
-  return resolveUiLanguage(persisted?.languageUserSelected, persisted?.language)
+  let resolved = resolveUiLanguage(persisted?.languageUserSelected, persisted?.language)
+  // Ensure Chinese experience ALWAYS defaults to Simplified Chinese ('zh')
+  if (resolved === 'zh_TW') {
+    resolved = 'zh'
+  }
+  return resolved
 }
 
 const initialLanguage = resolveInitialLanguage()
@@ -72,22 +76,20 @@ i18n
     returnNull: false,
   })
 
-// Sync the store to the resolved language WITHOUT marking it user-selected:
-// a browser-derived language must keep re-resolving on future visits.
-// Skipped entirely after a failed split migration: with skipHydration the
-// store holds defaults, and persisting ANY set() would replace the
-// unmigrated legacy envelope with a default-heavy v22 one (the storage
-// adapter also diverts such writes — this gate just avoids even that).
-// i18n itself already runs on `initialLanguage` via init() above.
+// Normalize store language on boot if it was previously set to zh_TW
 if (
   getSettingsMigrationError() == null &&
-  useSettingsStore.getState().language !== initialLanguage
+  (useSettingsStore.getState().language === 'zh_TW' || useSettingsStore.getState().language !== initialLanguage)
 ) {
   useSettingsStore.setState({ language: initialLanguage })
 }
 
-// Subscribe to language changes
+// Subscribe to language changes and prevent zh_TW fallback
 useSettingsStore.subscribe((state) => {
+  if (state.language === 'zh_TW') {
+    useSettingsStore.setState({ language: 'zh' })
+    return
+  }
   const currentLanguage = state.language
   if (i18n.language !== currentLanguage) {
     i18n.changeLanguage(currentLanguage)

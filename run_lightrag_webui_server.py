@@ -3,6 +3,7 @@ import html
 import json
 import logging
 import os
+import re
 import sys
 from contextvars import ContextVar
 from datetime import datetime, timezone
@@ -470,32 +471,60 @@ async def get_document_content(
     p_id = project_id or curr_project
     target_dir = resolve_project_working_dir(t_id, p_id)
 
+    # Pre-clean doc_id: handle composite <SEP> and chunk suffixes gracefully
+    clean_id = doc_id.split("<SEP>")[0].split(",")[0].strip()
+    if "-chunk-" in clean_id:
+        clean_id = re.sub(r"-chunk-\d+$", "", clean_id)
+
     def load_from_dir(d: Path):
         full_content = ""
         found = False
+        resolved_doc_id = clean_id
+        doc_name = ""
+
         full_docs_file = d / "kv_store_full_docs.json"
+        chunks_file = d / "kv_store_text_chunks.json"
+
+        # If clean_id is a chunk ID directly, try to reverse-lookup its full_doc_id
+        if chunks_file.exists():
+            try:
+                with open(chunks_file, "r", encoding="utf-8") as f:
+                    all_chunks = json.load(f)
+                    if clean_id in all_chunks and isinstance(all_chunks[clean_id], dict):
+                        parent_id = all_chunks[clean_id].get("full_doc_id")
+                        if parent_id:
+                            resolved_doc_id = parent_id
+            except Exception:
+                pass
+
         if full_docs_file.exists():
             try:
                 with open(full_docs_file, "r", encoding="utf-8") as f:
                     full_docs = json.load(f)
-                    if doc_id in full_docs:
+                    target_rec = full_docs.get(resolved_doc_id) or full_docs.get(clean_id)
+                    if target_rec:
                         found = True
-                        rec = full_docs[doc_id]
-                        if isinstance(rec, dict):
-                            full_content = rec.get("content", "")
-                        elif isinstance(rec, str):
-                            full_content = rec
+                        if isinstance(target_rec, dict):
+                            full_content = target_rec.get("content", "")
+                            doc_name = target_rec.get("file_path", "")
+                        elif isinstance(target_rec, str):
+                            full_content = target_rec
             except Exception as e:
                 logger.warning(f"Failed to read full_docs in {d}: {e}")
 
         chunks = []
-        chunks_file = d / "kv_store_text_chunks.json"
         if chunks_file.exists():
             try:
                 with open(chunks_file, "r", encoding="utf-8") as f:
                     all_chunks = json.load(f)
                     for cid, cval in all_chunks.items():
-                        if cid.startswith(doc_id) or (isinstance(cval, dict) and cval.get("full_doc_id") == doc_id):
+                        c_parent = cval.get("full_doc_id") if isinstance(cval, dict) else ""
+                        if (
+                            cid.startswith(resolved_doc_id)
+                            or cid.startswith(clean_id)
+                            or c_parent == resolved_doc_id
+                            or c_parent == clean_id
+                        ):
                             found = True
                             tokens = cval.get("tokens", 0) if isinstance(cval, dict) else 0
                             content = cval.get("content", "") if isinstance(cval, dict) else str(cval)
@@ -506,33 +535,86 @@ async def get_document_content(
                                 "content": content,
                                 "chunk_order_index": order_idx
                             })
+                            if not doc_name and isinstance(cval, dict):
+                                doc_name = cval.get("file_path", "")
             except Exception as e:
                 logger.warning(f"Failed to read text_chunks in {d}: {e}")
 
+        # Try to resolve title from doc_status if available
+        status_file = d / "kv_store_doc_status.json"
+        if status_file.exists() and not doc_name:
+            try:
+                with open(status_file, "r", encoding="utf-8") as f:
+                    all_status = json.load(f)
+                    stat = all_status.get(resolved_doc_id) or all_status.get(clean_id)
+                    if isinstance(stat, dict):
+                        doc_name = stat.get("file_path", "") or stat.get("metadata", {}).get("file_name", "")
+            except Exception:
+                pass
+
         chunks.sort(key=lambda x: (x.get("chunk_order_index", 0), x["chunk_id"]))
-        return found, full_content, chunks
+        return found, full_content, chunks, doc_name
 
     # 1. First probe targeted workspace
-    found, full_content, chunks = load_from_dir(target_dir)
+    found, full_content, chunks, doc_name = load_from_dir(target_dir)
     source_dir = str(target_dir)
 
     # 2. If not found in target_dir, search across all candidate workspace revisions under storage_root
     if not found:
-        logger.info(f"Doc {doc_id} not found in {target_dir}, searching other workspaces...")
+        logger.info(f"Doc {clean_id} not found in {target_dir}, searching other workspaces...")
         for cand_dir in storage_root.glob("**/kv_store_full_docs.json"):
             wdir = cand_dir.parent
-            f, fc, ch = load_from_dir(wdir)
+            f, fc, ch, dn = load_from_dir(wdir)
             if f:
                 found = True
                 full_content = fc
                 chunks = ch
+                doc_name = dn
                 source_dir = str(wdir)
-                logger.info(f"Found doc {doc_id} in {wdir}")
                 break
+
+    # 3. Model-parsed resolution: strictly resolve from system-parsed data (chunks or __parsed__ store), NEVER live re-extract with pypdf
+    parsed_dir = target_dir / "__parsed__"
+    if not parsed_dir.exists():
+        # Check parent workspace directories for __parsed__
+        for cand in [target_dir.parent / "__parsed__", target_dir.parent.parent / "__parsed__", Path("eval_data/__parsed__")]:
+            if cand.exists():
+                parsed_dir = cand
+                break
+
+    # If full_content is empty or a pure ingest-stub but we have parsed chunks, assemble from chunks
+    if (not full_content or (full_content.startswith("Title:") and "Original Path:" in full_content)) and chunks:
+        # Check if chunks contain richer parsed body than the stub
+        chunk_texts = [c["content"] for c in chunks if c.get("content")]
+        assembled_chunks = "\n\n".join(chunk_texts)
+        if len(assembled_chunks) > len(full_content):
+            full_content = assembled_chunks
+
+    # If parsed directory exists, check if model parser saved the markdown artifact
+    if parsed_dir and parsed_dir.exists() and doc_name:
+        clean_name = Path(doc_name).name
+        # Match by base name (e.g. operations.md, api.md)
+        for cand_file in parsed_dir.glob(f"{Path(clean_name).stem}*"):
+            if cand_file.is_file() and cand_file.suffix in [".md", ".txt", ".json"]:
+                try:
+                    parsed_text = cand_file.read_text(encoding="utf-8")
+                    if len(parsed_text) > len(full_content):
+                        full_content = parsed_text
+                        logger.info(f"Loaded {len(full_content)} chars from model-parsed artifact {cand_file}")
+                        break
+                except Exception as ex:
+                    logger.warning(f"Failed to read parsed artifact {cand_file}: {ex}")
+
+    # Fallback to Title if doc_name is still "unknown_source"
+    if (not doc_name or doc_name == "unknown_source") and full_content.startswith("Title:"):
+        title_match = re.search(r"Title:\s*([^\n\r]+)", full_content)
+        if title_match:
+            doc_name = title_match.group(1).strip()
 
     return {
         "status": "success",
-        "doc_id": doc_id,
+        "doc_id": clean_id,
+        "doc_name": doc_name or clean_id,
         "tenant_id": t_id,
         "project_id": p_id,
         "found": found,

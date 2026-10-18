@@ -142,9 +142,11 @@ export default function FolderTree({
       <div className="flex items-center justify-between px-3.5 py-3 border-b border-border/40">
         <div className="flex items-center gap-2">
           <span className="font-bold text-sm tracking-tight text-foreground">Folders</span>
-          <span className="text-[11px] font-mono px-1.5 py-0.2 rounded-full bg-primary/10 text-primary">
-            {folders.length}
-          </span>
+          {folders.length > 0 && (
+            <span className="text-[11px] font-mono px-1.5 py-0.2 rounded-full bg-primary/10 text-primary">
+              {folders.length}
+            </span>
+          )}
         </div>
         <Button
           variant="ghost"
@@ -158,19 +160,21 @@ export default function FolderTree({
         </Button>
       </div>
 
-      {/* 搜索框 - 对齐 Style B */}
-      <div className="px-2.5 pt-2.5 pb-1">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search folders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-7 pr-2.5 py-1.5 text-xs rounded-lg border border-border/70 bg-background/60 placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1.5 focus:ring-primary/40 focus:border-primary/80 transition-all"
-          />
-          <span className="absolute left-2.5 top-2 text-muted-foreground pointer-events-none">🔍</span>
+      {/* 搜索框 - 仅当有自定义文件夹时展示 */}
+      {folders.length > 0 && (
+        <div className="px-2.5 pt-2.5 pb-1">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search folders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-7 pr-2.5 py-1.5 text-xs rounded-lg border border-border/70 bg-background/60 placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1.5 focus:ring-primary/40 focus:border-primary/80 transition-all"
+            />
+            <span className="absolute left-2.5 top-2 text-muted-foreground pointer-events-none">🔍</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-2 py-2 space-y-4 text-xs">
         {/* 全部文档导航项 */}
@@ -198,12 +202,13 @@ export default function FolderTree({
           </button>
         </div>
 
-        {/* 业务文件夹列表 */}
-        <div className="space-y-1">
-          <div className="px-2 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider">
-            业务目录 (Folders)
-          </div>
-          <div className="space-y-0.5">
+        {/* 业务文件夹列表 - 仅当有创建的业务目录时展示 */}
+        {folders.length > 0 && (
+          <div className="space-y-1">
+            <div className="px-2 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider">
+              业务目录 (Folders)
+            </div>
+            <div className="space-y-0.5">
             {filteredFolders.map((folder) => {
               const isSelected = activeFolderId === folder.id
               const count = folderCounts[folder.id] || 0
@@ -279,6 +284,7 @@ export default function FolderTree({
             })}
           </div>
         </div>
+        )}
 
         {/* 快捷状态过滤器 */}
         <div className="space-y-1 pt-2 border-t border-border/40">

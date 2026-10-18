@@ -184,12 +184,19 @@ interface GraphState {
   graphDataVersion: number
   incrementGraphDataVersion: () => void
 
+  // Subgraph exploration depth (1, 2, or 3 degrees)
+  exploreDepth: 1 | 2 | 3
+  setExploreDepth: (depth: 1 | 2 | 3) => void
+
   // Methods for updating graph elements and UI state together
   updateNodeAndSelect: (nodeId: string, entityId: string, propertyName: string, newValue: string) => Promise<void>
   updateEdgeAndSelect: (edgeId: string, dynamicId: string, sourceId: string, targetId: string, propertyName: string, newValue: string) => Promise<void>
 }
 
 const useGraphStoreBase = create<GraphState>()((set, get) => ({
+  exploreDepth: 2,
+  setExploreDepth: (depth: 1 | 2 | 3) => set({ exploreDepth: depth }),
+
   selectedNode: null,
   focusedNode: null,
   selectedEdge: null,

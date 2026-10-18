@@ -259,25 +259,30 @@ export const ChatMessage = ({
           ? 'max-w-[85%] bg-primary text-primary-foreground shadow-xs rounded-2xl rounded-tr-xs px-4 py-3'
           : message.isError
             ? 'w-full bg-destructive/10 border border-destructive/30 text-destructive shadow-xs rounded-2xl p-4 sm:p-5'
-            : 'w-full bg-card/85 border border-border/70 text-card-foreground shadow-xs backdrop-blur-xs rounded-2xl p-4 sm:p-5'
+            : 'w-full bg-card/60 dark:bg-card/40 border border-border/70 text-card-foreground shadow-xs backdrop-blur-md rounded-2xl p-4 sm:p-5'
       } min-w-0`}
     >
       {/* Assistant Header */}
       {message.role === 'assistant' && (
-        <div className="mb-3 flex items-center justify-between border-b border-border/40 pb-2">
-          <div className="flex items-center gap-2">
-            <div className="flex size-6 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+        <div className="mb-3 flex items-center justify-between border-b border-border/40 pb-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-6 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 via-blue-500/20 to-emerald-500/20 border border-blue-500/30 text-blue-500">
               <BotIcon className="size-3.5" />
             </div>
-            <span className="text-xs font-semibold tracking-tight text-foreground">
-              LightRAG Assistant
-            </span>
-            {message.isError && (
-              <span className="rounded-md border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive font-mono">
-                Error
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold tracking-tight text-foreground">
+                OmniRAG Intelligence
               </span>
-            )}
+              <span className="rounded bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.2 text-[9px] font-mono text-emerald-500 dark:text-emerald-400 font-semibold">
+                Verified RAG
+              </span>
+            </div>
           </div>
+          {message.isError && (
+            <span className="rounded-md border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive font-mono">
+              Error
+            </span>
+          )}
         </div>
       )}
       {/* Before any answer text: the timing row sits on top and the thinking
@@ -475,7 +480,7 @@ const MessageMarkdown = memo(function MessageMarkdown({
     <div className="relative">
       <div className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-6 [&_.footnotes]:pt-3 [&_.footnotes]:border-t [&_.footnotes]:border-border/60 [&_.footnotes_ol]:text-xs [&_.footnotes_li]:my-1.5 [&_.footnotes_li]:text-muted-foreground [&_a[href^='#fn']]:inline-flex [&_a[href^='#fn']]:items-center [&_a[href^='#fn']]:justify-center [&_a[href^='#fn']]:px-1.5 [&_a[href^='#fn']]:h-4 [&_a[href^='#fn']]:text-[10px] [&_a[href^='#fn']]:font-mono [&_a[href^='#fn']]:rounded [&_a[href^='#fn']]:border [&_a[href^='#fn']]:border-emerald-500/30 [&_a[href^='#fn']]:bg-emerald-500/10 [&_a[href^='#fn']]:text-emerald-400 [&_a[href^='#fn']]:no-underline [&_a[href^='#fn']]:hover:bg-emerald-500/20 [&_a[href^='#fn']]:transition-colors [&_a[href^='#fn']]:mx-0.5 ${
         role === 'user'
-          ? 'text-primary-foreground prose-inherit-color [&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:border-primary-foreground/40 [&_a[href^="#fn"]]:bg-primary-foreground/15 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
+          ? 'text-primary-foreground font-medium prose-inherit-color [&_.footnotes]:border-border/60 [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
           : 'text-foreground [&_.footnotes]:border-border/60 [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
       }`}>
         <ReactMarkdown

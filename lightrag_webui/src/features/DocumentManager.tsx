@@ -1692,17 +1692,8 @@ export default function DocumentManager() {
               </div>
             </div>
 
-            {/* 右侧：流水线胶囊与操作按钮 */}
-            <div className="flex items-center gap-3">
-              <div className="hidden xl:flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 px-3 py-1 rounded-full border border-border/40">
-                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Parse</span>
-                <span>➔</span>
-                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Extract</span>
-                <span>➔</span>
-                <span className="inline-flex items-center gap-1 text-blue-600 font-medium">✓ Embedding</span>
-                <span>➔</span>
-                <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">✓ Ready</span>
-              </div>
+            {/* 右侧：操作按钮 */}
+            <div className="flex items-center gap-2">
 
               {isSelectionMode && (
                 <div className="flex items-center gap-1.5">

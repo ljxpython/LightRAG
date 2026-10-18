@@ -74,14 +74,14 @@ export default function EnterpriseLogo({
       {withText && (
         <div className="flex flex-col min-w-0 leading-none">
           <div className="flex items-center gap-1.5">
-            <span className="font-bold text-sm tracking-tight text-foreground">
+            <span className="font-bold text-sm xl:text-base tracking-tight text-foreground">
               OmniRAG
             </span>
-            <span className="rounded bg-primary/10 px-1 py-0.2 text-[9px] font-mono font-semibold text-primary">
+            <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] xl:text-[10px] font-mono font-semibold text-primary">
               PRO
             </span>
           </div>
-          <span className="text-[10px] text-muted-foreground font-medium mt-0.5">
+          <span className="text-[10px] xl:text-xs text-muted-foreground font-medium mt-0.5">
             {subtitle}
           </span>
         </div>

@@ -31,13 +31,19 @@ import { toast } from 'sonner'
 
 interface SessionManagerProps {
   onNewSession?: () => void
+  onSelectSession?: (sessionId: string) => void
   className?: string
 }
 
-export default function SessionManager({ onNewSession, className }: SessionManagerProps) {
+export default function SessionManager({
+  onNewSession,
+  onSelectSession,
+  className
+}: SessionManagerProps) {
   const {
     sessions,
     activeSessionId,
+    generatingSessionIds,
     createSession,
     switchSession,
     updateSessionTitle,
@@ -50,9 +56,27 @@ export default function SessionManager({ onNewSession, className }: SessionManag
   const [collapsed, setCollapsed] = useState(false)
 
   const handleCreate = () => {
-    createSession('新对话', 'hybrid')
-    if (onNewSession) onNewSession()
+    const active = sessions.find((s) => s.id === activeSessionId)
+    if (active && active.messages.length === 0 && active.title === '新对话') {
+      toast.info('当前已是新会话')
+      if (onNewSession) onNewSession()
+      return
+    }
+    const newId = createSession('新对话', 'hybrid')
+    if (onSelectSession) {
+      onSelectSession(newId)
+    } else if (onNewSession) {
+      onNewSession()
+    }
     toast.success('已创建新对话')
+  }
+
+  const handleSelectSession = (sessionId: string) => {
+    if (sessionId === activeSessionId) return
+    switchSession(sessionId)
+    if (onSelectSession) {
+      onSelectSession(sessionId)
+    }
   }
 
   const handleOpenRename = (session: ChatSession, e: React.MouseEvent) => {
@@ -144,7 +168,7 @@ export default function SessionManager({ onNewSession, className }: SessionManag
           className="w-full justify-center gap-2 h-9 text-xs font-medium border-border/80 bg-background/80 hover:bg-accent hover:border-primary/40 text-foreground shadow-2xs"
         >
           <Plus className="size-3.5 text-primary" />
-          <span>新建对话 (New Chat)</span>
+          <span>新建对话</span>
         </Button>
       </div>
 
@@ -156,16 +180,17 @@ export default function SessionManager({ onNewSession, className }: SessionManag
 
         {sessions.map((session) => {
           const isActive = activeSessionId === session.id
+          const isGenerating = generatingSessionIds?.includes(session.id)
 
           return (
             <div
               key={session.id}
-              onClick={() => switchSession(session.id)}
+              onClick={() => handleSelectSession(session.id)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                  switchSession(session.id)
+                  handleSelectSession(session.id)
                 }
               }}
               className={cn(
@@ -176,12 +201,19 @@ export default function SessionManager({ onNewSession, className }: SessionManag
               )}
             >
               <div className="flex items-center gap-2 min-w-0 flex-1 pr-1">
-                <MessageSquare
-                  className={cn(
-                    'size-3.5 shrink-0',
-                    isActive ? 'text-primary' : 'text-muted-foreground/70'
-                  )}
-                />
+                {isGenerating ? (
+                  <span className="relative flex size-2 shrink-0">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+                  </span>
+                ) : (
+                  <MessageSquare
+                    className={cn(
+                      'size-3.5 shrink-0',
+                      isActive ? 'text-primary' : 'text-muted-foreground/70'
+                    )}
+                  />
+                )}
                 <span className="truncate text-xs" title={session.title}>
                   {session.title}
                 </span>

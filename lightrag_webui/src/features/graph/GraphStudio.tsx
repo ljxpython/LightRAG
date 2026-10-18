@@ -24,6 +24,8 @@ import {
 import Button from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { useGraphStore, RawNodeType, RawEdgeType } from '@/stores/graph'
+import { useSettingsStore } from '@/stores/settings'
+import { toast } from 'sonner'
 import DocumentInspector from '@/components/documents/DocumentInspector'
 
 const GraphViewer = lazy(() => import('@/features/GraphViewer'))
@@ -40,13 +42,14 @@ export default function GraphStudio() {
   const { t } = useTranslation()
   const rawGraph = useGraphStore.use.rawGraph()
   const isFetching = useGraphStore.use.isFetching()
+  const graphIsEmpty = useGraphStore.use.graphIsEmpty()
   const selectedNode = useGraphStore.use.selectedNode()
   const setSelectedNode = useGraphStore.use.setSelectedNode()
   const setFocusedNode = useGraphStore.use.setFocusedNode()
-  const fetchGraph = useGraphStore.getState().fetchGraph
+  const exploreDepth = useGraphStore.use.exploreDepth()
+  const setExploreDepth = useGraphStore.use.setExploreDepth()
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [exploreDepth, setExploreDepth] = useState<1 | 2 | 3>(2)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'focused' | 'full'>('full')
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -54,6 +57,15 @@ export default function GraphStudio() {
   // 1. 核心数据提取与统计
   const allNodes = useMemo(() => rawGraph?.nodes || [], [rawGraph])
   const allEdges = useMemo(() => rawGraph?.edges || [], [rawGraph])
+
+  // 全量重刷图谱
+  const handleRefreshGraph = useCallback(() => {
+    useSettingsStore.getState().setQueryLabel('*')
+    useGraphStore.getState().setGraphDataFetchAttempted(false)
+    useGraphStore.getState().setLastSuccessfulQueryLabel('')
+    useGraphStore.getState().incrementGraphDataVersion()
+    toast.success('正在重新全量拉取知识拓扑...')
+  }, [])
 
   // 实体类型归类提取
   const categoryStats = useMemo(() => {
@@ -106,18 +118,46 @@ export default function GraphStudio() {
     return rels
   }, [selectedNode, rawGraph, allEdges])
 
-  // 实体关联的来源文档 ID
-  const associatedDocIds = useMemo(() => {
+  // 实体关联的来源文档 ID 与解析名称 (彻底解构 <SEP> 与 chunk 后缀)
+  const associatedDocs = useMemo(() => {
     if (!selectedNodeData?.properties) return []
     const props = selectedNodeData.properties
-    const ids: string[] = []
+    const rawItems: string[] = []
     if (props.source_id && typeof props.source_id === 'string') {
-      ids.push(...props.source_id.split(',').map((s: string) => s.trim()))
+      const parts = props.source_id.split(/<SEP>|,/).map((s: string) => s.trim()).filter(Boolean)
+      rawItems.push(...parts)
     }
     if (props.doc_ids && Array.isArray(props.doc_ids)) {
-      ids.push(...props.doc_ids)
+      rawItems.push(...props.doc_ids)
     }
-    return Array.from(new Set(ids.filter(Boolean)))
+
+    const uniqueDocIds = new Set<string>()
+    const docList: Array<{ docId: string; chunkId: string; fileName: string }> = []
+
+    for (const item of rawItems) {
+      // 提取真实 docId (剥离 -chunk-000 后缀)
+      const cleanedDocId = item.replace(/-chunk-\d+$/, '').trim()
+      if (cleanedDocId && !uniqueDocIds.has(cleanedDocId)) {
+        uniqueDocIds.add(cleanedDocId)
+        // 尝试解析友好源文件名
+        let resolvedName = ''
+        if (props.file_path && props.file_path !== 'unknown_source') {
+          resolvedName = props.file_path.split('/').pop() || ''
+        }
+        if (!resolvedName && props.title) {
+          resolvedName = props.title
+        }
+        if (!resolvedName && selectedNodeData.id.endsWith('.pdf')) {
+          resolvedName = selectedNodeData.id
+        }
+        docList.push({
+          docId: cleanedDocId,
+          chunkId: item,
+          fileName: resolvedName || cleanedDocId
+        })
+      }
+    }
+    return docList
   }, [selectedNodeData])
 
   // 快速聚焦目标实体
@@ -206,7 +246,12 @@ export default function GraphStudio() {
               <button
                 key={d}
                 type="button"
-                onClick={() => setExploreDepth(d)}
+                onClick={() => {
+                  setExploreDepth(d)
+                  if (!selectedNode) {
+                    toast.info(`已切换为 ${d}° 局部子图模式。请在图谱中选择任意实体节点查看局部脉络！`)
+                  }
+                }}
                 className={cn(
                   'px-2 py-0.5 text-xs rounded-lg font-medium transition-all cursor-pointer',
                   exploreDepth === d
@@ -222,10 +267,9 @@ export default function GraphStudio() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => fetchGraph(true)}
+            onClick={handleRefreshGraph}
             disabled={isFetching}
             className="h-8 gap-1.5 text-xs rounded-xl border-border/70"
-            tooltip="重新全量加载知识拓扑"
           >
             <RefreshCw className={cn('size-3.5', isFetching && 'animate-spin')} />
             <span className="hidden sm:inline">刷新图谱</span>
@@ -333,20 +377,44 @@ export default function GraphStudio() {
             <GraphViewer />
           </Suspense>
 
-          {/* 悬浮聚焦提示胶囊 */}
+          {/* 悬浮聚焦提示胶囊 (居中悬浮在顶部中央，彻底避免与左上角搜索/控制栏冲突) */}
           {selectedNode && (
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card/90 backdrop-blur-md border border-purple-500/30 shadow-md text-xs animate-in fade-in-50">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-purple-500/40 shadow-lg text-xs animate-in fade-in zoom-in-95">
               <span className="size-2 rounded-full bg-purple-500 animate-pulse" />
-              <span className="text-muted-foreground">当前聚焦:</span>
-              <span className="font-bold text-foreground">{selectedNode}</span>
+              <span className="text-muted-foreground font-medium">当前聚焦:</span>
+              <span className="font-bold text-foreground max-w-[200px] truncate">{selectedNode}</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-500/10 text-purple-600 font-mono font-semibold">
+                {exploreDepth}° 局部拓扑
+              </span>
               <button
                 type="button"
                 onClick={() => setSelectedNode(null)}
-                className="text-muted-foreground hover:text-foreground ml-1 font-bold cursor-pointer"
+                className="text-muted-foreground hover:text-foreground ml-1 font-bold cursor-pointer rounded-full p-0.5 hover:bg-muted"
                 title="取消聚焦"
               >
                 ×
               </button>
+            </div>
+          )}
+
+          {/* 图谱为空时的优雅兜底恢复卡片 */}
+          {allNodes.length === 0 && !isFetching && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 bg-background/85 backdrop-blur-xs text-center animate-in fade-in">
+              <div className="size-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 mb-3 shadow-inner">
+                <Network className="size-6" />
+              </div>
+              <h4 className="text-sm font-bold text-foreground mb-1">当前拓扑无可见数据</h4>
+              <p className="text-xs text-muted-foreground max-w-sm mb-4">
+                知识图谱处于未查询或空状态，点击下方按钮立即重新拉取全部实体与关联关系。
+              </p>
+              <Button
+                size="sm"
+                onClick={handleRefreshGraph}
+                className="gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-md"
+              >
+                <RefreshCw className="size-3.5" />
+                <span>重新加载全量图谱</span>
+              </Button>
             </div>
           )}
         </div>
@@ -428,22 +496,26 @@ export default function GraphStudio() {
                 <div className="flex items-center justify-between text-[11px] font-bold text-foreground">
                   <span className="flex items-center gap-1">
                     <FileText className="size-3.5 text-blue-500" />
-                    <span>溯源文档来源 ({associatedDocIds.length || '全库提取'})</span>
+                    <span>溯源文档来源 ({associatedDocs.length || '全库提取'})</span>
                   </span>
                 </div>
 
-                {associatedDocIds.length > 0 ? (
+                {associatedDocs.length > 0 ? (
                   <div className="space-y-1.5">
-                    {associatedDocIds.map((docId) => (
+                    {associatedDocs.map((doc) => (
                       <div
-                        key={docId}
+                        key={doc.docId}
                         className="p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/20 flex items-center justify-between gap-2"
                       >
                         <div className="min-w-0 flex-1">
-                          <div className="font-mono text-[11px] text-foreground truncate font-medium">{docId}</div>
-                          <div className="text-[10px] text-muted-foreground">提取实体权重关联切片</div>
+                          <div className="text-[11px] text-foreground truncate font-semibold" title={doc.fileName}>
+                            {doc.fileName}
+                          </div>
+                          <div className="font-mono text-[9px] text-muted-foreground truncate">
+                            ID: {doc.docId}
+                          </div>
                         </div>
-                        <DocumentInspector docId={docId} fileName={docId} />
+                        <DocumentInspector docId={doc.docId} fileName={doc.fileName} />
                       </div>
                     ))}
                   </div>

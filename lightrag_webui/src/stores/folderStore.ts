@@ -28,36 +28,7 @@ interface FolderState {
   removeDocTag: (docId: string, tag: string) => void
 }
 
-const DEFAULT_FOLDERS: KnowledgeFolder[] = [
-  {
-    id: 'folder-ops',
-    name: 'Operations Spec',
-    description: '线上运维规范、发布流程与应急手册',
-    color: 'emerald',
-    createdAt: 1718000000000
-  },
-  {
-    id: 'folder-api',
-    name: 'API Contracts',
-    description: '核心微服务接口协议与 FastMCP 工具契约',
-    color: 'blue',
-    createdAt: 1718000001000
-  },
-  {
-    id: 'folder-arch',
-    name: 'Architecture',
-    description: 'LightRAG 生产架构设计与存储拓扑',
-    color: 'indigo',
-    createdAt: 1718000002000
-  },
-  {
-    id: 'folder-guides',
-    name: 'Product Guides',
-    description: '产品使用指导与用户 FAQ',
-    color: 'amber',
-    createdAt: 1718000003000
-  }
-]
+const DEFAULT_FOLDERS: KnowledgeFolder[] = []
 
 export const useFolderStore = create<FolderState>()(
   persist(
@@ -170,6 +141,21 @@ export const useFolderStore = create<FolderState>()(
     }),
     {
       name: 'lightrag-knowledge-folders',
+      version: 2,
+      migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as Partial<FolderState>
+        if (version < 2) {
+          const oldFolders = state.folders || []
+          const filtered = oldFolders.filter(
+            (f) => !['folder-ops', 'folder-api', 'folder-arch', 'folder-guides'].includes(f.id)
+          )
+          return {
+            ...state,
+            folders: filtered
+          } as FolderState
+        }
+        return state as FolderState
+      },
       storage: createJSONStorage(() => localStorage)
     }
   )

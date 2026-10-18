@@ -6,8 +6,6 @@ import {
   Loader2,
   Layers,
   Search,
-  Maximize2,
-  Minimize2,
   X,
   ExternalLink,
   Code2,
@@ -93,7 +91,6 @@ export default function DocumentInspector({
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChunkIndex, setSelectedChunkIndex] = useState<number | null>(null)
-  const [isFullScreen, setIsFullScreen] = useState(false)
 
   const { docFolderMap, folders } = useFolderStore()
   const folderId = docFolderMap[docId]
@@ -171,12 +168,7 @@ export default function DocumentInspector({
       )}
 
       <DialogContent
-        className={cn(
-          'flex flex-col p-0 gap-0 overflow-hidden bg-background border border-border/80 shadow-2xl transition-all duration-200',
-          isFullScreen
-            ? 'w-[98vw] max-w-[98vw] h-[96vh] max-h-[96vh] rounded-lg'
-            : 'w-[92vw] max-w-6xl h-[88vh] max-h-[88vh] rounded-xl'
-        )}
+        className="flex flex-col p-0 gap-0 overflow-hidden bg-background border border-border/80 shadow-2xl transition-all duration-200 w-[94vw] max-w-7xl h-[88vh] max-h-[88vh] rounded-xl"
       >
         {/* 顶部工具栏 Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-card/80 backdrop-blur shrink-0">
@@ -212,14 +204,14 @@ export default function DocumentInspector({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0 pr-8">
             {/* 视口切换 */}
             <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 text-xs">
               <button
                 type="button"
                 onClick={() => setActiveTab('split')}
                 className={cn(
-                  'px-2.5 py-1 rounded-md font-medium transition-all',
+                  'px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer',
                   activeTab === 'split' ? 'bg-background text-foreground shadow-2xs' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
@@ -229,7 +221,7 @@ export default function DocumentInspector({
                 type="button"
                 onClick={() => setActiveTab('content')}
                 className={cn(
-                  'px-2.5 py-1 rounded-md font-medium transition-all',
+                  'px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer',
                   activeTab === 'content' ? 'bg-background text-foreground shadow-2xs' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
@@ -239,7 +231,7 @@ export default function DocumentInspector({
                 type="button"
                 onClick={() => setActiveTab('chunks')}
                 className={cn(
-                  'px-2.5 py-1 rounded-md font-medium transition-all',
+                  'px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer',
                   activeTab === 'chunks' ? 'bg-background text-foreground shadow-2xs' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
@@ -252,22 +244,12 @@ export default function DocumentInspector({
                 variant="outline"
                 size="sm"
                 onClick={() => handleCopy(data.full_content, 'full_doc')}
-                className="gap-1.5 text-xs h-8"
+                className="gap-1.5 text-xs h-8 cursor-pointer"
               >
                 {copiedId === 'full_doc' ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
                 <span>复制全文</span>
               </Button>
             )}
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsFullScreen(!isFullScreen)}
-              className="size-8 text-muted-foreground hover:text-foreground"
-              tooltip={isFullScreen ? '退出全屏' : '全屏展示'}
-            >
-              {isFullScreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
-            </Button>
           </div>
         </div>
 

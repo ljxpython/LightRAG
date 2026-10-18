@@ -2,20 +2,21 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Activity,
   CheckCircle2,
-  Clock,
-  AlertTriangle,
-  Play,
-  RotateCcw,
   StopCircle,
   Terminal,
-  ChevronDown,
-  ChevronUp,
-  Layers,
-  Cpu,
-  Check,
-  X
+  RefreshCw,
+  Clock,
+  Layers
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/Dialog'
 import { getPipelineStatus, cancelPipeline, PipelineStatusResponse } from '@/api/lightrag'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -28,14 +29,13 @@ interface PipelineMonitorProps {
 
 export default function PipelineMonitor({
   onRefreshDocs,
-  className,
-  compact = false
+  className
 }: PipelineMonitorProps) {
+  const [modalOpen, setModalOpen] = useState(false)
   const [status, setStatus] = useState<PipelineStatusResponse | null>(null)
   const [isPolling, setIsPolling] = useState(true)
   const [canceling, setCanceling] = useState(false)
-  const [expanded, setExpanded] = useState(!compact)
-  const [showLogs, setShowLogs] = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const logsEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -52,35 +52,42 @@ export default function PipelineMonitor({
 
     if (isPolling) {
       fetchStatus()
-      timer = setInterval(fetchStatus, 3000)
+      // 如果弹窗打开或者有任务正在执行，每 2 秒高频刷新；平时 5 秒低频探测
+      const interval = modalOpen || status?.busy ? 2000 : 5000
+      timer = setInterval(fetchStatus, interval)
     }
 
     return () => {
       if (timer) clearInterval(timer)
     }
-  }, [isPolling])
+  }, [isPolling, modalOpen, status?.busy])
 
   useEffect(() => {
-    if (showLogs && logsEndRef.current) {
+    if (modalOpen && logsEndRef.current) {
       logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [status?.history_messages, showLogs])
+  }, [status?.history_messages, modalOpen])
 
-  const handleCancel = async () => {
+  const handleConfirmCancel = async () => {
+    setShowCancelConfirm(false)
     setCanceling(true)
     try {
-      await cancelPipeline()
-      toast.success('已发送取消流水线指令')
+      const res = await cancelPipeline()
+      if (res?.status === 'cancellation_requested') {
+        toast.success('已发送中断流水线指令')
+      } else {
+        toast.info('流水线当前未在运行')
+      }
       if (onRefreshDocs) onRefreshDocs()
     } catch (e) {
-      toast.error('取消流水线失败')
+      toast.error('中断流水线失败')
     } finally {
       setCanceling(false)
     }
   }
 
   const isBusy = Boolean(status?.busy)
-  const currentOp = status?.current_op || '空闲就绪 (Idle)'
+  const currentOp = status?.current_op || '空闲就绪'
   const messages = status?.history_messages || []
 
   // 判断流水线各阶段的当前高亮
@@ -113,141 +120,250 @@ export default function PipelineMonitor({
     { key: 'ready', label: '4. Ready', desc: '持久化与图谱就绪' }
   ] as const
 
+  const totalBatches = status?.batchs || 0
+  const curBatch = status?.cur_batch || 0
+  const progressPercent = totalBatches > 0 ? Math.min(100, Math.round((curBatch / totalBatches) * 100)) : 0
+
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-border/80 bg-card/70 backdrop-blur shadow-2xs overflow-hidden transition-all',
-        className
-      )}
-    >
-      {/* 状态总览条 Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border/40">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div
-            className={cn(
-              'size-2 rounded-full shrink-0 animate-pulse',
-              isBusy ? 'bg-amber-500' : 'bg-emerald-500'
-            )}
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-foreground">
-              {isBusy ? '任务流水线执行中' : '流水线监控中心'}
+    <>
+      {/* 顶栏极简触发按钮 (与 Scan / Upload 等高同规格对齐) */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setModalOpen(true)}
+        className={cn(
+          'gap-2 text-xs h-9 rounded-xl border-border/70 transition-all font-medium',
+          isBusy
+            ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/35 hover:bg-amber-500/20'
+            : 'text-muted-foreground hover:text-foreground hover:bg-accent/60',
+          className
+        )}
+        tooltip="点击查看流水线执行进度与实时日志"
+      >
+        {isBusy ? (
+          <>
+            <span className="relative flex size-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-amber-500" />
             </span>
-            <span
-              className={cn(
-                'px-2 py-0.5 text-[10px] font-mono rounded-full font-medium',
-                isBusy
-                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
-                  : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
-              )}
-            >
-              {isBusy ? currentOp : '就绪待命'}
-            </span>
-          </div>
-        </div>
+            <span className="truncate max-w-[150px]">流水线处理中 ({currentOp})</span>
+          </>
+        ) : (
+          <>
+            <Activity className="size-3.5 text-muted-foreground" />
+            <span>流水线状态</span>
+          </>
+        )}
+      </Button>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          {isBusy && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCancel}
-              disabled={canceling}
-              className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
-            >
-              <StopCircle className="size-3.5 mr-1" />
-              <span>中断流水线</span>
-            </Button>
-          )}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowLogs(!showLogs)}
-            className="h-7 text-xs text-muted-foreground hover:text-foreground"
-          >
-            <Terminal className="size-3 mr-1" />
-            <span>{showLogs ? '隐藏日志' : '实时日志'}</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setExpanded(!expanded)}
-            className="size-7 text-muted-foreground hover:text-foreground"
-          >
-            {expanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
-          </Button>
-        </div>
-      </div>
-
-      {/* 展开的阶段卡片与步骤条 */}
-      {expanded && (
-        <div className="p-4 space-y-4">
-          {/* 四阶段流水线 Step Flow */}
-          <div className="grid grid-cols-4 gap-2.5">
-            {steps.map((st) => {
-              const state = getStepStatus(st.key)
-              return (
-                <div
-                  key={st.key}
-                  className={cn(
-                    'p-3 rounded-lg border text-xs transition-all relative overflow-hidden',
-                    state === 'active' && 'bg-primary/5 border-primary/40 shadow-2xs',
-                    state === 'completed' && 'bg-muted/40 border-border/80',
-                    state === 'idle' && 'bg-muted/20 border-border/40 opacity-70',
-                    state === 'pending' && 'bg-muted/10 border-border/30 opacity-60'
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span
-                      className={cn(
-                        'font-semibold text-xs',
-                        state === 'active' ? 'text-primary' : 'text-foreground'
-                      )}
-                    >
-                      {st.label}
-                    </span>
-                    {state === 'completed' && (
-                      <CheckCircle2 className="size-3.5 text-emerald-500" />
-                    )}
-                    {state === 'active' && (
-                      <div className="size-2 rounded-full bg-primary animate-ping" />
-                    )}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground">{st.desc}</p>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* 实时控制台日志面板 */}
-          {showLogs && (
-            <div className="mt-2 rounded-lg border border-border/60 bg-muted/40 p-3 font-mono text-xs">
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40 text-[11px] text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <Terminal className="size-3 text-primary" />
-                  <span>Pipeline Execution Stream</span>
-                </div>
-                <span>{messages.length} 条流水线事件</span>
+      {/* 现代升级版居中弹出模态卡片 */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-[760px] p-0 overflow-hidden rounded-2xl border-border/80 bg-card shadow-2xl">
+          {/* Header 区域 */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-muted/20">
+            <div className="flex items-center gap-3">
+              <div
+                className={cn(
+                  'size-9 rounded-xl flex items-center justify-center border',
+                  isBusy
+                    ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                    : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                )}
+              >
+                <Activity className={cn('size-4.5', isBusy && 'animate-pulse')} />
               </div>
-              <div className="max-h-40 overflow-y-auto space-y-1 text-foreground/80 text-[11px]">
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                  流水线监控中心
+                  <span
+                    className={cn(
+                      'text-xs px-2 py-0.5 rounded-full font-mono font-medium border',
+                      isBusy
+                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                        : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                    )}
+                  >
+                    {isBusy ? currentOp : '就绪待命'}
+                  </span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  实时监控文档解析、实体与关系抽取、多维向量嵌入与知识图谱构建状态
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          {/* Body 区域 */}
+          <div className="px-6 py-5 space-y-4 max-h-[75vh] overflow-y-auto">
+            {/* 1. 四阶段流水线卡片 */}
+            <div className="grid grid-cols-4 gap-2.5">
+              {steps.map((st) => {
+                const state = getStepStatus(st.key)
+                return (
+                  <div
+                    key={st.key}
+                    className={cn(
+                      'p-3 rounded-xl border text-xs transition-all relative overflow-hidden flex flex-col justify-between min-h-[76px]',
+                      state === 'active' &&
+                        'bg-primary/10 border-primary/50 shadow-xs ring-1 ring-primary/20',
+                      state === 'completed' &&
+                        'bg-emerald-500/5 border-emerald-500/30 text-emerald-700 dark:text-emerald-400',
+                      state === 'pending' && 'bg-muted/20 border-border/40 opacity-60',
+                      state === 'idle' && 'bg-muted/15 border-border/40 opacity-70'
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span
+                        className={cn(
+                          'font-semibold text-xs',
+                          state === 'active' ? 'text-primary' : 'text-foreground'
+                        )}
+                      >
+                        {st.label}
+                      </span>
+                      {state === 'completed' && (
+                        <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                      )}
+                      {state === 'active' && (
+                        <span className="relative flex size-2 shrink-0">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                          <span className="relative inline-flex rounded-full size-2 bg-primary" />
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-tight">{st.desc}</p>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* 2. 任务批次进度信息 (当有活动任务或统计时显示) */}
+            {(isBusy || totalBatches > 0) && (
+              <div className="p-3.5 rounded-xl border border-border/60 bg-muted/25 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                    <Layers className="size-3.5 text-primary" />
+                    任务批次进度:
+                    <span className="text-foreground font-mono font-semibold">
+                      {curBatch} / {totalBatches || 1}
+                    </span>
+                  </span>
+                  <span className="font-mono text-primary font-semibold text-xs">
+                    {progressPercent}%
+                  </span>
+                </div>
+                {/* 进度条 */}
+                <div className="w-full h-1.5 bg-muted/60 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all duration-300 rounded-full"
+                    style={{ width: `${Math.max(5, progressPercent)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* 3. 实时终端控制台日志面板 */}
+            <div className="rounded-xl border border-border/60 bg-muted/30 p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs text-muted-foreground font-medium pb-1.5 border-b border-border/40">
+                <div className="flex items-center gap-1.5">
+                  <Terminal className="size-3.5 text-primary" />
+                  <span className="text-foreground font-semibold">
+                    实时流水线事件流 (Pipeline Execution Stream)
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono bg-muted/60 px-2 py-0.5 rounded-md">
+                  {messages.length} 条流水线事件
+                </span>
+              </div>
+              <div className="bg-zinc-950 text-zinc-200 border border-zinc-800/80 rounded-lg p-3 font-mono text-[11px] max-h-48 overflow-y-auto space-y-1 select-text shadow-inner">
                 {messages.length === 0 ? (
-                  <div className="text-muted-foreground italic">暂无流水线历史消息</div>
+                  <div className="text-zinc-500 italic py-4 text-center">
+                    暂无流水线历史事件
+                  </div>
                 ) : (
                   messages.map((msg, i) => (
-                    <div key={i} className="leading-relaxed hover:text-foreground">
-                      <span className="text-muted-foreground/60 mr-2">[{i + 1}]</span>
-                      {msg}
+                    <div
+                      key={i}
+                      className="leading-relaxed hover:bg-zinc-900/60 rounded px-1 -mx-1"
+                    >
+                      <span className="text-zinc-500 mr-2 select-none">
+                        [{String(i + 1).padStart(2, '0')}]
+                      </span>
+                      <span>{msg}</span>
                     </div>
                   ))
                 )}
                 <div ref={logsEndRef} />
               </div>
             </div>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+
+          {/* Footer 操作栏 */}
+          <div className="px-6 py-3.5 border-t border-border/50 bg-muted/15 flex items-center justify-between">
+            <div>
+              {isBusy ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCancelConfirm(true)}
+                  disabled={canceling}
+                  className="h-8 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+                >
+                  <StopCircle className="size-3.5 mr-1.5" />
+                  <span>中断流水线</span>
+                </Button>
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                  <span>流水线就绪，可随时执行文档扫描或增量上传</span>
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setModalOpen(false)}
+              className="h-8 text-xs rounded-lg px-4"
+            >
+              关闭
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 中断确认弹窗 */}
+      <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-destructive flex items-center gap-2">
+              <StopCircle className="size-5" />
+              确认中断当前流水线？
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground mt-2">
+              中断流水线将立即终止当前正在执行的切片、实体提取或多模态向量化任务，部分未完成的索引可能需要重新扫描构建。
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2.5 mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCancelConfirm(false)}
+              className="h-8 text-xs"
+            >
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleConfirmCancel}
+              className="h-8 text-xs"
+            >
+              确认中断
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

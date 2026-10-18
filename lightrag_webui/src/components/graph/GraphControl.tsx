@@ -38,6 +38,7 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
   const focusedEdge = useGraphStore.use.focusedEdge()
   const sigmaGraph = useGraphStore.use.sigmaGraph()
   const graphEdgeCount = useGraphStore.use.graphEdgeCount()
+  const exploreDepth = useGraphStore.use.exploreDepth()
 
   // Mirror GraphViewer's gating: above EDGE_PERF_LIMIT the sigma instance is
   // (re)built without the edge picking buffer, so edge events cannot fire even
@@ -399,11 +400,27 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
     }
 
     // Precompute the highlight context once, outside the reducers.
+    // BFS traversal up to exploreDepth (1, 2, or 3 degrees)
     const neighborSet = new Set<string>()
     let focusedNodeValid = false
     if (_focusedNode && graph.hasNode(_focusedNode)) {
       focusedNodeValid = true
-      graph.forEachNeighbor(_focusedNode, (neighbor) => neighborSet.add(neighbor))
+      neighborSet.add(_focusedNode)
+      let currentLevel: string[] = [_focusedNode]
+      const maxD = Math.max(1, Math.min(3, exploreDepth || 1))
+      for (let d = 0; d < maxD; d++) {
+        const nextLevel: string[] = []
+        for (const nId of currentLevel) {
+          graph.forEachNeighbor(nId, (neighbor) => {
+            if (!neighborSet.has(neighbor)) {
+              neighborSet.add(neighbor)
+              nextLevel.push(neighbor)
+            }
+          })
+        }
+        currentLevel = nextLevel
+        if (currentLevel.length === 0) break
+      }
     }
     let focusedEdgeSource = ''
     let focusedEdgeTarget = ''
@@ -460,12 +477,12 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
         const newData = { ...data, hidden: false, labelColor, color: edgeColor }
 
         if (focusedNodeValid) {
-          // No graph.extremities() here: it allocates an array per edge.
-          const touchesFocused =
-            graph.source(edge) === _focusedNode || graph.target(edge) === _focusedNode
+          const s = graph.source(edge)
+          const t = graph.target(edge)
+          const inSubGraph = neighborSet.has(s) && neighborSet.has(t)
           if (hideUnselectedEdges) {
-            if (!touchesFocused) newData.hidden = true
-          } else if (touchesFocused) {
+            if (!inSubGraph) newData.hidden = true
+          } else if (inSubGraph) {
             newData.color = edgeHighlightColor
           }
         } else if (focusedEdgeValid) {
@@ -493,7 +510,8 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
     hideUnselectedEdges,
     effectiveEdgeEvents,
     renderEdgeLabels,
-    renderLabels
+    renderLabels,
+    exploreDepth
   ])
 
   return null
