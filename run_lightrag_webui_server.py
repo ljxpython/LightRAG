@@ -42,6 +42,7 @@ os.environ["EMBEDDING_BINDING_HOST"] = os.environ.get("EMBEDDING_BASE_URL", "")
 os.environ["EMBEDDING_BINDING_API_KEY"] = os.environ.get("EMBEDDING_API_KEY", "")
 os.environ["EMBEDDING_MODEL"] = os.environ.get("EMBEDDING_MODEL", "text-embedding-v4")
 os.environ["EMBEDDING_DIM"] = os.environ.get("EMBEDDING_DIM", "1024")
+os.environ["SUMMARY_LANGUAGE"] = os.environ.get("SUMMARY_LANGUAGE", "Chinese")
 
 if "TOKEN_SECRET" not in os.environ:
     os.environ["TOKEN_SECRET"] = "secret-token-for-lightrag-webui-testing-123456"

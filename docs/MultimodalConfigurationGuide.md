@@ -34,8 +34,8 @@
 # 1. 动态文件路由分流表 (核心调度器)
 # ------------------------------------------------------------------------------
 # 规则格式: "ext1:parser1;ext2:parser2"
-# 单张图片强制走 image_vlm (直连视觉模型)；复合图文长文档走 mineru-i (高保真版面提取)
-LIGHTRAG_PARSER="png:image_vlm;jpg:image_vlm;jpeg:image_vlm;webp:image_vlm;bmp:image_vlm;pdf:mineru-i;docx:mineru-i;pptx:mineru-i;xlsx:mineru-i"
+# 单张图片/矢量图强制走 image_vlm (直连视觉模型)；复合图文长文档走 mineru-i (高保真版面提取)
+LIGHTRAG_PARSER="png:image_vlm;jpg:image_vlm;jpeg:image_vlm;webp:image_vlm;bmp:image_vlm;svg:image_vlm;gif:image_vlm;tiff:image_vlm;tif:image_vlm;ico:image_vlm;pdf:mineru-i;docx:mineru-i;pptx:mineru-i;xlsx:mineru-i"
 
 # ------------------------------------------------------------------------------
 # 2. 单图直连视觉大模型 (VLM - Direct Image Engine)
@@ -76,7 +76,11 @@ ENABLE_EQUATION_PROCESSING="true"
 VISION_BASE_URL="https://hk-api.maomaoai.pro/v1"
 VISION_MODEL="deepseek-v4.1-flash"
 VISION_API_KEY="sk-wJJDDZtU7AbQ3KmjqnHh9ncr8wqmm4KHmXyKGGk38etuxINO"
-VISION_MAX_TOKENS="8192"
+# ------------------------------------------------------------------------------
+# 5. 全局图谱与摘要语言控制 (避免实体和关系抽成英文)
+# ------------------------------------------------------------------------------
+# 默认为 English！若处理中文文档，必须显式设为 Chinese，否则抽取出的实体和关系全会被翻译成英文！
+SUMMARY_LANGUAGE="Chinese"
 ```
 
 ---
@@ -168,6 +172,21 @@ EMBEDDING_MAX_TOKENS='8192'
 > [!IMPORTANT]
 > **关于 `LLM_EXTRA_BODY_JSON` 的特别告诫**：
 > 当使用 DeepSeek 等带有深度思考（Reasoning）的模型做底层知识抽取时，必须设置 `thinking: {"type": "disabled"}`。否则模型会在正文前输出 `<think>...</think>`，直接破坏 LightRAG 官方内核的 JSON 实体抽取解析器，导致全部入库失败！
+
+---
+
+### 5. 全局知识抽取与摘要语言控制：`SUMMARY_LANGUAGE`
+
+```bash
+SUMMARY_LANGUAGE="Chinese"
+```
+
+#### 为什么必须显式配置？（深层机制）
+- **官方默认陷阱**：LightRAG 官方内核（`lightrag/constants.py`）将 `DEFAULT_SUMMARY_LANGUAGE` 默认写死为 `"English"`。
+- **大模型的死板执行**：在实体与关系抽取提示词（`lightrag/prompt.py`）中，模板明确声明 `The entire output (entity names, keywords, and descriptions) must be written in {language}`。
+  - 如果未设置 `SUMMARY_LANGUAGE=Chinese`，大模型即使看到纯中文文档/海报，也会机械地把所有实体名强制翻译为英文（如 `Adlerian Task Separation Wall`、`Feynman Technique`），且所有实体与关系描述全用英文编写！
+  - 这会导致中文知识库检索时实体匹配度严重断层，且在 WebUI 的 Graph Studio 中全是一片洋文。
+- **配置规则**：中文生产底座必须统一配置 `SUMMARY_LANGUAGE="Chinese"`，确保所有切块后的知识图谱实体、属性、关联描述全量以简体中文持久化。
 
 ---
 

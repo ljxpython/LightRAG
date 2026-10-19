@@ -7,7 +7,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
+  DialogFooter
 } from '@/components/ui/Dialog'
 import FileUploader from '@/components/ui/FileUploader'
 import { toast } from 'sonner'
@@ -22,7 +23,7 @@ import {
 import { errorMessage } from '@/lib/utils'
 import { getSupportedFileTypes, uploadDocument } from '@/api/lightrag'
 
-import { UploadIcon } from 'lucide-react'
+import { UploadIcon, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface UploadDocumentsDialogProps {
@@ -41,6 +42,7 @@ export default function UploadDocumentsDialog({
 }: UploadDocumentsDialogProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [progresses, setProgresses] = useState<Record<string, number>>({})
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({})
@@ -228,6 +230,10 @@ export default function UploadDocumentsDialog({
               console.error('Error refreshing documents:', err)
             })
           }
+          if (!hasErrors) {
+            setSelectedFiles([])
+            setOpen(false)
+          }
         }
       } catch (err) {
         console.error('Unexpected error during upload:', err)
@@ -240,6 +246,10 @@ export default function UploadDocumentsDialog({
   )
 
   const uploaderInputs = deriveUploaderInputs(fileTypes)
+  const validFiles = selectedFiles.filter(
+    (file) => !('rejected' in file && (file as any).rejected)
+  )
+  const validFilesCount = validFiles.length
 
   return (
     <Dialog
@@ -254,6 +264,7 @@ export default function UploadDocumentsDialog({
           // uploading before the capability matrix arrives.
           setFileTypes({ status: 'loading' })
         } else {
+          setSelectedFiles([])
           setProgresses({})
           setFileErrors({})
           setFileTypes({ status: 'idle' })
@@ -274,6 +285,9 @@ export default function UploadDocumentsDialog({
           </DialogDescription>
         </DialogHeader>
         <FileUploader
+          value={selectedFiles}
+          onValueChange={setSelectedFiles}
+          autoUpload={false}
           maxFileCount={Infinity}
           maxSize={200 * 1024 * 1024}
           description={t('documentPanel.uploadDocuments.fileTypes', {
@@ -289,6 +303,53 @@ export default function UploadDocumentsDialog({
           acceptedExtensions={uploaderInputs.acceptedExtensions}
           engineCapabilities={uploaderInputs.engineCapabilities}
         />
+        <DialogFooter className="flex items-center justify-between gap-3 pt-3 border-t border-border/60 sm:justify-between">
+          <div className="text-xs text-muted-foreground">
+            {validFilesCount > 0 ? (
+              <span>
+                已就绪 <strong className="text-foreground font-semibold">{validFilesCount}</strong> 个文件待上传
+              </span>
+            ) : (
+              <span>拖拽或点击选择文件后点击确定</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedFiles([])
+                setProgresses({})
+                setFileErrors({})
+                setOpen(false)
+              }}
+              disabled={isUploading}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={() => handleDocumentsUpload(validFiles)}
+              disabled={isUploading || validFilesCount === 0}
+              className="min-w-[100px]"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  <span>{t('documentPanel.uploadDocuments.batch.uploading')}</span>
+                </>
+              ) : (
+                <>
+                  <UploadIcon className="h-3.5 w-3.5 mr-1.5" />
+                  <span>{validFilesCount > 0 ? `确定上传 (${validFilesCount})` : '确定上传'}</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

@@ -127,6 +127,12 @@ interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   disabled?: boolean
 
+  /**
+   * Whether to automatically trigger onUpload upon files dropped.
+   * Defaults to true for backward compatibility. Set false for manual confirm.
+   */
+  autoUpload?: boolean
+
   description?: string
 }
 
@@ -164,6 +170,7 @@ function FileUploader(props: FileUploaderProps) {
     maxFileCount = 1,
     multiple = false,
     disabled = false,
+    autoUpload = true,
     description,
     className,
     ...dropzoneProps
@@ -233,7 +240,7 @@ function FileUploader(props: FileUploaderProps) {
       setFiles(updatedFiles)
 
       // Only upload accepted files - make sure we're not uploading rejected files
-      if (onUpload && acceptedFiles.length > 0) {
+      if (autoUpload && onUpload && acceptedFiles.length > 0) {
         // Filter out any files that might have been rejected by our custom validator
         const validFiles = acceptedFiles.filter(file => {
           // Skip files without a name
@@ -255,7 +262,7 @@ function FileUploader(props: FileUploaderProps) {
         }
       }
     },
-    [files, maxFileCount, multiple, onUpload, onReject, setFiles, t, acceptedExts, engineMatrix, maxSize]
+    [files, maxFileCount, multiple, onUpload, onReject, setFiles, t, acceptedExts, engineMatrix, maxSize, autoUpload]
   )
 
   function onRemove(index: number) {

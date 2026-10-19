@@ -87,7 +87,35 @@ export default function PipelineMonitor({
   }
 
   const isBusy = Boolean(status?.busy)
-  const currentOp = status?.current_op || '空闲就绪'
+
+  // 从后端真实下发的 latest_message / history_messages / job_name 中精准推导当前阶段
+  const latestMsg =
+    status?.latest_message ||
+    (status?.history_messages && status.history_messages.length > 0
+      ? status.history_messages[status.history_messages.length - 1]
+      : '') ||
+    status?.job_name ||
+    ''
+
+  const resolveCurrentOp = (): string => {
+    if (!isBusy) return '就绪待命'
+    const lower = latestMsg.toLowerCase()
+    if (lower.includes('parse') || lower.includes('reading') || lower.includes('scan')) {
+      return '文档解析中 (Parsing)'
+    }
+    if (lower.includes('extract') || lower.includes('entity') || lower.includes('relation') || lower.includes('analyz')) {
+      return '实体抽取中 (Extracting)'
+    }
+    if (lower.includes('embed') || lower.includes('vector') || lower.includes('llm')) {
+      return '向量嵌入中 (Embedding)'
+    }
+    if (lower.includes('ready') || lower.includes('persist') || lower.includes('merge')) {
+      return '图谱就绪中 (Ready)'
+    }
+    return latestMsg ? (latestMsg.length > 25 ? latestMsg.slice(0, 25) + '...' : latestMsg) : '流水线处理中'
+  }
+
+  const currentOp = resolveCurrentOp()
   const messages = status?.history_messages || []
 
   // 判断流水线各阶段的当前高亮
@@ -95,7 +123,7 @@ export default function PipelineMonitor({
     if (!isBusy) {
       return step === 'ready' ? 'completed' : 'idle'
     }
-    const op = currentOp.toLowerCase()
+    const op = latestMsg.toLowerCase()
     if (op.includes('parse') || op.includes('reading') || op.includes('scan')) {
       if (step === 'parse') return 'active'
       return 'pending'

@@ -151,8 +151,15 @@ export default function ClearDocumentsDialog({ onDocumentsCleared }: ClearDocume
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" side="bottom" tooltip={t('documentPanel.clearDocuments.tooltip')} size="sm">
-          <EraserIcon/> {t('documentPanel.clearDocuments.button')}
+        <Button
+          variant="ghost"
+          size="sm"
+          side="bottom"
+          tooltip={t('documentPanel.clearDocuments.tooltip')}
+          className="h-7 px-2 text-xs text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 transition-colors"
+        >
+          <EraserIcon className="h-3.5 w-3.5 mr-1 text-muted-foreground/60" />
+          <span>{t('documentPanel.clearDocuments.button')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl" onCloseAutoFocus={(e) => e.preventDefault()}>
