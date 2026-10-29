@@ -180,6 +180,12 @@ export type LightragStatus = {
  */
 export type QueryMode = 'naive' | 'local' | 'global' | 'hybrid' | 'mix' | 'bypass'
 
+export interface ReferenceItem {
+  reference_id: string
+  file_path: string
+  content?: string[]
+}
+
 export type Message = {
   role: 'user' | 'assistant' | 'system'
   content: string
@@ -188,6 +194,7 @@ export type Message = {
   thinkingTime?: number | null
   responseTime?: number | null
   firstTokenTime?: number | null
+  references?: ReferenceItem[]
 }
 
 export type QueryRequest = {
@@ -236,11 +243,16 @@ export type QueryRequest = {
   enable_rerank?: boolean
   /** If True, emits retrieval progress events and a final response-time metadata line (streaming only). Default: false. */
   include_progress?: boolean
+  /** If True, includes reference list in responses. Affects /query and /query/stream. Default: true. */
+  include_references?: boolean
+  /** If True, includes actual chunk text content in references. Default: false on server, but enabled for grounded retrieval. */
+  include_chunk_content?: boolean
 }
 
 export type QueryResponse = {
   response: string
   response_time?: number
+  references?: ReferenceItem[]
   /**
    * Whether the answering LLM actually wrote this response. False for text a
    * query path produced without calling it — the canned no-context reply and
@@ -706,7 +718,8 @@ async function _readNdjsonStream(
   onError: ((error: string) => void) | undefined,
   onResponseTime?: (seconds: number) => void,
   onProgress?: (event: string) => void,
-  onLlmGenerated?: (llmGenerated: boolean) => void
+  onLlmGenerated?: (llmGenerated: boolean) => void,
+  onReferences?: (references: ReferenceItem[]) => void
 ): Promise<void> {
   if (!response.body) {
     throw new Error('Response body is null');
@@ -720,6 +733,9 @@ async function _readNdjsonStream(
     if (typeof parsed.llm_generated === 'boolean') {
       onLlmGenerated?.(parsed.llm_generated);
     }
+    if (parsed.references && onReferences) {
+      onReferences(parsed.references);
+    }
     if (parsed.response) {
       onChunk(parsed.response);
     } else if (parsed.error) {
@@ -729,8 +745,6 @@ async function _readNdjsonStream(
     } else if (parsed.progress && onProgress) {
       onProgress(parsed.progress);
     }
-    // references-only lines are silently consumed —
-    // the caller only cares about response chunks and errors.
   };
 
   const reader = response.body.getReader();
@@ -901,16 +915,22 @@ export const queryTextStream = async (
   // Reports the server's verdict on whether the answering LLM wrote the
   // content of a complete (non-streamed) response line. Streamed chunks carry
   // no flag — they always come from the LLM.
-  onLlmGenerated?: (llmGenerated: boolean) => void
+  onLlmGenerated?: (llmGenerated: boolean) => void,
+  onReferences?: (references: ReferenceItem[]) => void
 ) => {
   const headers = _buildStreamHeaders();
+  const requestPayload: QueryRequest = {
+    ...request,
+    include_chunk_content: request.include_chunk_content ?? true,
+    include_references: request.include_references ?? true,
+  };
 
   try {
     const response = await fetch(`${backendBaseUrl}/query/stream`, {
       method: 'POST',
       headers,
       credentials: 'include',
-      body: JSON.stringify(request),
+      body: JSON.stringify(requestPayload),
       signal,
     });
 
@@ -942,7 +962,7 @@ export const queryTextStream = async (
               method: 'POST',
               headers: retryHeaders,
               credentials: 'include',
-              body: JSON.stringify(request),
+              body: JSON.stringify(requestPayload),
               signal,
             });
           } catch (refreshError) {
@@ -988,7 +1008,8 @@ export const queryTextStream = async (
       onError,
       onResponseTime,
       onProgress,
-      onLlmGenerated
+      onLlmGenerated,
+      onReferences
     );
   } catch (error) {
     // Auth termination is NOT an answer failure: navigation to the entry's

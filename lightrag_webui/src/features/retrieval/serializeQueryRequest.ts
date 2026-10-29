@@ -43,6 +43,8 @@ export function serializeQueryRequest(
     response_type: 'Multiple Paragraphs',
     // Request retrieval progress events for the live progress display.
     include_progress: true,
+    include_references: true,
+    include_chunk_content: true,
     conversation_history:
       effectiveHistoryTurns > 0
         ? history

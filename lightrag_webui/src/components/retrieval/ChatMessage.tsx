@@ -22,7 +22,7 @@ import { useAiContentNoticeStore } from '@/stores/aiContentNotice'
 import { shouldShowAiContentNotice } from '@/lib/aiContentNotice'
 import { copyToClipboard } from '@/utils/clipboard'
 import { toast } from 'sonner'
-import EvidenceDrawer, { extractEvidenceFromMessage } from './EvidenceDrawer'
+import EvidenceDrawer, { getGroundedEvidence } from './EvidenceDrawer'
 
 // KaTeX configuration options interface
 interface KaTeXOptions {
@@ -109,7 +109,7 @@ export const ChatMessage = ({
     ? message.content
     : (displayContent !== undefined ? displayContent : (message.content || ''))
 
-  const evidence = useMemo(() => extractEvidenceFromMessage(message), [message])
+  const evidence = useMemo(() => getGroundedEvidence(message), [message])
 
   const handleCopyAssistantMessage = async () => {
     const textToCopy = finalDisplayContent || ''
@@ -396,17 +396,22 @@ export const ChatMessage = ({
             {timingRow}
           </div>
           <div className="flex items-center gap-2 ml-auto">
-            {evidence.hasEvidence && (
-              <button
-                type="button"
-                onClick={() => setIsEvidenceOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
-                title="查看本次回答命中的证据文档与知识切片"
-              >
-                <FileSearchIcon className="size-3.5" />
-                <span>证据溯源 ({evidence.documents.length})</span>
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsEvidenceOpen(true)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer",
+                evidence.hasEvidence
+                  ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                  : "border border-border/70 bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+              title={evidence.hasEvidence ? "查看本次回答命中的证据文档与知识切片" : "查看证据溯源与切片透视"}
+            >
+              <FileSearchIcon className="size-3.5" />
+              <span>
+                证据溯源{evidence.hasEvidence ? ` (${evidence.documents.length})` : ''}
+              </span>
+            </button>
             <button
               type="button"
               onClick={handleCopyAssistantMessage}

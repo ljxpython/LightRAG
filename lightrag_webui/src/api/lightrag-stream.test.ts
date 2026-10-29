@@ -209,6 +209,46 @@ describe('queryTextStream — normal path', () => {
     expect(errors).toEqual([])
   })
 
+  test('dispatches references lines to onReferences callback without dropping them', async () => {
+    const receivedRefs: any[] = []
+    const chunks: string[] = []
+
+    installFetchMock(() =>
+      makeNdjsonResponse([
+        JSON.stringify({
+          references: [
+            {
+              reference_id: 'ref-1',
+              file_path: 'Operations.md',
+              content: ['Actual chunk content here'],
+            },
+          ],
+        }),
+        '{"response": "Based on Operations.md..."}',
+      ])
+    )
+
+    await apiModule.queryTextStream(
+      makeQueryRequest(),
+      (c) => chunks.push(c),
+      () => {},
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      (refs) => receivedRefs.push(...refs)
+    )
+
+    expect(receivedRefs).toEqual([
+      {
+        reference_id: 'ref-1',
+        file_path: 'Operations.md',
+        content: ['Actual chunk content here'],
+      },
+    ])
+    expect(chunks).toEqual(['Based on Operations.md...'])
+  })
+
   test('forwards error lines to onError', async () => {
     const chunks: string[] = []
     const errors: string[] = []

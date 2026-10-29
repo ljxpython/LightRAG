@@ -415,7 +415,8 @@ export function useQuerySession({
               latexRendered: assistantMessage.latexRendered,
               thinkingTime: assistantMessage.thinkingTime,
               responseTime: assistantMessage.responseTime,
-              firstTokenTime: assistantMessage.firstTokenTime
+              firstTokenTime: assistantMessage.firstTokenTime,
+              references: assistantMessage.references
             })
           }
           return newMessages
@@ -459,6 +460,18 @@ export function useQuerySession({
             // so it lands before that content reaches updateAssistantMessage.
             (reported) => {
               llmGenerated = resolveAiGenerated(llmGenerated, reported)
+            },
+            // References sent on the first line of NDJSON stream
+            (references) => {
+              assistantMessage.references = references
+              setMessages((prev) => {
+                const newMessages = [...prev]
+                const lastMessage = newMessages[newMessages.length - 1]
+                if (lastMessage && lastMessage.id === assistantMessage.id) {
+                  lastMessage.references = references
+                }
+                return newMessages
+              })
             }
           )
           if (streamError) {
@@ -477,6 +490,9 @@ export function useQuerySession({
             serverResponseTimeRef.current = response.response_time
           }
           llmGenerated = resolveAiGenerated(llmGenerated, response.llm_generated)
+          if (response.references) {
+            assistantMessage.references = response.references
+          }
           updateAssistantMessage(response.response)
         }
       } catch (err) {

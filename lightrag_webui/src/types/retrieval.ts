@@ -7,12 +7,13 @@
  * rendering component. `ChatMessage` re-exports it for compatibility.
  */
 
-import type { Message } from '@/api/lightrag'
+import type { Message, ReferenceItem } from '@/api/lightrag'
 
 export type MessageWithError = Message & {
   id: string // Unique identifier for stable React keys
   isError?: boolean
   isThinking?: boolean // Flag to indicate if the message is in a "thinking" state
+  references?: ReferenceItem[]
   /**
    * Whether this message's text was written by the answering LLM. Decided by
    * the query session (see `lib/aiContentNotice.ts`), never re-derived from
