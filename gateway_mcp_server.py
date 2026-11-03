@@ -26,15 +26,18 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 import sys
 from typing import Any, Dict, List, Optional
 import uuid
+from contextvars import ContextVar
 
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from fastmcp import FastMCP
 from lightrag import QueryParam
@@ -50,12 +53,101 @@ from auth_middleware import KnowledgeScope, KnowledgeTokenVerifier
 from graph_explorer import GraphExplorer
 from ingest_service import KnowledgeIngestService, MIME_EXT
 from locator_resolver import LocatorResolver
-from workspace_manager import TenantWorkspaceManager
+from workspace_manager import TenantWorkspaceManager, apply_workspace_namespace_patch
+apply_workspace_namespace_patch()
 from image_vlm_parser import register_image_vlm_engine
 
 register_image_vlm_engine()
 
 logger = logging.getLogger("fastmcp_gateway")
+
+current_scope_ctx: ContextVar[Optional[KnowledgeScope]] = ContextVar("current_scope_ctx", default=None)
+
+
+class ScopeExtractorMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, verifier: KnowledgeTokenVerifier, mgr: TenantWorkspaceManager):
+        super().__init__(app)
+        self.verifier = verifier
+        self.mgr = mgr
+
+    async def dispatch(self, request: Request, call_next):
+        auth_header = request.headers.get("authorization", "")
+        token = ""
+        if auth_header.lower().startswith("bearer "):
+            token = auth_header[7:].strip()
+
+        scope = None
+        if token:
+            scope = self.verifier.verify_token(token)
+
+        if scope is None:
+            t_param = request.query_params.get("tenant_id")
+            p_param = request.query_params.get("project_id")
+            name_param = request.query_params.get("project_name") or request.query_params.get("name")
+            if t_param and p_param:
+                scope = KnowledgeScope(tenant_id=t_param, project_id=p_param, project_name=name_param)
+
+        if scope and scope.project_name and scope.project_name.strip():
+            try:
+                self.mgr.save_project_meta(scope.tenant_id, scope.project_id, name=scope.project_name.strip())
+            except Exception:
+                pass
+
+        token_ctx = current_scope_ctx.set(scope)
+        try:
+            return await call_next(request)
+        finally:
+            current_scope_ctx.reset(token_ctx)
+
+
+def _extract_doc_info(item: Any) -> Dict[str, Any]:
+    if isinstance(item, tuple) and len(item) >= 2:
+        doc_id = str(item[0])
+        val = item[1]
+    elif isinstance(item, dict):
+        doc_id = str(item.get("id") or item.get("doc_id") or "")
+        val = item
+    else:
+        doc_id = str(getattr(item, "id", "") or getattr(item, "doc_id", ""))
+        val = item
+
+    file_path = getattr(val, "file_path", None) if not isinstance(val, dict) else val.get("file_path")
+    metadata = getattr(val, "metadata", None) if not isinstance(val, dict) else val.get("metadata")
+    if not isinstance(metadata, dict):
+        metadata = {}
+    content_summary = getattr(val, "content_summary", "") if not isinstance(val, dict) else val.get("content_summary", "")
+    raw_status = getattr(val, "status", "ready") if not isinstance(val, dict) else val.get("status", "ready")
+    chunks_count = getattr(val, "chunks_count", 0) if not isinstance(val, dict) else val.get("chunks_count", 0)
+    content_length = getattr(val, "content_length", 0) if not isinstance(val, dict) else val.get("content_length", 0)
+    updated_at = getattr(val, "updated_at", None) if not isinstance(val, dict) else val.get("updated_at")
+
+    filename = ""
+    if file_path and file_path != "unknown_source":
+        filename = Path(file_path).name
+    elif metadata.get("source_file"):
+        filename = Path(metadata["source_file"]).name
+    elif content_summary:
+        m = re.search(r"Title:\s*([^\r\n]+)", content_summary)
+        if m:
+            filename = m.group(1).strip()
+        else:
+            m_draw = re.search(r'path="([^"]+)"', content_summary)
+            if m_draw:
+                filename = Path(m_draw.group(1)).name
+    if not filename:
+        filename = f"document_{doc_id[:8]}"
+
+    status_str = str(raw_status or "ready").lower()
+    status = "ready" if status_str in ("processed", "ready") else status_str
+
+    return {
+        "document_id": doc_id,
+        "filename": filename,
+        "status": status,
+        "chunks_count": chunks_count,
+        "content_length": content_length,
+        "updated_at": str(updated_at) if updated_at else None,
+    }
 
 
 def build_default_workspace_manager() -> TenantWorkspaceManager:
@@ -80,8 +172,54 @@ def create_mcp_server(
     server = FastMCP(name=name)
 
     def _get_current_scope() -> KnowledgeScope:
-        """Resolves target tenant and project from platform token or defaults."""
-        return verifier.resolve_default_or_first_scope()
+        """Resolves target tenant and project from FastMCP HTTP request, token or defaults."""
+        try:
+            from fastmcp.server.dependencies import get_http_headers, get_http_request
+            headers = get_http_headers(include_all=True)
+            auth_header = headers.get("authorization", "")
+            token = ""
+            if auth_header.lower().startswith("bearer "):
+                token = auth_header[7:].strip()
+            if token:
+                sc = verifier.verify_token(token)
+                if sc:
+                    if sc.project_name and sc.project_name.strip():
+                        try:
+                            curr_meta = mgr.get_project_meta(sc.tenant_id, sc.project_id)
+                            if curr_meta.get("name") != sc.project_name.strip():
+                                mgr.save_project_meta(sc.tenant_id, sc.project_id, name=sc.project_name.strip())
+                        except Exception:
+                            pass
+                    logger.info(f"Resolved scope from FastMCP headers: {sc}")
+                    return sc
+            try:
+                req = get_http_request()
+                if req:
+                    t_param = req.query_params.get("tenant_id")
+                    p_param = req.query_params.get("project_id")
+                    name_param = req.query_params.get("project_name") or req.query_params.get("name")
+                    if t_param and p_param:
+                        if name_param and name_param.strip():
+                            try:
+                                mgr.save_project_meta(t_param, p_param, name=name_param.strip())
+                            except Exception:
+                                pass
+                        sc = KnowledgeScope(tenant_id=t_param, project_id=p_param, project_name=name_param)
+                        logger.info(f"Resolved scope from FastMCP query params: {sc}")
+                        return sc
+            except Exception:
+                pass
+        except Exception as e:
+            logger.debug(f"Unable to extract scope from FastMCP HTTP context: {e}")
+
+        sc = current_scope_ctx.get()
+        if sc:
+            logger.info(f"Resolved scope from ContextVar: {sc}")
+            return sc
+
+        default_sc = verifier.resolve_default_or_first_scope()
+        logger.warning(f"Fallback to default scope: {default_sc}")
+        return default_sc
 
     # 1. Query Tool (Enhanced with mode, document filtering, history)
     @server.tool(annotations={"readOnlyHint": True})
@@ -200,33 +338,55 @@ def create_mcp_server(
         """Lists managed documents in the project knowledge base."""
         limit = max(1, min(int(limit), 100))
         scope = _get_current_scope()
-        project_dir = mgr.get_project_dir(scope.tenant_id, scope.project_id)
-        managed_dir = project_dir / "managed_assets"
 
         documents = []
-        if managed_dir.exists():
-            for f in sorted(managed_dir.iterdir()):
-                if f.is_file() and not f.name.startswith("."):
-                    documents.append(
-                        {
-                            "document_id": f"kd_{uuid.uuid5(uuid.NAMESPACE_DNS, f.name).hex[:32]}",
-                            "filename": f.name,
-                            "status": "ready",
-                        }
+        total_count = 0
+        try:
+            async with mgr.acquire_read_lease(scope.tenant_id, scope.project_id) as rag:
+                if hasattr(rag, "doc_status") and rag.doc_status is not None:
+                    docs_tuple = await rag.doc_status.get_docs_paginated(
+                        page=1,
+                        page_size=limit,
+                        sort_field="updated_at",
+                        sort_direction="desc",
                     )
-                if len(documents) >= limit:
-                    break
+                    docs_list, total_count = docs_tuple
+                    for item in docs_list:
+                        info = _extract_doc_info(item)
+                        doc_entry: Dict[str, Any] = {
+                            "document_id": info["document_id"],
+                            "filename": info["filename"],
+                            "status": info["status"],
+                        }
+                        if info.get("chunks_count") is not None:
+                            doc_entry["chunks_count"] = info["chunks_count"]
+                        if info.get("content_length") is not None:
+                            doc_entry["content_length"] = info["content_length"]
+                        if info.get("updated_at"):
+                            doc_entry["updated_at"] = info["updated_at"]
+                        documents.append(doc_entry)
+        except Exception as e:
+            logger.warning(f"Failed to query doc_status for scope {scope}: {e}", exc_info=True)
 
+        # Fallback to managed_assets only if doc_status returned zero documents
         if not documents:
-            documents = [
-                {
-                    "document_id": "kd_00000000000000000000000000000001",
-                    "filename": "sample_document.pdf",
-                    "status": "ready",
-                }
-            ]
+            project_dir = mgr.get_project_dir(scope.tenant_id, scope.project_id)
+            managed_dir = project_dir / "managed_assets"
+            if managed_dir.exists():
+                for f in sorted(managed_dir.iterdir()):
+                    if f.is_file() and not f.name.startswith("."):
+                        documents.append(
+                            {
+                                "document_id": f"kd_{uuid.uuid5(uuid.NAMESPACE_DNS, f.name).hex[:32]}",
+                                "filename": f.name,
+                                "status": "ready",
+                            }
+                        )
+                    if len(documents) >= limit:
+                        break
+            total_count = len(documents)
 
-        return {"status": "ok", "documents": documents}
+        return {"status": "ok", "total": total_count, "documents": documents}
 
     # 3. Document Status Tool
     @server.tool(annotations={"readOnlyHint": True})
@@ -234,10 +394,28 @@ def create_mcp_server(
         document_id: str,
     ) -> Dict[str, Any]:
         """Returns indexing status of a specific document."""
+        scope = _get_current_scope()
+        doc_id = (document_id or "").strip()
+        status_val = "ready"
+        try:
+            async with mgr.acquire_read_lease(scope.tenant_id, scope.project_id) as rag:
+                if hasattr(rag, "doc_status") and rag.doc_status is not None:
+                    if hasattr(rag.doc_status, "get_docs_by_ids"):
+                        found = await rag.doc_status.get_docs_by_ids([doc_id])
+                        if found and doc_id in found:
+                            raw = str(found[doc_id].get("status", "ready")).lower()
+                            status_val = "ready" if raw in ("processed", "ready") else raw
+                    elif hasattr(rag.doc_status, "get_full_docs_by_ids"):
+                        found = await rag.doc_status.get_full_docs_by_ids([doc_id])
+                        if found:
+                            raw = str(found[0].get("status", "ready")).lower()
+                            status_val = "ready" if raw in ("processed", "ready") else raw
+        except Exception as e:
+            logger.warning(f"Failed to probe doc status for {doc_id}: {e}")
         return {
             "status": "ok",
-            "document_id": document_id,
-            "overall_status": "ready",
+            "document_id": doc_id,
+            "overall_status": status_val,
         }
 
     # 4. Ingest Submit Tool
@@ -425,32 +603,68 @@ def create_mcp_server(
         scope = _resolve_scope_from_request(req)
         limit = max(1, min(int(req.query_params.get("limit", 20)), 100))
         offset = max(0, int(req.query_params.get("offset", 0)))
-        project_dir = mgr.get_project_dir(scope.tenant_id, scope.project_id)
-        managed_dir = project_dir / "managed_assets"
 
         all_docs = []
-        if managed_dir.exists():
-            for f in sorted(managed_dir.iterdir()):
-                if f.is_file() and not f.name.startswith("."):
-                    ext = f.suffix.lower()
-                    mime = "application/octet-stream"
-                    for m, e in MIME_EXT.items():
-                        if f".{e}" == ext:
-                            mime = m
-                            break
-                    st = f.stat()
-                    doc_id = f"kd_{uuid.uuid5(uuid.NAMESPACE_DNS, f.name).hex[:32]}"
-                    all_docs.append({
-                        "document_id": doc_id,
-                        "file_name": f.name,
-                        "mime_type": mime,
-                        "size_bytes": st.st_size if st.st_size > 0 else 1,
-                        "status": "ready",
-                        "searchable": True,
-                        "published_at": datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat(),
-                    })
+        total = 0
+        try:
+            async with mgr.acquire_read_lease(scope.tenant_id, scope.project_id) as rag:
+                if hasattr(rag, "doc_status") and rag.doc_status is not None:
+                    docs_tuple = await rag.doc_status.get_docs_paginated(
+                        page=1,
+                        page_size=1000,
+                        sort_field="updated_at",
+                        sort_direction="desc",
+                    )
+                    docs_list, total = docs_tuple
+                    for item in docs_list:
+                        info = _extract_doc_info(item)
+                        filename = info["filename"]
+                        ext = Path(filename).suffix.lower()
+                        mime = "application/octet-stream"
+                        for m, e in MIME_EXT.items():
+                            if f".{e}" == ext:
+                                mime = m
+                                break
+                        size_bytes = info.get("content_length") or 1
+                        all_docs.append({
+                            "document_id": info["document_id"],
+                            "file_name": filename,
+                            "mime_type": mime,
+                            "size_bytes": size_bytes,
+                            "status": info["status"],
+                            "searchable": True,
+                            "published_at": info.get("updated_at") or datetime.now(timezone.utc).isoformat(),
+                        })
+        except Exception as e:
+            logger.warning(f"REST get_documents_route error on doc_status: {e}", exc_info=True)
+
+        if not all_docs:
+            project_dir = mgr.get_project_dir(scope.tenant_id, scope.project_id)
+            managed_dir = project_dir / "managed_assets"
+            if managed_dir.exists():
+                for f in sorted(managed_dir.iterdir()):
+                    if f.is_file() and not f.name.startswith("."):
+                        ext = f.suffix.lower()
+                        mime = "application/octet-stream"
+                        for m, e in MIME_EXT.items():
+                            if f".{e}" == ext:
+                                mime = m
+                                break
+                        st = f.stat()
+                        doc_id = f"kd_{uuid.uuid5(uuid.NAMESPACE_DNS, f.name).hex[:32]}"
+                        all_docs.append({
+                            "document_id": doc_id,
+                            "file_name": f.name,
+                            "mime_type": mime,
+                            "size_bytes": st.st_size if st.st_size > 0 else 1,
+                            "status": "ready",
+                            "searchable": True,
+                            "published_at": datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat(),
+                        })
+            total = len(all_docs)
+
         page_items = all_docs[offset : offset + limit]
-        return JSONResponse({"items": page_items, "total": len(all_docs)})
+        return JSONResponse({"items": page_items, "total": total})
 
     # REST Endpoint 3: Ingest Jobs list
     @server.custom_route("/internal/knowledge/jobs", methods=["GET"])
@@ -537,5 +751,10 @@ if __name__ == "__main__":
     host = os.environ.get("GATEWAY_HOST", "0.0.0.0")
     port = int(os.environ.get("GATEWAY_PORT", "8001"))
     print(f"Starting FastMCP Production Streamable HTTP Gateway (8 Tools) on {host}:{port}/mcp...")
-    cors = [Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])]
-    mcp.run(transport="http", host=host, port=port, path="/mcp", middleware=cors)
+    default_mgr = build_default_workspace_manager()
+    default_verifier = KnowledgeTokenVerifier()
+    middleware = [
+        Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]),
+        Middleware(ScopeExtractorMiddleware, verifier=default_verifier, mgr=default_mgr),
+    ]
+    mcp.run(transport="http", host=host, port=port, path="/mcp", middleware=middleware)

@@ -25,6 +25,7 @@ class KnowledgeScope(BaseModel):
     project_id: str
     knowledge_base_id: Optional[str] = None
     namespace: Optional[str] = None
+    project_name: Optional[str] = None
 
     @field_validator("tenant_id", "project_id")
     @classmethod
@@ -80,6 +81,7 @@ class KnowledgeTokenVerifier:
                     tenant_id=payload["tenant_id"],
                     project_id=payload["project_id"],
                     knowledge_base_id=payload.get("knowledge_base_id"),
+                    project_name=payload.get("project_name"),
                 )
             except Exception as e:
                 logger.debug(f"JWT verification failed: {e}")

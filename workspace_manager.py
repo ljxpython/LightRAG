@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import asyncio
 from datetime import datetime, timezone
 import json
@@ -19,6 +20,49 @@ from llm_client import (
 logger = logging.getLogger("workspace_manager")
 
 
+def apply_workspace_namespace_patch() -> None:
+    """Dynamically patches JsonKVStorage and JsonDocStatusStorage to inject working_dir MD5 hash into namespace."""
+    import hashlib
+    from lightrag.kg.json_kv_impl import JsonKVStorage
+    from lightrag.kg.json_doc_status_impl import JsonDocStatusStorage
+
+    if getattr(JsonKVStorage, "_is_workspace_patched", False):
+        return
+
+    orig_kv_post_init = JsonKVStorage.__post_init__
+
+    def patched_kv_post_init(self) -> None:
+        orig_kv_post_init(self)
+        working_dir = (
+            self.global_config.get("working_dir") if self.global_config else None
+        )
+        if working_dir:
+            wdir = os.path.abspath(working_dir)
+            wdir_tag = hashlib.md5(wdir.encode("utf-8")).hexdigest()[:12]
+            if not self.namespace.startswith(f"{wdir_tag}_"):
+                self.namespace = f"{wdir_tag}_{self.namespace}"
+
+    JsonKVStorage.__post_init__ = patched_kv_post_init
+    JsonKVStorage._is_workspace_patched = True
+
+    orig_doc_post_init = JsonDocStatusStorage.__post_init__
+
+    def patched_doc_post_init(self) -> None:
+        orig_doc_post_init(self)
+        working_dir = (
+            self.global_config.get("working_dir") if self.global_config else None
+        )
+        if working_dir:
+            wdir = os.path.abspath(working_dir)
+            wdir_tag = hashlib.md5(wdir.encode("utf-8")).hexdigest()[:12]
+            if not self.namespace.startswith(f"{wdir_tag}_"):
+                self.namespace = f"{wdir_tag}_{self.namespace}"
+
+    JsonDocStatusStorage.__post_init__ = patched_doc_post_init
+    JsonDocStatusStorage._is_workspace_patched = True
+    logger.info("Workspace namespace monkey-patch applied successfully.")
+
+
 class TenantWorkspaceManager:
     """Enterprise multi-tenant workspace manager with zero-lock POSIX CAS activation and reader leases."""
 
@@ -26,16 +70,20 @@ class TenantWorkspaceManager:
         self,
         storage_root: Path,
         lease_manager: Optional[ReaderLeaseManager] = None,
+        max_cached_instances: Optional[int] = None,
     ):
+        apply_workspace_namespace_patch()
         self.storage_root = Path(storage_root)
         self.storage_root.mkdir(parents=True, exist_ok=True)
-        # Key: "tenant_id:project_id" -> LightRAG instance
-        self._rag_instances: Dict[str, LightRAG] = {}
+        self.max_cached_instances = max_cached_instances or int(
+            os.getenv("MAX_ACTIVE_RAG_INSTANCES", "8")
+        )
+        # Key: "tenant_id:project_id" -> LightRAG instance (LRU)
+        self._rag_instances: OrderedDict[str, LightRAG] = OrderedDict()
         # Key: "tenant_id:project_id" -> current version name (e.g. "rev_1")
         self._active_versions: Dict[str, str] = {}
         self.lease_mgr = lease_manager or ReaderLeaseManager()
         self._lock = asyncio.Lock()
-
     def get_project_dir(self, tenant_id: str, project_id: str) -> Path:
         p_dir = self.storage_root / tenant_id / project_id
         p_dir.mkdir(parents=True, exist_ok=True)
@@ -139,22 +187,45 @@ class TenantWorkspaceManager:
         tenant_id: str = "__default",
         project_id: str = "11111111-1111-4111-8111-111111111111",
     ) -> Tuple[LightRAG, str]:
-        """Returns initialized LightRAG engine and active version name."""
+        """Returns initialized LightRAG engine and active version name with LRU eviction and reader leases."""
         key = f"{tenant_id}:{project_id}"
         async with self._lock:
             current_version = self.get_active_version_name(tenant_id, project_id)
-            if key not in self._rag_instances or self._active_versions.get(key) != current_version:
-                active_dir = self.get_active_dir(tenant_id, project_id)
-                rag = LightRAG(
-                    working_dir=str(active_dir),
-                    llm_model_func=unified_llm_func,
-                    embedding_func=create_lightrag_embedding_func(),
-                )
-                await rag.initialize_storages()
-                self._rag_instances[key] = rag
-                self._active_versions[key] = current_version
-            return self._rag_instances[key], self._active_versions[key]
+            if key in self._rag_instances and self._active_versions.get(key) == current_version:
+                self._rag_instances.move_to_end(key)
+                return self._rag_instances[key], current_version
 
+            # If existing instance was invalidated due to version shift, drain it gracefully
+            old_rag = self._rag_instances.pop(key, None)
+            old_ver = self._active_versions.pop(key, None)
+            if old_rag is not None and old_ver is not None:
+                await self.lease_mgr.mark_retired(
+                    tenant_id, project_id, old_ver, old_rag,
+                    cleanup_callback=lambda r: r.finalize_storages()
+                )
+
+            # Evict LRU entries if capacity reached
+            while len(self._rag_instances) >= self.max_cached_instances:
+                evict_key, evict_rag = self._rag_instances.popitem(last=False)
+                evict_ver = self._active_versions.pop(evict_key, None)
+                if evict_rag is not None and evict_ver is not None:
+                    evict_tenant, evict_project = evict_key.split(":", 1)
+                    await self.lease_mgr.mark_retired(
+                        evict_tenant, evict_project, evict_ver, evict_rag,
+                        cleanup_callback=lambda r: r.finalize_storages()
+                    )
+
+            active_dir = self.get_active_dir(tenant_id, project_id)
+            rag = LightRAG(
+                working_dir=str(active_dir),
+                llm_model_func=unified_llm_func,
+                embedding_func=create_lightrag_embedding_func(),
+                addon_params={"language": "简体中文"},
+            )
+            await rag.initialize_storages()
+            self._rag_instances[key] = rag
+            self._active_versions[key] = current_version
+            return self._rag_instances[key], self._active_versions[key]
     @asynccontextmanager
     async def acquire_read_lease(
         self, tenant_id: str, project_id: str

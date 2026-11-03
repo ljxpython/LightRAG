@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 import networkx as nx
 
 logger = logging.getLogger("graph_explorer")
@@ -17,6 +17,25 @@ logger = logging.getLogger("graph_explorer")
 class GraphExplorer:
     def __init__(self, storage_root: Path):
         self.storage_root = Path(storage_root)
+        # Key: resolved file path -> (st_mtime, nx.Graph)
+        self._graph_cache: Dict[str, Tuple[float, nx.Graph]] = {}
+
+    def _get_cached_graph(self, graph_path: Path) -> nx.Graph:
+        """Returns cached nx.Graph if file st_mtime has not changed, otherwise reloads."""
+        resolved_path = graph_path.resolve()
+        cache_key = str(resolved_path)
+        stat = resolved_path.stat()
+        mtime = stat.st_mtime
+
+        cached = self._graph_cache.get(cache_key)
+        if cached is not None:
+            cached_mtime, cached_graph = cached
+            if cached_mtime == mtime:
+                return cached_graph
+
+        g = nx.read_graphml(resolved_path)
+        self._graph_cache[cache_key] = (mtime, g)
+        return g
 
     def _get_active_graph_path(self, tenant_id: str, project_id: str) -> Optional[Path]:
         p_dir = self.storage_root / tenant_id / project_id
@@ -52,7 +71,7 @@ class GraphExplorer:
             }
 
         try:
-            g = nx.read_graphml(graph_path)
+            g = self._get_cached_graph(graph_path)
         except Exception as e:
             logger.error(f"Failed to read graphml at {graph_path}: {e}")
             return {

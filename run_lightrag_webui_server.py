@@ -59,7 +59,8 @@ finally:
 
 from lease_manager import ReaderLeaseManager
 from snapshot_manager import SnapshotManager
-from workspace_manager import TenantWorkspaceManager
+from workspace_manager import TenantWorkspaceManager, apply_workspace_namespace_patch
+apply_workspace_namespace_patch()
 from image_vlm_parser import register_image_vlm_engine
 
 register_image_vlm_engine()
@@ -700,21 +701,120 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
                 response.set_cookie("x_tenant_id", tenant_id, path="/", samesite="lax")
                 response.set_cookie("x_project_id", project_id, path="/", samesite="lax")
 
-            # 5. Handle SSO token auto-login
+            # 5. Handle SSO token auto-login & embed immersion injection
+            path = request.url.path
+            content_type = response.headers.get("content-type", "")
+            is_html_request = (path in ("/webui", "/webui/", "/webui/index.html") or path == "/") and "text/html" in content_type
+
+            # Check if embed mode is requested
+            is_embed = request.query_params.get("embed") in ("true", "1", "yes")
+
+            # Check or generate SSO token
             sso_token = request.query_params.get("token")
+            # If no valid token provided or token is not a standard 3-part JWT, auto-mint a long-lived JWT
+            if not sso_token or len(sso_token.split(".")) != 3:
+                try:
+                    from lightrag.api.auth import auth_handler
+                    sso_token = auth_handler.create_token(username="admin", role="admin", custom_expire_hours=24 * 365)
+                except Exception as ex:
+                    logger.warning(f"Failed to create auto SSO token: {ex}")
+                    sso_token = None
+
             if sso_token:
                 response.set_cookie("LIGHTRAG-API-TOKEN", sso_token, path="/", samesite="lax")
-                path = request.url.path
-                content_type = response.headers.get("content-type", "")
-                if (path in ("/webui", "/webui/", "/webui/index.html") or path == "/") and "text/html" in content_type:
-                    body_chunks = [chunk async for chunk in response.body_iterator]
-                    body_bytes = b"".join(body_chunks)
-                    body_str = body_bytes.decode("utf-8", errors="ignore")
-                    sso_script = f"<script>localStorage.setItem('LIGHTRAG-API-TOKEN', {json.dumps(sso_token)});</script>"
-                    injected_html = body_str.replace("</head>", sso_script + "</head>")
-                    resp_headers = dict(response.headers)
-                    resp_headers.pop("content-length", None)
-                    return HTMLResponse(content=injected_html, status_code=response.status_code, headers=resp_headers)
+
+            if is_html_request:
+                body_chunks = [chunk async for chunk in response.body_iterator]
+                body_bytes = b"".join(body_chunks)
+                body_str = body_bytes.decode("utf-8", errors="ignore")
+
+                injected_snippets = []
+
+                # Inject SSO script and tab routing script
+                tab_param = request.query_params.get("tab", "").strip()
+                sso_script = f"""<script>
+(function() {{
+    try {{
+        var token = {json.dumps(sso_token) if sso_token else 'null'};
+        if (token) {{
+            localStorage.setItem('LIGHTRAG-API-TOKEN', token);
+            localStorage.setItem('LIGHTRAG-PREVIOUS-USER', 'admin');
+        }}
+        var urlParams = new URLSearchParams(window.location.search);
+        var targetProj = urlParams.get('project_id') || urlParams.get('project') || {json.dumps(project_id)};
+        var targetTenant = urlParams.get('tenant_id') || urlParams.get('tenant') || {json.dumps(tenant_id)};
+        if (targetProj) {{
+            var wsRaw = localStorage.getItem('lightrag-workspace-storage');
+            var wsParsed = wsRaw ? JSON.parse(wsRaw) : {{ state: {{}}, version: 0 }};
+            wsParsed.state = wsParsed.state || {{}};
+            wsParsed.state.currentProjectId = targetProj;
+            wsParsed.state.currentTenantId = targetTenant;
+            localStorage.setItem('lightrag-workspace-storage', JSON.stringify(wsParsed));
+        }}
+        var tab = urlParams.get('tab') || {json.dumps(tab_param)};
+        if (tab) {{
+            // 1. Correct Zustand key: settings-storage
+            var raw = localStorage.getItem('settings-storage');
+            var parsed = raw ? JSON.parse(raw) : {{ state: {{}}, version: 22 }};
+            parsed.state = parsed.state || {{}};
+            parsed.state.currentTab = tab;
+            localStorage.setItem('settings-storage', JSON.stringify(parsed));
+            // 2. Backward compatibility alias
+            localStorage.setItem('lightrag-settings-storage', JSON.stringify(parsed));
+        }}
+    }} catch(e) {{
+        console.error('SSO/Tab initialization failed:', e);
+    }}
+
+    // Runtime double-insurance: trigger click on sidebar button once DOM is loaded
+    window.addEventListener('DOMContentLoaded', function() {{
+        var urlParams = new URLSearchParams(window.location.search);
+        var tab = urlParams.get('tab') || {json.dumps(tab_param)};
+        if (!tab) return;
+        var attempts = 0;
+        var interval = setInterval(function() {{
+            attempts++;
+            var buttons = document.querySelectorAll('aside button');
+            var matched = false;
+            buttons.forEach(function(btn) {{
+                var text = (btn.innerText || '').toLowerCase();
+                if (tab === 'knowledge-graph' && (text.includes('graph studio') || text.includes('图谱工坊'))) {{
+                    btn.click();
+                    matched = true;
+                }} else if (tab === 'retrieval' && (text.includes('chat studio') || text.includes('智能问答'))) {{
+                    btn.click();
+                    matched = true;
+                }} else if (tab === 'documents' && (text.includes('knowledge hub') || text.includes('知识资产'))) {{
+                    btn.click();
+                    matched = true;
+                }}
+            }});
+            if (matched || attempts > 25) {{
+                clearInterval(interval);
+            }}
+        }}, 120);
+    }});
+}})();
+</script>"""
+                injected_snippets.append(sso_script)
+
+                if is_embed:
+                    embed_css = """<style id="lightrag-embed-override">
+    header { display: none !important; }
+    aside { display: none !important; }
+    main { height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
+    body { margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+</style>"""
+                    injected_snippets.append(embed_css)
+
+                injected_content = "\n".join(injected_snippets) + "\n"
+                if "<head>" in body_str:
+                    injected_html = body_str.replace("<head>", "<head>\n" + injected_content, 1)
+                else:
+                    injected_html = body_str.replace("</head>", injected_content + "</head>", 1)
+                resp_headers = dict(response.headers)
+                resp_headers.pop("content-length", None)
+                return HTMLResponse(content=injected_html, status_code=response.status_code, headers=resp_headers)
 
             return response
         finally:

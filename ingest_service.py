@@ -30,6 +30,23 @@ from workspace_manager import TenantWorkspaceManager
 
 logger = logging.getLogger("ingest_service")
 
+def fast_candidate_link(source_dir: Path, target_dir: Path) -> None:
+    """Builds a candidate sandbox using zero-copy OS hardlinks with fallback to shutil.copy2."""
+    import shutil
+    target_dir.mkdir(parents=True, exist_ok=True)
+    resolved_src = source_dir.resolve()
+    if not resolved_src.exists():
+        return
+
+    for item in resolved_src.iterdir():
+        if item.is_file() and not item.name.endswith(".tmp"):
+            dst_file = target_dir / item.name
+            try:
+                os.link(str(item), str(dst_file))
+            except OSError:
+                shutil.copy2(item, dst_file)
+
+
 MIME_EXT = {
     "text/plain": "txt",
     "text/markdown": "md",
@@ -346,10 +363,7 @@ class KnowledgeIngestService:
             # 1. Base copy from current active dir if exists
             active_dir = self.workspace_mgr.get_active_dir(tenant_id, project_id)
             if active_dir.exists():
-                for item in active_dir.resolve().iterdir():
-                    if item.is_file():
-                        import shutil
-                        shutil.copy2(item, cand_dir / item.name)
+                fast_candidate_link(active_dir, cand_dir)
 
             # 2. Build / Ingest document into candidate LightRAG
             from llm_client import create_lightrag_embedding_func, unified_llm_func
@@ -357,6 +371,7 @@ class KnowledgeIngestService:
                 working_dir=str(cand_dir),
                 llm_model_func=unified_llm_func,
                 embedding_func=create_lightrag_embedding_func(),
+                addon_params={"language": "简体中文"},
             )
             await candidate_rag.initialize_storages()
 
@@ -409,10 +424,7 @@ class KnowledgeIngestService:
         cand_dir = p_dir / "candidates" / cand_id
         cand_dir.mkdir(parents=True, exist_ok=True)
 
-        for item in active_dir.resolve().iterdir():
-            if item.is_file():
-                import shutil
-                shutil.copy2(item, cand_dir / item.name)
+        fast_candidate_link(active_dir, cand_dir)
 
         # 3. Prune from LightRAG storage in sandbox
         from llm_client import create_lightrag_embedding_func, unified_llm_func
@@ -420,6 +432,7 @@ class KnowledgeIngestService:
             working_dir=str(cand_dir),
             llm_model_func=unified_llm_func,
             embedding_func=create_lightrag_embedding_func(),
+            addon_params={"language": "简体中文"},
         )
         await candidate_rag.initialize_storages()
 

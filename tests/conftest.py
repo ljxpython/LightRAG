@@ -7,6 +7,8 @@ This file provides command-line options and fixtures for test configuration.
 import logging
 
 import pytest
+from workspace_manager import apply_workspace_namespace_patch
+apply_workspace_namespace_patch()
 
 
 @pytest.fixture
