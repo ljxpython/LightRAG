@@ -1,0 +1,34 @@
+{
+  "test_cases": [
+    {
+      "question": "生产备份每天什么时候执行，保留多久？",
+      "ground_truth": "生产备份每日在 02:15 UTC 执行全量备份，保留周期为 35 天。",
+      "project": "eval_benchmark"
+    },
+    {
+      "question": "备份恢复演练的频率是多少？",
+      "ground_truth": "备份恢复演练每 14 天组织一次端到端恢复演练验证。",
+      "project": "eval_benchmark"
+    },
+    {
+      "question": "P1 和 P2 事故分别多久确认响应？",
+      "ground_truth": "P1 级别重大事故要求在 7 分钟内完成确认响应，P2 级别事故要求在 25 分钟内完成确认响应。",
+      "project": "eval_benchmark"
+    },
+    {
+      "question": "登录接口使用什么方法和路径？成功后有哪些令牌字段？",
+      "ground_truth": "登录接口采用 POST /v2/auth/login，成功响应包含 access_token, expires_in 以及 refresh_token 字段。",
+      "project": "eval_benchmark"
+    },
+    {
+      "question": "访问令牌和刷新令牌各自的有效期是多少？",
+      "ground_truth": "访问令牌 (access_token) 有效期为 90 分钟，刷新令牌 (refresh_token) 有效期为 10 天。",
+      "project": "eval_benchmark"
+    },
+    {
+      "question": "客户端超出限流额度会收到什么状态码，如何知道等待时间？",
+      "ground_truth": "超出限流额度会收到 HTTP 429 Too Many Requests 状态码，通过响应头中的 Retry-After 字段获取需要等待的时间。",
+      "project": "eval_benchmark"
+    }
+  ]
+}

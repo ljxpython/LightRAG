@@ -104,3 +104,9 @@ memory-bank
 sandbox_storage/
 eval_data/__parsed__/
 
+# Decoupled evaluation suite
+evaluation/results/*.csv
+evaluation/results/*.json
+evaluation/.eval_venv/
+
+
