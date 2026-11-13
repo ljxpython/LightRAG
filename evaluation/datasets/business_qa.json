@@ -1,33 +1,84 @@
 {
+  "dataset_name": "business_qa",
+  "project": "common",
+  "corpus_manifest": {
+    "project_id": "common",
+    "project_name": "通用业务基准",
+    "revision": "rev_1",
+    "doc_count": 4,
+    "source_docs": [
+      "ops_backup_policy.md",
+      "sla_incident_management.md",
+      "auth_api_spec.md",
+      "gateway_rate_limiting.md"
+    ]
+  },
+  "total_cases": 6,
   "test_cases": [
     {
+      "test_id": "case_1",
       "question": "生产备份每天什么时候执行，保留多久？",
       "ground_truth": "生产备份每日在 02:15 UTC 执行全量备份，保留周期为 35 天。",
+      "contexts": [
+        "## 4. 生产环境备份与灾备策略\n系统每日在 02:15 UTC 自动触发数据库全量快照与物理增量备份任务。所有快照与归档数据自动同步至多可用区异地冷存储，全量备份保留周期为 35 天，超时由生命周期规则自动安全排空。"
+      ],
+      "source_docs": ["ops_backup_policy.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     },
     {
+      "test_id": "case_2",
       "question": "备份恢复演练的频率是多少？",
       "ground_truth": "备份恢复演练每 14 天组织一次端到端恢复演练验证。",
+      "contexts": [
+        "## 5. 容灾演练与数据可信验证\n为验证备份数据的完整性与有效性，运维与基础设施团队每 14 天组织一次端到端自动化恢复演练验证，拉起隔离沙箱并校验数据校验和（Checksum），保障故障场景秒级应急。"
+      ],
+      "source_docs": ["ops_backup_policy.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     },
     {
+      "test_id": "case_3",
       "question": "P1 和 P2 事故分别多久确认响应？",
       "ground_truth": "P1 级别重大事故要求在 7 分钟内完成确认响应，P2 级别事故要求在 25 分钟内完成确认响应。",
+      "contexts": [
+        "## 2. 事故级别与应急响应 SLA 指标\n根据线上业务影响面划分事故级别：\n- P1 级别重大事故（核心链路不可用或数据受损）：要求值班负责人必须在 7 分钟内完成确认响应，15 分钟内拉起应急作战室；\n- P2 级别事故（核心功能降级或非核心服务中断）：要求在 25 分钟内完成确认响应，1 小时内输出初步抑制方案。"
+      ],
+      "source_docs": ["sla_incident_management.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     },
     {
+      "test_id": "case_4",
       "question": "登录接口使用什么方法和路径？成功后有哪些令牌字段？",
       "ground_truth": "登录接口采用 POST /v2/auth/login，成功响应包含 access_token, expires_in 以及 refresh_token 字段。",
+      "contexts": [
+        "### 3.1 统一身份认证接口\n- 请求路径：POST /v2/auth/login\n- 请求头：Content-Type: application/json\n- 成功响应体结构 (200 OK)：\n```json\n{\n  \"access_token\": \"eyJhbGciOi...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 5400,\n  \"refresh_token\": \"d98f7a6b...\"\n}\n```"
+      ],
+      "source_docs": ["auth_api_spec.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     },
     {
+      "test_id": "case_5",
       "question": "访问令牌和刷新令牌各自的有效期是多少？",
       "ground_truth": "访问令牌 (access_token) 有效期为 90 分钟，刷新令牌 (refresh_token) 有效期为 10 天。",
+      "contexts": [
+        "### 3.2 令牌生命周期与轮转机制\n- 访问令牌 (access_token)：采用短生命周期无状态 JWT，有效期设置为 90 分钟 (5400 秒)；\n- 刷新令牌 (refresh_token)：用于安全续期，单次签发有效期为 10 天，存储在 Redis 哨兵集群中支持主动吊销与滑动延期。"
+      ],
+      "source_docs": ["auth_api_spec.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     },
     {
+      "test_id": "case_6",
       "question": "客户端超出限流额度会收到什么状态码，如何知道等待时间？",
       "ground_truth": "超出限流额度会收到 HTTP 429 Too Many Requests 状态码，通过响应头中的 Retry-After 字段获取需要等待的时间。",
+      "contexts": [
+        "### 4. 网关分布式限流策略\n当客户端调用频次超出当前租户配额或触发令牌桶限流阈值时，网关立即阻断请求并返回 HTTP 429 Too Many Requests 错误状态码。响应头中将包含标准的 Retry-After 标头（单位为秒），告知客户端需等待的退避冷却时间。"
+      ],
+      "source_docs": ["gateway_rate_limiting.md"],
+      "evolution_type": "standard_qa",
       "project": "eval_benchmark"
     }
   ]

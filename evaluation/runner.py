@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 load_dotenv(repo_root / ".env", override=False)
 
 from evaluation.engine import RAGEvaluationEngine
+from evaluation.mlflow_adapter import MLflowEvaluationTracker
 
 # Setup Clean Console Logger
 logger = logging.getLogger("eval_runner")
@@ -122,6 +123,9 @@ async def run_evaluation(
     enable_rerank: Optional[bool] = None,
     user_prompt: Optional[str] = None,
     max_total_tokens: Optional[int] = None,
+    mlflow_enabled: bool = True,
+    experiment_name: Optional[str] = None,
+    mlflow_tracking_uri: Optional[str] = None,
 ):
     print("=" * 80)
     print("🚀 启动独立外挂式多租户 RAGAS 质量评测")
@@ -247,6 +251,37 @@ async def run_evaluation(
     print(f"   • JSON 报告: {reports['json'].resolve()}")
     print("=" * 90)
 
+    # MLflow Tracking Integration
+    if mlflow_enabled:
+        print("\n📡 [MLflow] 正在将 RAGAS 评测指标与运行记录同步至 MLflow 平台...")
+        tracker = MLflowEvaluationTracker(
+            tracking_uri=mlflow_tracking_uri,
+            experiment_name=experiment_name,
+            enabled=True,
+        )
+        run_name = f"ragas_{project_id}_{mode}_topk{top_k}"
+        with tracker.start_run(run_name=run_name, tags={"framework": "RAGAS", "project": project_id, "mode": mode}) as run:
+            if run:
+                tracker.log_params({
+                    "project": project_id,
+                    "mode": mode,
+                    "top_k": top_k,
+                    "chunk_top_k": chunk_top_k,
+                    "enable_rerank": enable_rerank,
+                    "dataset": dataset_path.name,
+                    "total_cases": stats["total"],
+                })
+                tracker.log_metrics({
+                    "ragas_score": stats["avg_ragas_score"],
+                    "faithfulness": stats["avg_faithfulness"],
+                    "context_recall": stats["avg_context_recall"],
+                    "context_precision": stats["avg_context_precision"],
+                    "success_rate": stats["success_rate"],
+                })
+                tracker.log_results_table(results, framework="ragas", artifact_file="ragas_cases.json")
+                tracker.log_artifacts([reports["csv"], reports["json"]])
+                print("   ✅ RAGAS MLflow 评测大表同步完成！")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run decoupled multi-tenant RAGAS evaluation.")
@@ -318,6 +353,31 @@ def main():
         default=None,
         help="Max total tokens for context (default: 30000 in server)",
     )
+    parser.add_argument(
+        "--mlflow",
+        dest="mlflow_enabled",
+        action="store_true",
+        default=True,
+        help="Enable syncing metrics and run to remote MLflow platform (default: True)",
+    )
+    parser.add_argument(
+        "--no-mlflow",
+        dest="mlflow_enabled",
+        action="store_false",
+        help="Disable syncing to MLflow",
+    )
+    parser.add_argument(
+        "--experiment-name",
+        type=str,
+        default=None,
+        help="Target MLflow experiment name (default: lightrag-production-evaluation)",
+    )
+    parser.add_argument(
+        "--mlflow-tracking-uri",
+        type=str,
+        default=None,
+        help="Target MLflow server URI (default: http://49.233.222.54:9128)",
+    )
 
     args = parser.parse_args()
     asyncio.run(run_evaluation(
@@ -331,6 +391,9 @@ def main():
         enable_rerank=args.enable_rerank,
         user_prompt=args.user_prompt,
         max_total_tokens=args.max_total_tokens,
+        mlflow_enabled=args.mlflow_enabled,
+        experiment_name=args.experiment_name,
+        mlflow_tracking_uri=args.mlflow_tracking_uri,
     ))
 
 

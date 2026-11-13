@@ -25,6 +25,7 @@ import DocumentManager from '@/features/DocumentManager'
 import RetrievalView from '@/features/RetrievalView'
 import DashboardOverview from '@/features/dashboard/DashboardOverview'
 import ReleaseConsole from '@/features/release/ReleaseConsole'
+import EvaluationStudio from '@/features/evaluation/EvaluationStudio'
 import AppSidebar from '@/components/layout/AppSidebar'
 import type { Tab } from '@/stores/settings'
 
@@ -287,6 +288,11 @@ function App() {
                   <TabsContent value="release" className="absolute inset-0 overflow-auto">
                     <ErrorBoundary>
                       <ReleaseConsole />
+                    </ErrorBoundary>
+                  </TabsContent>
+                  <TabsContent value="evaluation" className="absolute inset-0 overflow-auto">
+                    <ErrorBoundary>
+                      <EvaluationStudio key={workspaceEpoch} />
                     </ErrorBoundary>
                   </TabsContent>
                 </div>

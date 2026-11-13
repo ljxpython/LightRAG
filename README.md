@@ -1,655 +1,135 @@
-<div align="center">
+# LightRAG 独立外挂式多租户质量评测体系
 
-<div style="margin: 20px 0;">
-  <img src="./assets/logo.png" width="120" height="120" alt="LightRAG Logo" style="border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 217, 255, 0.3);">
-</div>
-
-# 🚀 LightRAG: Simple and Fast Retrieval-Augmented Generation
-
-<div align="center">
-<a href="https://www.star-history.com/hkuds/lightrag"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=trending&amp;theme=dark"><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=trending"><img alt="GitHub Trending Repository of the Day" src="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=trending" height="55"></picture></a>&#32;<a href="https://trendshift.io/repositories/13043" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13043" alt="HKUDS/LightRAG | Trendshift" height="55"></a>&#32;<a href="https://www.star-history.com/hkuds/lightrag"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=rank&amp;theme=dark"><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=rank"><img alt="Star History Rank" src="https://api.star-history.com/badge?repo=HKUDS/LightRAG&amp;type=rank" height="55"></picture></a>
-</div>
-
-<p>
-</p>
-<div align="center">
-  <div style="width: 100%; height: 2px; margin: 20px 0; background: linear-gradient(90deg, transparent, #00d9ff, transparent);"></div>
-</div>
-
-<div align="center">
-  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; text-align: center;">
-    <p>
-      <a href='https://github.com/HKUDS/LightRAG'><img src='https://img.shields.io/badge/🔥Project-Page-00d9ff?style=for-the-badge&logo=github&logoColor=white&labelColor=1a1a2e'></a>
-      <a href='https://arxiv.org/abs/2410.05779'><img src='https://img.shields.io/badge/📄arXiv-2410.05779-ff6b6b?style=for-the-badge&logo=arxiv&logoColor=white&labelColor=1a1a2e'></a>
-      <a href="https://github.com/HKUDS/LightRAG/stargazers"><img src='https://img.shields.io/github/stars/HKUDS/LightRAG?color=00d9ff&style=for-the-badge&logo=star&logoColor=white&labelColor=1a1a2e' /></a>
-    </p>
-    <p>
-      <img src="https://img.shields.io/badge/🐍Python-3.10-4ecdc4?style=for-the-badge&logo=python&logoColor=white&labelColor=1a1a2e">
-      <a href="https://pypi.org/project/lightrag-hku/"><img src="https://img.shields.io/pypi/v/lightrag-hku.svg?style=for-the-badge&logo=pypi&logoColor=white&labelColor=1a1a2e&color=ff6b6b"></a>
-    </p>
-    <p>
-      <a href="https://discord.gg/yF2MmDJyGJ"><img src="https://img.shields.io/badge/💬Discord-Community-7289da?style=for-the-badge&logo=discord&logoColor=white&labelColor=1a1a2e"></a>
-      <a href="https://github.com/HKUDS/LightRAG/issues/285"><img src="https://img.shields.io/badge/💬WeChat-Group-07c160?style=for-the-badge&logo=wechat&logoColor=white&labelColor=1a1a2e"></a>
-    </p>
-    <p>
-      <a href="README-zh.md"><img src="https://img.shields.io/badge/🇨🇳中文版-1a1a2e?style=for-the-badge"></a>
-      <a href="README.md"><img src="https://img.shields.io/badge/🇺🇸English-1a1a2e?style=for-the-badge"></a>
-      <a href="README-ja.md"><img src="https://img.shields.io/badge/🇯🇵日本語版-1a1a2e?style=for-the-badge"></a>
-      <a href="README-id.md"><img src="https://img.shields.io/badge/🇮🇩Bahasa%20Indonesia-1a1a2e?style=for-the-badge"></a>
-    </p>
-    <p>
-      <a href="https://pepy.tech/projects/lightrag-hku"><img src="https://static.pepy.tech/personalized-badge/lightrag-hku?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads"></a>
-      <a href="https://hvtracker.net/agents/lightrag/"><img src="https://hvtracker.net/badge/lightrag.svg"></a>
-    </p>
-  </div>
-</div>
-
-</div>
-
-<div align="center" style="margin: 30px 0;">
-  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="800">
-</div>
-
-<div align="center" style="margin: 30px 0;">
-    <img src="./README.assets/b2aaf634151b4706892693ffb43d9093.png" width="800" alt="LightRAG Diagram">
-</div>
+基于香港大学最新官方 LightRAG 1.5.8 专有分支构建的企业级外挂式知识系统质量评测套件。
+严格恪守 **“上游源码（`lightrag/`）0 侵入、0 篡改”** 红线，完全在外部解耦运行。
 
 ---
 
-## 🎉 News
-- [2026.07]🎯[New Feature]: Add **Smart Heading** recognition feature for word documents.
-- [2026.05]🎯[New Feature]: **Merge RagAnything into LightRAG**🎉. Multimodal content parsing and extraction via **MinerU / Docling** services.
-- [2026.05]🎯[New Feature]: Introducing four selectable text chunking strategies: `Fix`, `Recursive`, `Vector`, and `Paragraph`.
-- [2026.05]🎯[New Feature]: **Role-specific LLM configuration** support, 4 distinct roles: EXTRACT, QUERY, KEYWORDS, and VLM, with independent LLM settings.
-- [2026.03]🎯[New Feature]: Integrated **OpenSearch** as a unified storage backend, providing comprehensive support for all four LightRAG storage.
-- [2026.03]🎯[New Feature]: Introduced a setup wizard. Support for local deployment of embedding, reranking, and storage backends via Docker.
-- [2025.11]🎯[New Feature]: Integrated **RAGAS for Evaluation** and **Langfuse for Tracing**. Updated the API to return retrieved contexts alongside query results to support context precision metrics.
-- [2025.10]🎯[Scalability Enhancement]: Eliminated processing bottlenecks to support **Large-Scale Datasets Efficiently**.
-- [2025.09]🎯[New Feature] Enhances knowledge graph extraction accuracy for **Open-Sourced LLMs** such as Qwen3-30B-A3B.
-- [2025.08]🎯[New Feature] **Reranker** is now supported, significantly boosting performance for mixed queries (set as default query mode).
-- [2025.08]🎯[New Feature] Added **Document Deletion** with automatic KG regeneration to ensure optimal query performance.
-- [2025.06]🎯[New Release] Our team has released [RAG-Anything](https://github.com/HKUDS/RAG-Anything) — an **All-in-One Multimodal RAG** system for seamless processing of text, images, tables, and equations.
-- [2025.06]🎯[New Feature] LightRAG now supports comprehensive multimodal data handling through [RAG-Anything](https://github.com/HKUDS/RAG-Anything) integration, enabling seamless document parsing and RAG capabilities across diverse formats including PDFs, images, Office documents, tables, and formulas. Please refer to the new [multimodal section](https://github.com/HKUDS/LightRAG/?tab=readme-ov-file#multimodal-document-processing-rag-anything-integration) for details.
-- [2025.03]🎯[New Feature] LightRAG now supports citation functionality, enabling proper source attribution and enhanced document traceability.
-- [2025.02]🎯[New Feature] You can now use MongoDB as an all-in-one storage solution for unified data management.
-- [2025.02]🎯[New Release] Our team has released [VideoRAG](https://github.com/HKUDS/VideoRAG)-a RAG system for understanding extremely long-context videos
-- [2025.01]🎯[New Release] Our team has released [MiniRAG](https://github.com/HKUDS/MiniRAG) making RAG simpler with small models.
-- [2025.01]🎯You can now use PostgreSQL as an all-in-one storage solution for data management.
-- [2024.11]🎯[New Resource] A comprehensive guide to LightRAG is now available on [LearnOpenCV](https://learnopencv.com/lightrag). — explore in-depth tutorials and best practices. Many thanks to the blog author for this excellent contribution!
-- [2024.11]🎯[New Feature] Introducing the LightRAG WebUI — an interface that allows you to insert, query, and visualize LightRAG knowledge through an intuitive web-based dashboard.
-- [2024.11]🎯[New Feature] You can now [use Neo4J for Storage](https://github.com/HKUDS/LightRAG?tab=readme-ov-file#using-neo4j-for-storage)-enabling graph database support.
-- [2024.10]🎯[New Feature] We've added a link to a [LightRAG Introduction Video](https://youtu.be/oageL-1I0GE). — a walkthrough of LightRAG's capabilities. Thanks to the author for this excellent contribution!
-- [2024.10]🎯[New Channel] We have created a [Discord channel](https://discord.gg/yF2MmDJyGJ)!💬 Welcome to join our community for sharing, discussions, and collaboration! 🎉🎉
+## 🌟 双轨评测框架矩阵
 
-<details>
-  <summary style="font-size: 1.4em; font-weight: bold; cursor: pointer; display: list-item;">
-    Algorithm Flowchart
-  </summary>
+本项目同时支持业内两大主流评估框架，满足从学术度量到工业 CI/CD 自动化断言的全场景需求：
 
-![LightRAG Indexing Flowchart](https://learnopencv.com/wp-content/uploads/2024/11/LightRAG-VectorDB-Json-KV-Store-Indexing-Flowchart-scaled.jpg)
-*Figure 1: LightRAG Indexing Flowchart - Img Caption : [Source](https://learnopencv.com/lightrag/)*
-![LightRAG Retrieval and Querying Flowchart](https://learnopencv.com/wp-content/uploads/2024/11/LightRAG-Querying-Flowchart-Dual-Level-Retrieval-Generation-Knowledge-Graphs-scaled.jpg)
-*Figure 2: LightRAG Retrieval and Querying Flowchart - Img Caption : [Source](https://learnopencv.com/lightrag/)*
-
-</details>
-
-## Installation
-
-**💡 Using uv for Package Management**: This project uses [uv](https://docs.astral.sh/uv/) for fast and reliable Python package management. Install uv first: `curl -LsSf https://astral.sh/uv/install.sh | sh` (Unix/macOS) or `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"` (Windows)
-
-> **Note**: You can also use pip if you prefer, but uv is recommended for better performance and more reliable dependency management.
->
-> **📦 Offline Deployment**: For offline or air-gapped environments, see the [Offline Deployment Guide](./docs/OfflineDeployment.md) for instructions on pre-installing all dependencies and cache files.
-
-### Install LightRAG Server
-
-* Install from PyPI
-
-```bash
-### Install LightRAG Server as tool using uv (recommended)
-uv tool install "lightrag-hku[api]"
-
-### Or using pip
-# python -m venv .venv
-# source .venv/bin/activate  # Windows: .venv\Scripts\activate
-# pip install "lightrag-hku[api]"
-
-# Setup env file
-# Obtain the env.example file by downloading it from the GitHub repository root
-# or by copying it from a local source checkout.
-cp env.example .env  # Update the .env with your LLM and embedding configurations
-# Launch the server. It binds to all interfaces (0.0.0.0) by default.
-# SECURITY: before exposing it on a network, configure authentication in .env
-# (LIGHTRAG_API_KEY, or AUTH_ACCOUNTS together with TOKEN_SECRET), or bind to
-# 127.0.0.1 for local-only access; without auth every endpoint is public.
-# Note: the Ollama-compatible /api/* routes stay open by default for client
-# compatibility; set WHITELIST_PATHS=/health to require auth on them too.
-lightrag-server
-```
-
-* Installation from Source
-
-```bash
-git clone https://github.com/HKUDS/LightRAG.git
-cd LightRAG
-
-# Bootstrap the development environment (recommended)
-make dev
-source .venv/bin/activate  # Activate the virtual environment (Linux/macOS)
-# Or on Windows: .venv\Scripts\activate
-
-# make dev installs the test toolchain plus the full offline stack
-# (API, storage backends, and provider integrations), then builds the frontend.
-# Run make env-base or copy env.example to .env before starting the server.
-
-# Equivalent manual steps with uv
-# Note: uv sync automatically creates a virtual environment in .venv/
-uv sync --extra test --extra offline
-source .venv/bin/activate  # Activate the virtual environment (Linux/macOS)
-# Or on Windows: .venv\Scripts\activate
-
-### Or using pip with virtual environment
-# python -m venv .venv
-# source .venv/bin/activate  # Windows: .venv\Scripts\activate
-# pip install -e ".[test,offline]"
-
-# Build front-end artifacts
-cd lightrag_webui
-bun install --frozen-lockfile
-bun run build
-cd ..
-
-# setup env file
-make env-base  # Or: cp env.example .env and update it manually
-# Launch API-WebUI server
-lightrag-server
-```
-
-* Launching the LightRAG Server with Docker Compose
-
-```bash
-git clone https://github.com/HKUDS/LightRAG.git
-cd LightRAG
-cp env.example .env  # Update the .env with your LLM and embedding configurations
-# modify LLM and Embedding settings in .env
-docker compose up
-```
-
-> Historical versions of LightRAG docker images can be found here: [LightRAG Docker Images]( https://github.com/HKUDS/LightRAG/pkgs/container/lightrag)
->
-> Official GHCR images published by GitHub Actions are signed with Sigstore Cosign using GitHub OIDC. See [docs/DockerDeployment.md](./docs/DockerDeployment.md#verify-official-ghcr-images-with-cosign) for verification commands.
->
-> On Apple Silicon (macOS 26) without Docker Desktop, you can run the same Postgres/Neo4j/Milvus storage stack on Apple's native `container` runtime — see [docs/AppleContainerSetup.md](./docs/AppleContainerSetup.md).
-
-### Create .env File With Setup Tool
-
-Instead of editing `env.example` by hand, use the interactive setup wizard to generate a configured `.env` and, when needed, `docker-compose.final.yml`:
-
-```bash
-make env-base           # Required first step: LLM, embedding, reranker
-make env-storage        # Optional: storage backends and database services
-make env-server         # Optional: server port, auth, and SSL
-make env-base-rewrite   # Optional: force-regenerate wizard-managed compose services
-make env-storage-rewrite # Optional: force-regenerate wizard-managed compose services
-make env-security-check # Optional: audit the current .env for security risks
-```
-
-For full description of every target see [docs/InteractiveSetup.md](./docs/InteractiveSetup.md).
-
-### Optional: spaCy Models for docx smart_heading
-
-The native docx parser's opt-in `smart_heading` engine parameter uses spaCy for sentence/NER heuristics. The spaCy runtime is already included in the `api` extra — only the two pinned language models (`zh_core_web_sm` / `en_core_web_sm` 3.8.0, GitHub release wheels not published on PyPI) need one extra step:
-
-```bash
-lightrag-download-cache --spacy-install
-```
-
-Enable smart_heading per file/rule (e.g. `LIGHTRAG_PARSER=docx:native(smart_heading=true)`), or globally in `.env`:
-
-```bash
-# .docx files routed to the native engine get smart_heading by default;
-# opt a file back out with an explicit native(smart_heading=false) rule/hint.
-DOCX_SMART_HEADING=true
-```
-
-When the global switch is on (or a `LIGHTRAG_PARSER` rule carries `native(smart_heading=true)`), the server verifies the models at startup and fails fast with install guidance if they are missing. Deployments that never enable smart_heading need no models. The main Docker image ships the models pre-installed (the lite image does not); for air-gapped hosts see the [Offline Deployment Guide](./docs/OfflineDeployment.md).
-
-### Optional: libcairo for SVG Rasterization (native md/textpack)
-
-The native markdown/textpack parser rasterizes embedded SVG images to PNG via `cairosvg`. `cairosvg` is a cffi binding: `pip install cairosvg` (pulled in by the `api` extra) always succeeds, but rendering only works if the native `libcairo` shared library is *also* present on the host — `pip`/`uv` cannot install system libraries. Without it, rasterization fails at runtime and the affected SVG is skipped (the rest of the document is unaffected); the server logs a warning at startup so the gap is visible before it shows up as a per-document warning later.
-
-Install the system package for your platform:
-
-```bash
-# Debian / Ubuntu (the official Docker image already includes this)
-sudo apt-get install -y libcairo2
-
-# RHEL / Fedora
-sudo dnf install -y cairo
-
-# macOS (Homebrew)
-brew install cairo
-
-# Windows: install the GTK3 runtime, which bundles libcairo-2.dll
-```
-
-Deployments that never process markdown/textpack documents with embedded SVGs can ignore the startup warning.
-
-## About LightRAG
-
-### A Lightweight, Graph-Based RAG Framework
-
-LightRAG is a lightweight knowledge-graph RAG framework and an efficient alternative to Microsoft GraphRAG. It adopts a dual-layer architecture to manage both knowledge graphs (KGs) and vector embeddings, effectively bridging the gap between traditional vector-based RAG and graph-based RAG approaches. Designed for high scalability, LightRAG addresses key challenges in large-scale graph indexing and retrieval, including heavy computational overhead, slow response times, and the high cost of incremental updates. While supporting large datasets, LightRAG can still deliver exceptionally high RAG quality, even when paired with a 30B open-source large language model (LLM).
-
-### Features & Advantages
-
-- **Deep Contextual Understanding:** Through graph-structured indexing, LightRAG captures complex semantic dependencies between entities, overcoming the fragmented context limitations typical of traditional chunk-based retrieval methods. Its generation quality and context awareness are particularly outstanding in vertical domains (e.g., legal, financial) that require global comprehension or logical reasoning.
-- **Exceptional Comprehensiveness & Diversity:** LightRAG’s dual-level retrieval mechanism allows it to integrate detailed facts and abstract concepts concurrently. This enables the system to achieve remarkable performance in query result comprehensiveness and diversity, making it highly effective at handling complex, cross-document queries.
-- **Extreme Retrieval Efficiency & Low Cost:** LightRAG does not rely on inefficient community reports or multi-hop reasoning for complex queries. This drastically reduces the number of LLM calls required during both the indexing and querying phases, significantly lowering response latency and LLM computational costs.
-- **Incremental Updates & Selective Deletion:** LightRAG addresses the challenges of incrementally updating and selectively deleting content from graph-based knowledge bases, keeping them current in dynamic data environments. When a document is deleted, the system can use the LLM cache created during indexing to quickly rebuild the affected entities and relationships, substantially improving update efficiency.
-- **Multiple Document Parsing Engines:** LightRAG's document processing pipeline supports MinerU, Docling, and Native and can be extended with third-party parsers. LightRAG's Native engine efficiently parses images, tables, and formulas in Word and Markdown documents, making it especially suitable for documents rich in multimodal content. The Native engine also automatically detects and corrects section headings in Word documents, improving content extraction from documents with inconsistent outlines and laying the foundation for section-aware text chunking.
-- **Multiple Text Chunking Strategies:** LightRAG supports four text chunking strategies: `Fixed-length (F)`, `Recursive character (R)`, `Vector semantic (V)`, and `Paragraph semantic (P)`. The LightRAG-native `Paragraph semantic (P)` strategy **aligns chunk boundaries with the document's native semantic boundaries**—headings, paragraphs, and tables—as closely as possible. This reduces problems such as mismatched headings and content or missing header rows when long tables are split.
-- **Multiple Storage Backends:** LightRAG's default KV, vector, and graph stores are in-memory databases with local file persistence — suitable only for small-scale testing and evaluation, **not for production**. LightRAG also supports a wide range of commonly used storage backends (PostgreSQL recommended) for production deployments with large datasets.
-
-### Multimodal Capability Upgrades
-
-Traditional RAG systems lack an effective way to process multimodal content such as images, formulas, and tables in documents. Starting with v1.5, LightRAG seamlessly integrates multimodal processing into its document pipeline and query flow. Through the knowledge graph, LightRAG connects multimodal content with the body text and can use that information when answering queries to produce more accurate and reliable responses. This capability can substantially improve RAG quality for documents rich in multimodal content, such as operation manuals and academic papers.
-
-### LightRAG API Server
-
-The LightRAG server offers not only a web-based UI for exploring LightRAG functionalities but also a comprehensive REST API. For more information about the LightRAG server, please refer to [LightRAG Server](./docs/LightRAG-API-Server.md).
-
-![iShot_2025-03-23_12.40.08](./README.assets/iShot_2025-03-23_12.40.08.png)
-
-## Key Configuration Guide
-
-### Selecting LLM Models
-
-LightRAG requires LLM/VLMs of four different roles during its workflow. You should configure models with different capabilities and speeds for different roles to strike a balance between performance and processing speed. LightRAG has higher capability requirements for Large Language Models (LLMs) than traditional RAG because it requires LLMs to perform complex entity-relation extraction tasks from documents. During the query phase, the LLM needs to process a large volume of retrieved information, including entities, relationships, and text chunks. This requires the model to have the capability of generating high-quality responses in long, noisy contexts.
-
-**Recommended models by role:**
-
-- **Extraction LLM (`EXTRACT`)**: Entity-relation extraction runs on every text chunk, so a fast, cost-effective mainstream model is enough — a **non-thinking** model (reasoning/thinking mode disabled) is strongly recommended to avoid slow, expensive extraction. Good hosted options include GPT-5.6-luna, Claude Haiku, or Gemini-mini internationally, and DeepSeek-V4-lite or Kimi in China. For local deployment, Qwen3-30B-A3B-Instruct is a reasonable minimum.
-- **Query LLM (`QUERY`)**: This model writes the final answer from long, noisy retrieved context, so it should be *stronger* than the extraction model in order to maximize answer quality. Choose a higher-tier model from the same families; a thinking-capable model is fine here.
-- **Keyword LLM (`KEYWORD`)**: A lightweight, latency-sensitive step that **must** use a non-thinking model to keep query latency low; a fast model comparable to the extraction one is sufficient.
-- **VLM (`VLM`)**: Any mainstream multimodal model with image-input support works. For local deployment, consider Qwen3.6-35B-A3B.
-
-Within your acceptable latency and cost budget, prefer the highest-scoring model available (based on public benchmarks/leaderboards). For detailed model configurations, please refer to [RoleSpecificLLMConfiguration.md](./docs/RoleSpecificLLMConfiguration.md)
-
-### Selecting Query Modes
-
-LightRAG supports five query modes:
-
-- **local**: Focuses on precise matching of local contexts and specific entities. It retrieves candidate entities and their directly associated attributes from the knowledge graph. This mode is suitable for Q&A targeting specific objects, concrete concepts, or detailed facts, providing highly relevant and detailed local context support.
-- **global**: Focuses on macro themes, cross-document reasoning, and deep relationships between entities. It retrieves relationship chains covering broad themes and concepts. This mode is suitable for queries that require summarization across multiple contexts, trend analysis, or understanding complex semantic dependencies.
-- **hybrid**: Merges the retrieval results of both local and global modes. It performs comprehensive reasoning and generation by simultaneously recalling specific entities and global relationship contexts.
-- **naive**: Traditional RAG retrieval based on text chunks. It does not use a knowledge graph and relies directly on vector similarity to retrieve from the original text chunks.
-- **mix**: Fully-featured mode that merges retrieval results from local, global, and naive modes to provide the most comprehensive and rich retrieval results.
-
-The default query mode for LightRAG is `mix`. Using `mix` mode generally yields the most ideal query results. The `mix` mode takes slightly longer than `naive`, while other query modes are roughly comparable in latency.
-
-### Embedding Models
-
-When choosing an Embedding model, pay attention to its multilingual support capabilities. Since LightRAG's retrieval quality has limited dependency on the Embedding model, it is recommended to choose low-dimensional and fast models. Any mainstream, up-to-date embedding model works well; for local deployment, `BAAI/bge-m3` is a solid choice. We highly recommend deploying the Embedding model locally to achieve the best performance.
-
-**Important Note**: The Embedding model must be determined before document indexing, and the same model must be used in the query phase. Once selected, embedding models generally cannot be changed. If changed, you will need to re-embed all text chunks, entities, and relationships. LightRAG does not currently provide a re-embedding tool. Some storage backends (e.g., PostgreSQL) require the vector dimension to be defined when creating tables for the first time, so changing the Embedding model requires deleting vector-related tables so LightRAG can recreate them.
-
-### Enabling Reranking
-
-Enabling the Rerank option during the query phase can significantly improve query quality. However, enabling Rerank typically introduces a 1–2 second delay. To minimize latency, it is highly recommended to deploy the Rerank model locally. Any mainstream, up-to-date reranker works; for local deployment, `BAAI/bge-reranker-v2-m3` is recommended. For configuration details, please refer to the `env.example` file. Unlike Embedding models, the Rerank model can be changed at any time during the query phase.
-
-### Document Processing Pipeline Configuration
-
-The default pipeline configuration in LightRAG does not allow the system to perform at its best. The quality of document parsing greatly impacts document indexing and querying. Therefore, we recommend configuring the pipeline to enable the MinerU parsing engine and activating the pipeline's image analysis features. Suggested configuration:
-
-```
-LIGHTRAG_PARSER=*:native-iteP,*:mineru-iteP,*:legacy-R
-
-VLM_PROCESS_ENABLE=true
-VLM_LLM_MODEL=<your_vlm_model_name>
-```
-
-Since the cloud-based MinerU service has limitations on usage, file size, and page count, it is recommended to use a locally deployed MinerU. For details on configuring the file processing pipeline, please refer to [FileProcessingPipeline.md](./docs/FileProcessingPipeline.md)
-
-### Concurrency Optimization for File Processing
-
-For large-scale document processing, you need to improve concurrency. Key environment variables related to concurrent file processing include:
-
-- **MAX_ASYNC_LLM**: Sets the base concurrency for LLM roles (`MAX_ASYNC` remains a deprecated alias). During file processing, it also caps entity/relation extraction tasks for the chunks of one document; each entity-merge or relation-merge phase can run up to twice this many tasks.
-- **EXTRACT_MAX_ASYNC_LLM**: Optionally overrides the Extract-role limit for actual extraction and merge-summary LLM requests. When unset, it inherits `MAX_ASYNC_LLM`; it does not change the pipeline task limits above.
-- **MAX_PARALLEL_INSERT**: Controls the maximum number of files processed in parallel, rather than the per-document chunk or graph-merge task limits. It should ideally be set to about 1/3 of `MAX_ASYNC_LLM`.
-- **MAX_PARALLEL_PARSE_MINERU**: Controls the number of parallel files processed for MinerU parsing.
-- **MAX_PARALLEL_PARSE_DOCLING**: Controls the number of parallel files processed for Docling parsing.
-- **EMBEDDING_FUNC_MAX_ASYNC**: Controls the maximum concurrency for embedding models.
-- **EMBEDDING_BATCH_NUM**: Controls the number of texts included in each embedding model request (how many embeddings per batch). Increasing this number can significantly reduce the number of API calls to the embedding model and speed up data persistence in the embedding storage.
-
-```
-# Sample Configuration
-MAX_ASYNC_LLM=8
-MAX_PARALLEL_INSERT=3
-EMBEDDING_FUNC_MAX_ASYNC=16
-EMBEDDING_BATCH_NUM=32
-```
-
-### Selecting Backend Storage
-
-LightRAG requires four types of backend storage:
-
-- **KV_STORAGE**: Used to save LLM response caches, text chunking results, entity-relation extraction results, etc.
-- **VECTOR_STORAGE**: Used to store vector information for text chunks, entities, and relationships.
-- **GRAPH_STORAGE**: Used to save the knowledge graph.
-- **DOC_STATUS_STORAGE**: Used to store the document list.
-
-**All four default storages are in-memory databases** (`JsonKVStorage`, `NanoVectorDBStorage`, `NetworkXStorage`, `JsonDocStatusStorage`): the whole dataset resides in the server process's memory and local files under `WORKING_DIR` serve only as persistence, so capacity is bounded by available RAM. The defaults are therefore intended **only for small-scale testing, evaluation, and debugging, and are not suitable for production**.
-
-For production, **PostgreSQL is the recommended backend** — it can serve all four storage types on its own; MongoDB and OpenSearch are the other single-backend options. Alternatively, you can select specialized databases for vector or graph storage, such as using Milvus or Qdrant for vector storage, and Neo4j or Memgraph for graph storage.
-
-For the complete list of available implementations per storage type, see [Storage Types Supported](./docs/LightRAG-API-Server.md#storage-types-supported).
-
-### Other Important Configurations for Document Processing
-
-During the document insertion stage, you may also want to adjust the following environment variables based on your needs:
-
-- **SUMMARY_LANGUAGE**: Controls the language used by the LLM when outputting entity-relation names and summaries, e.g., `Chinese`, `English`.
-- **ENTITY_EXTRACTION_USE_JSON**: Controls whether the LLM outputs entity-relation extractions in JSON format. Using JSON format typically yields more stable results, but it consumes more tokens and can be slightly slower.
-- **ENABLE_CONTENT_HEADINGS**: Controls whether the section heading information of a text chunk is sent to the LLM during the query stage (enabled by default, providing more context for the LLM).
-- **FORCE_LLM_SUMMARY_ON_MERGE / MAX_SOURCE_IDS_PER_RELATION**: Controls the maximum number of text chunks an `entity/relation` can be associated with.
-- **SOURCE_IDS_LIMIT_METHOD**: Controls whether to keep updating the entity/relation description once an `entity/relation` exceeds its associated text chunk limit (by default it stops updating, because at that point the entity-relation description is already rich enough and further updates add little value; skipping updates can greatly speed up knowledge base construction).
-- **MAX_FILE_PATHS**: Controls the maximum number of source files an `entity/relation` can be associated with; once this limit is exceeded, new file names are no longer written to the vector storage.
-
-### Resolving LLM Timeouts During Entity-Relation Extraction
-
-LLM timeouts during entity-relation extraction usually trace back to one of three causes. Identify the cause, then apply the matching remedy (the parameters can be combined):
-
-- **The model is slow.** A model running below ~50 tokens/second may be unable to finish a chunk that contains many entities and relations before the request times out. Increase the timeout via `*_LLM_TIMEOUT` — either the global `LLM_TIMEOUT` or the role-specific `EXTRACT_LLM_TIMEOUT` for the extraction phase. Note that the effective execution timeout is **twice** the configured value, so `EXTRACT_LLM_TIMEOUT=300` allows up to **600 seconds**.
-- **The chunk produces too many entities and relations.** Reference/bibliography chunks, for example, can make the model emit an enormous number of records that cannot complete in time. Cap the output length with `OPENAI_LLM_MAX_TOKENS` or `OPENAI_LLM_MAX_COMPLETION_TOKENS` (the correct parameter name depends on the LLM provider — see `env.example`). A useful sizing rule is `max_output_tokens < LLM_TIMEOUT × tokens_per_second` (e.g., `9000 < 240s × 50 tps`).
-- **The model gets stuck in an output loop.** Some models (locally deployed Qwen models in particular) occasionally fall into an endless-output loop on certain text. When this is intermittent, simply re-processing the document once usually resolves it.
-- **References specifically (P chunking strategy).** When using the paragraph-semantic (`P`) chunking strategy (e.g., `LIGHTRAG_PARSER=...-iteP`), set `CHUNK_P_DROP_REFERENCES=true` to automatically drop matching reference blocks before chunking. This prevents references from generating a flood of low-value entities and relations, a common source of timeouts. It can also be enabled per file via the filename hint `paper.[-P(drop_rf=true)].pdf`; related detection knobs (`CHUNK_P_REFERENCES_TAIL_N`, `CHUNK_P_REFERENCES_HEADINGS`) are documented in `env.example`.
-
-### Other Important Configurations for Document Querying
-
-During the document query stage, you may also want to adjust the following environment variables based on your needs:
-- **MAX_ENTITY_TOKENS / MAX_RELATION_TOKENS / MAX_TOTAL_TOKENS**: Controls the token length of the retrieved content sent to the LLM context. The retrieved content consists of three parts: `entities`, `relations`, and `text chunks`. The lengths of entities and relations can be controlled independently, while the text chunk length is determined by subtracting the entity and relation lengths from the total length.
-- **ENABLE_CONTENT_HEADINGS**: Controls whether the section heading where a text chunk resides is sent to the LLM; enabled by default, providing richer context for the LLM and improving answer quality.
-- **ENABLE_LLM_CACHE**: Whether to cache query results. Enabled by default; identical query questions, query modes, and LLM model parameters will return the same result.
-- **USER_PROMPT_PREFIX / USER_PROMPT_PREFIX_FILE**: Global instructions prepended to every request's `user_prompt` (the "Additional Instructions" section of the answer prompt), giving operators one place to customize LLM output. It is concatenated verbatim, so end the value with `\n\n` yourself. If a request's `user_prompt` is empty, the prefix alone becomes the instructions sent to the LLM; only the API field `disable_user_prompt_prefix` suppresses it, and a request can never read or replace it. Use `USER_PROMPT_PREFIX_FILE` (a `.md`/`.txt` file name under `PROMPT_DIR/user_prompt`) for long or multi-paragraph text, since a `.env` value must stay on one line.
-
-### WebUI Entries and the Default Entry
-
-The server mounts two WebUI entries from a single frontend build. **`/webui`** is the admin console: document management, knowledge-graph exploration, and query debugging with the full query-parameter panel. **`/workspace`** is a query-only entry for everyday knowledge-base users: the chat surface and nothing else (no document management, no knowledge graph, no query-parameter sidebar, no API-docs links), designed for mobile use, and showing a welcome page to visitors who are not signed in.
-
-- **LIGHTRAG_DEFAULT_UI**: Which entry the root path `/` redirects to — `webui` (default) or `workspace`. It controls **exactly one** behavior: that redirect. Both entries stay mounted either way and remain reachable at their own URLs; any other value fails startup. Set it to `workspace` when the deployment's primary audience is query users rather than administrators.
-- **UI_TEMPLATES_DIR**: Points at an optional multi-language bundle that replaces the welcome page, login-page text, query empty state, brand logo and copyright line with your own, without rebuilding the WebUI. See [UserDefinedUI.md](./docs/UserDefinedUI.md).
-- **ENABLE_AI_CONTENT_NOTICE**: Labels every **LLM-generated** answer as AI-generated in both query UIs (`/workspace` and the `/webui` retrieval panel); text the model did not write — the canned no-context reply, the admin panel's debug output — stays unlabelled. Off by default; it is a UI element only and never enters the API response or the stored chat history.
-
-Two things to know before pointing end users at `/workspace`. First, query parameters there are **inherited, not editable**: each query uses the settings `/webui` saved in the **same browser** (frontend defaults when none were saved), which is per-browser local state, not a server-wide policy. Second, hiding the admin UI is a UX split, **not** a security boundary — the API still authorizes every endpoint server-side. For the complete behavior of the query entry, see [LightRAG-API-Server.md](./docs/LightRAG-API-Server.md#the-workspace-query-entry).
-
-## Using LightRAG As SDK
-
-> ⚠️ **For integration into your project, we strongly recommend using the REST API provided by the LightRAG Server.** The LightRAG SDK is primarily intended for embedded applications or academic research and evaluation purposes.
-
-### Install LightRAG SDK
-
-* Install from source code
-
-```bash
-cd LightRAG
-# 注意: uv sync 会自动在 .venv/ 目录创建虚拟环境
-uv sync
-source .venv/bin/activate  # 激活虚拟环境 (Linux/macOS)
-# Windows 系统: .venv\Scripts\activate
-
-# 或: pip install -e .
-```
-
-* Install from PyPI
-
-```bash
-uv pip install lightrag-hku
-# 或: pip install lightrag-hku
-```
-
-### LightRAG SDK Sample Code
-
-To get started with LightRAG core, refer to the sample codes available in the `examples` folder. Additionally, a [video demo](https://www.youtube.com/watch?v=g21royNJ4fw) demonstration is provided to guide you through the local setup process. If you already possess an OpenAI API key, you can run the demo right away:
-
-```bash
-### you should run the demo code with project folder
-cd LightRAG
-### provide your API-KEY for OpenAI
-export OPENAI_API_KEY="sk-...your_opeai_key..."
-### download the demo document of "A Christmas Carol" by Charles Dickens
-curl https://raw.githubusercontent.com/gusye1234/nano-graphrag/main/tests/mock_data.txt > ./book.txt
-### run the demo code
-python examples/lightrag_openai_demo.py
-```
-
-For a streaming response implementation example, please see `examples/lightrag_openai_compatible_demo.py`. Prior to execution, ensure you modify the sample code's LLM and embedding configurations accordingly.
-
-**Note 1**: When running the demo program, please be aware that different test scripts may use different embedding models. Vectors written by one model are unusable by another, so switching models requires rebuilding them. For the **demo** data specifically, the simplest route is to delete the demo directory (`./dickens`) and re-run — the corpus is small and disposable; keep `kv_store_llm_response_cache.json` if you want the LLM cache. For a **real deployment, do not delete the working directory**: it holds the knowledge graph and the text chunks, and deleting it turns a re-embedding job into a full re-ingestion of every document. Run `lightrag-rebuild-vdb` instead — see [Switching embedding models](./docs/ProgramingWithCore.md#switching-embedding-models).
-
-**Note 2**: Only `lightrag_openai_demo.py` and `lightrag_openai_compatible_demo.py` are officially supported sample codes. Other sample files are community contributions that haven't undergone full testing and optimization.
-
-### **Notes on SDK Usage**
-
-For detailed instructions on using the SDK, please refer to **[docs/ProgramingWithCore.md](./docs/ProgramingWithCore.md)**. Some LightRAG features are not exposed via the REST API and are accessible only through the SDK. These features are typically experimental and may not be compatible with future versions.
-
-## Replicating Findings in the Paper
-
-LightRAG consistently outperforms NaiveRAG, RQ-RAG, HyDE, and GraphRAG across agriculture, computer science, legal, and mixed domains. For the full evaluation methodology, prompts, and reproduce steps, see **[docs/Reproduce.md](./docs/Reproduce.md)**.
-
-**Overall Performance Table**
-
-||**Agriculture**||**CS**||**Legal**||**Mix**||
-|----------------------|---------------|------------|------|------------|---------|------------|-------|------------|
-||NaiveRAG|**LightRAG**|NaiveRAG|**LightRAG**|NaiveRAG|**LightRAG**|NaiveRAG|**LightRAG**|
-|**Comprehensiveness**|32.4%|**67.6%**|38.4%|**61.6%**|16.4%|**83.6%**|38.8%|**61.2%**|
-|**Diversity**|23.6%|**76.4%**|38.0%|**62.0%**|13.6%|**86.4%**|32.4%|**67.6%**|
-|**Empowerment**|32.4%|**67.6%**|38.8%|**61.2%**|16.4%|**83.6%**|42.8%|**57.2%**|
-|**Overall**|32.4%|**67.6%**|38.8%|**61.2%**|15.2%|**84.8%**|40.0%|**60.0%**|
-||RQ-RAG|**LightRAG**|RQ-RAG|**LightRAG**|RQ-RAG|**LightRAG**|RQ-RAG|**LightRAG**|
-|**Comprehensiveness**|31.6%|**68.4%**|38.8%|**61.2%**|15.2%|**84.8%**|39.2%|**60.8%**|
-|**Diversity**|29.2%|**70.8%**|39.2%|**60.8%**|11.6%|**88.4%**|30.8%|**69.2%**|
-|**Empowerment**|31.6%|**68.4%**|36.4%|**63.6%**|15.2%|**84.8%**|42.4%|**57.6%**|
-|**Overall**|32.4%|**67.6%**|38.0%|**62.0%**|14.4%|**85.6%**|40.0%|**60.0%**|
-||HyDE|**LightRAG**|HyDE|**LightRAG**|HyDE|**LightRAG**|HyDE|**LightRAG**|
-|**Comprehensiveness**|26.0%|**74.0%**|41.6%|**58.4%**|26.8%|**73.2%**|40.4%|**59.6%**|
-|**Diversity**|24.0%|**76.0%**|38.8%|**61.2%**|20.0%|**80.0%**|32.4%|**67.6%**|
-|**Empowerment**|25.2%|**74.8%**|40.8%|**59.2%**|26.0%|**74.0%**|46.0%|**54.0%**|
-|**Overall**|24.8%|**75.2%**|41.6%|**58.4%**|26.4%|**73.6%**|42.4%|**57.6%**|
-||GraphRAG|**LightRAG**|GraphRAG|**LightRAG**|GraphRAG|**LightRAG**|GraphRAG|**LightRAG**|
-|**Comprehensiveness**|45.6%|**54.4%**|48.4%|**51.6%**|48.4%|**51.6%**|**50.4%**|49.6%|
-|**Diversity**|22.8%|**77.2%**|40.8%|**59.2%**|26.4%|**73.6%**|36.0%|**64.0%**|
-|**Empowerment**|41.2%|**58.8%**|45.2%|**54.8%**|43.6%|**56.4%**|**50.8%**|49.2%|
-|**Overall**|45.2%|**54.8%**|48.0%|**52.0%**|47.2%|**52.8%**|**50.4%**|49.6%|
-
-
-## 📚 Documentation and Tools
-
-### Reference Documentation (`docs/`)
-
-Entries marked 🇨🇳 also ship a Chinese translation as `*-zh.md` in the same folder.
-
-**Deployment and Setup**
-
-| Document | What it covers |
-|---|---|
-| [InteractiveSetup.md](./docs/InteractiveSetup.md) | The `make env-*` setup wizard: generating `.env` and the wizard-managed `docker-compose.final.yml` |
-| [DockerDeployment.md](./docs/DockerDeployment.md) | Docker / Docker Compose deployment, image variants, and Cosign verification of the official GHCR images |
-| [AppleContainerSetup.md](./docs/AppleContainerSetup.md) | Running the Postgres / Neo4j / Milvus storage stack on Apple's native `container` runtime (Apple Silicon, no Docker Desktop) |
-| [OfflineDeployment.md](./docs/OfflineDeployment.md) | Air-gapped installs: pre-installing dependencies, the tiktoken cache, and the spaCy models |
-| [MultiSiteDeployment.md](./docs/MultiSiteDeployment.md) | Several isolated instances behind one reverse proxy, sharing a single WebUI build (`LIGHTRAG_API_PREFIX`) |
-| [FrontendBuildGuide.md](./docs/FrontendBuildGuide.md) | How the WebUI is built and shipped (Bun / Node), and which install scenarios require a build |
-
-**Server and API**
-
-| Document | What it covers |
-|---|---|
-| [LightRAG-API-Server.md](./docs/LightRAG-API-Server.md) [🇨🇳](./docs/LightRAG-API-Server-zh.md) | The complete server guide: startup, configuration, authentication, REST endpoints, and WebUI usage |
-| [UserDefinedUI.md](./docs/UserDefinedUI.md) [🇨🇳](./docs/UserDefinedUI-zh.md) | Replacing the welcome page, login-page text, user agreement, query empty state, copyright line and brand logo per language (`UI_TEMPLATES_DIR`) |
-
-**Document Processing**
-
-| Document | What it covers |
-|---|---|
-| [FileProcessingPipeline.md](./docs/FileProcessingPipeline.md) [🇨🇳](./docs/FileProcessingPipeline-zh.md) | Pipeline specification: `LIGHTRAG_PARSER` routing rules, per-engine parameters, multimodal analysis, document status lifecycle |
-| [ParserServiceDeployment.md](./docs/ParserServiceDeployment.md) [🇨🇳](./docs/ParserServiceDeployment-zh.md) | Self-hosting the external MinerU and docling-serve parsing services (Docker, GPU, model weights) |
-| [ParagraphSemanticChunking.md](./docs/ParagraphSemanticChunking.md) [🇨🇳](./docs/ParagraphSemanticChunking-zh.md) | The `Paragraph semantic (P)` chunking strategy: heading/paragraph/table-aware boundaries, reference dropping |
-| [LightRAGSidecarFormat.md](./docs/LightRAGSidecarFormat.md) [🇨🇳](./docs/LightRAGSidecarFormat-zh.md) | The sidecar (`*.parsed/`) interchange format every multimodal-capable parser engine must emit |
-| [ThirdPartyParser.md](./docs/ThirdPartyParser.md) [🇨🇳](./docs/ThirdPartyParser-zh.md) | Developing and registering your own parser engine |
-| [ParserDebugCLI.md](./docs/ParserDebugCLI.md) [🇨🇳](./docs/ParserDebugCLI-zh.md) | `python -m lightrag.parser.cli` — parse a single file offline and inspect the result without a server |
-
-**Models and Storage**
-
-| Document | What it covers |
-|---|---|
-| [RoleSpecificLLMConfiguration.md](./docs/RoleSpecificLLMConfiguration.md) [🇨🇳](./docs/RoleSpecificLLMConfiguration-zh.md) | Per-role (`EXTRACT` / `QUERY` / `KEYWORD` / `VLM`) LLM and VLM configuration |
-| [LLMProviderOptions.md](./docs/LLMProviderOptions.md) | Complete reference for provider generation options (`OPENAI_LLM_*`, `OLLAMA_LLM_*`, `GEMINI_LLM_*`, `BEDROCK_LLM_*`, `*_EMBEDDING_*`) |
-| [AsymmetricEmbedding.md](./docs/AsymmetricEmbedding.md) | Query/document asymmetric embedding (`EMBEDDING_ASYMMETRIC`) and per-model prefixes |
-| [MilvusConfigurationGuide.md](./docs/MilvusConfigurationGuide.md) | Tuning Milvus index parameters through `vector_db_storage_cls_kwargs` |
-
-**SDK and Development**
-
-| Document | What it covers |
-|---|---|
-| [ProgramingWithCore.md](./docs/ProgramingWithCore.md) | Using LightRAG as a Python SDK, including features that are not exposed over REST |
-| [Reproduce.md](./docs/Reproduce.md) | Reproducing the evaluation results reported in the paper |
-| [UV_LOCK_GUIDE.md](./docs/UV_LOCK_GUIDE.md) | When and how to update `uv.lock` |
-
-### Maintenance Tools (`lightrag/tools/`)
-
-Storage-facing tools read `.env` and environment variables exactly like the server does, so run them from the project root with the same configuration. Several of them rewrite storage in place — check the linked guide for whether the server (and any other writer) has to be stopped first; `rebuild_vdb` requires it.
-
-**`rebuild_vdb.py`** — `lightrag-rebuild-vdb` — [README_REBUILD_VDB.md](./lightrag/tools/README_REBUILD_VDB.md)
-
-Drops and rebuilds every vector storage from its authoritative source (graph nodes/edges and the `text_chunks` KV store). The recovery path after a failed vector write, and after changing the embedding model or dimension. Also offers a read-only consistency check.
-
-**`clean_llm_query_cache.py`** — `lightrag-clean-llmqc` — [README_CLEAN_LLM_QUERY_CACHE.md](./lightrag/tools/README_CLEAN_LLM_QUERY_CACHE.md)
-
-Deletes query-mode LLM cache entries (`mix:*`, `hybrid:*`, `local:*`, `global:*`, `naive:*`) while preserving the expensive extraction cache.
-
-**`migrate_llm_cache.py`** — `python -m lightrag.tools.migrate_llm_cache` — [README_MIGRATE_LLM_CACHE.md](./lightrag/tools/README_MIGRATE_LLM_CACHE.md)
-
-Migrates default-mode caches (extraction, summary, multimodal analysis) between KV storage backends, preserving workspace isolation.
-
-**`kg_integrity_repair.py`** — `python -m lightrag.tools.kg_integrity_repair [--apply]` — [README_KG_INTEGRITY_REPAIR.md](./lightrag/tools/README_KG_INTEGRITY_REPAIR.md)
-
-Audits the whole graph for contributions missing from the `full_entities` / `full_relations` recovery anchors, reports irrecoverable orphans, and optionally repairs the anchors so delete/retry can discover them again.
-
-**`source_conflict_repair.py`** — `python -m lightrag.tools.source_conflict_repair list` / `... repair` — [README_SOURCE_CONFLICT_REPAIR.md](./lightrag/tools/README_SOURCE_CONFLICT_REPAIR.md)
-
-Lists documents that claim the same canonical source key, and demotes the candidates the operator did not choose to duplicates. It never picks a winner on its own and never deletes content.
-
-**`download_cache.py`** — `lightrag-download-cache [--spacy-install]` — [OfflineDeployment.md](./docs/OfflineDeployment.md)
-
-Pre-downloads the tiktoken encodings and the pinned spaCy models required for offline deployment and the docx `smart_heading` engine parameter.
-
-**`hash_password.py`** — `lightrag-hash-password [--username USER]` — [LightRAG-API-Server.md](./docs/LightRAG-API-Server.md)
-
-Generates a bcrypt value ready to paste into `AUTH_ACCOUNTS`.
-
-**`check_initialization.py`** — `python -m lightrag.tools.check_initialization --demo` — [ProgramingWithCore.md](./docs/ProgramingWithCore.md)
-
-SDK diagnostic: verifies that a `LightRAG` instance is fully initialized, catching the common "forgot `await rag.initialize_storages()`" mistake.
-
-## 🔗 Related Projects
-
-*Ecosystem & Extensions*
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/HKUDS/RAG-Anything">
-          <div style="width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%); border-radius: 15px; border: 1px solid rgba(0, 217, 255, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-            <span style="font-size: 32px;">📸</span>
-          </div>
-          <b>RAG-Anything</b><br>
-          <sub>Multimodal RAG</sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/HKUDS/VideoRAG">
-          <div style="width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%); border-radius: 15px; border: 1px solid rgba(0, 217, 255, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-            <span style="font-size: 32px;">🎥</span>
-          </div>
-          <b>VideoRAG</b><br>
-          <sub>Extreme Long-Context Video RAG</sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/HKUDS/MiniRAG">
-          <div style="width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%); border-radius: 15px; border: 1px solid rgba(0, 217, 255, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-            <span style="font-size: 32px;">✨</span>
-          </div>
-          <b>MiniRAG</b><br>
-          <sub>Extremely Simple RAG</sub>
-        </a>
-      </td>
-    </tr>
-  </table>
-</div>
+| 评估框架 | 核心定位 | 判定机制 | 关键优势 | 适用场景 |
+|---|---|---|---|---|
+| **RAGAS** (`runner.py`) | 学术型连续度量衡 (Scorer) | 0.0 ~ 1.0 连续浮点分值 | 社区基准对齐度高，标准打分成熟 | 算法调优、模型版本纵向基准对照 |
+| **DeepEval** (`deepeval_runner.py`) | 工业级断言与诊断引擎 (Assertor) | 阈值断言 (Pass / Fail) + **逐字推理证据链 (Reason)** | **精准输出扣分理由**，指出哪个切片不相关、为何排序靠后 | CI/CD 门禁、回归测试、切片召回排查 |
 
 ---
 
-## 🤝 Contribution
+## 📁 目录拓扑结构
 
-<div align="center">
-  We welcome contributions of all kinds — bug fixes, new features, documentation improvements, and more.<br>
-  Please read our <a href=".github/CONTRIBUTING.md"><strong>Contributing Guide</strong></a> before submitting a pull request.
-</div>
-
-<br>
-
-<div align="center">
-  We thank all our contributors for their valuable contributions.
-</div>
-
-<div align="center">
-  <a href="https://github.com/HKUDS/LightRAG/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=HKUDS/LightRAG" style="border-radius: 15px; box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);" />
-  </a>
-</div>
-
-
-## 📖 Citation
-
-```python
-@article{guo2024lightrag,
-title={LightRAG: Simple and Fast Retrieval-Augmented Generation},
-author={Zirui Guo and Lianghao Xia and Yanhua Yu and Tu Ao and Chao Huang},
-year={2024},
-eprint={2410.05779},
-archivePrefix={arXiv},
-primaryClass={cs.IR}
-}
+```text
+evaluation/
+├── datasets/                       # 标准问答测试集
+│   ├── sample_lightrag.json        # 港大官方 6 题标准基准集
+│   └── business_qa.json            # 业务场景扩展问答集
+├── documents/                      # 标准原始语料库 (5 篇核心 Markdown 原材料)
+│   ├── a_brief_history_of_the_internet.md
+│   ├── artificial_intelligence.md
+│   ├── renewable_energy_revolution.md
+│   ├── the_great_wall_of_china.md
+│   └── the_quantum_leap_computing.md
+├── results/                        # 自动生成的结构化报表 (CSV / JSON 带时间戳)
+├── ingest_samples.py               # 原材料一键全自动灌库工具
+├── engine.py                       # RAGAS 评估引擎 (含 bypass_n 补丁与两阶段信号量)
+├── runner.py                       # RAGAS CLI 多租户评测运行器
+├── deepeval_runner.py              # DeepEval 工业级断言与扣分诊断评测运行器
+└── README.md                       # 模块规范说明文档
 ```
 
 ---
 
-<div align="center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 30px; margin: 30px 0;">
-  <div>
-    <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="500">
-  </div>
-  <div style="margin-top: 20px;">
-    <a href="https://github.com/HKUDS/LightRAG" style="text-decoration: none;">
-      <img src="https://img.shields.io/badge/⭐%20Star%20us%20on%20GitHub-1a1a2e?style=for-the-badge&logo=github&logoColor=white">
-    </a>
-    <a href="https://github.com/HKUDS/LightRAG/issues" style="text-decoration: none;">
-      <img src="https://img.shields.io/badge/🐛%20Report%20Issues-ff6b6b?style=for-the-badge&logo=github&logoColor=white">
-    </a>
-    <a href="https://github.com/HKUDS/LightRAG/discussions" style="text-decoration: none;">
-      <img src="https://img.shields.io/badge/💬%20Discussions-4ecdc4?style=for-the-badge&logo=github&logoColor=white">
-    </a>
-  </div>
-</div>
+## 🚀 快速上手指南
 
-<div align="center">
-  <div style="width: 100%; max-width: 600px; margin: 20px auto; padding: 20px; background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%); border-radius: 15px; border: 1px solid rgba(0, 217, 255, 0.2);">
-    <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
-      <span style="font-size: 24px;">⭐</span>
-      <span style="color: #00d9ff; font-size: 18px;">Thank you for visiting LightRAG!</span>
-      <span style="font-size: 24px;">⭐</span>
-    </div>
-  </div>
-</div>
+### 步骤 1：为待测项目一键灌库（准备待测知识库）
+
+评测前必须确保目标项目（例如 `eval_benchmark`）已灌入语料原材料并构建好图谱：
+
+```bash
+# 自动读取 .env 登录鉴权，将 evaluation/documents/ 下全部语料灌入目标项目
+python evaluation/ingest_samples.py --project eval_benchmark
+```
+
+### 步骤 2 选项 A：运行 RAGAS 学术评测
+
+```bash
+# 对 eval_benchmark 项目运行 6 题 RAGAS 全量质量评测
+python evaluation/runner.py --project eval_benchmark --dataset evaluation/datasets/sample_lightrag.json
+```
+
+**核心指标输出：**
+- `Faithfulness`: 回答对检索切片的忠实度（反幻觉）
+- `Context Recall`: 检索切片对参考答案的召回覆盖率
+- `Context Precision`: 检索切片中相关内容的排序靠前度
+- `Answer Relevancy`: 回答与提问语义的相关程度
+
+---
+
+### 步骤 2 选项 B：运行 DeepEval 工业级断言与诊断评测
+
+```bash
+# 激活独立评测沙箱环境
+source evaluation/.eval_venv/bin/activate
+
+# 运行 DeepEval 全量断言评测（设定 Pass 阈值为 0.7）
+python evaluation/deepeval_runner.py --project eval_benchmark --threshold 0.7
+```
+
+**DeepEval 核心杀手锏：扣分理由逐字透传 (`Reason`)**
+
+DeepEval 不仅输出分数与 PASS/FAIL 判定，还会针对低分项输出详细的医学手术刀式排查报告。例如针对检索切片排序低分的诊断：
+
+```text
+• contextual_precision: 0.3873 [❌ FAIL]
+  └─ 🔍 理由: The score is 0.39 because relevant nodes in retrieval contexts are not ranked above irrelevant ones:
+              nodes 1 and 2 are irrelevant, discussing Chinese API tokens. The first relevant node only appears at node 3,
+              which states 'LightRAG solves the hallucination problem...'. Later relevant nodes at 5 and 7 are separated
+              by irrelevant node 6 about vector databases. Multiple irrelevant nodes precede the relevant nodes.
+```
+
+---
+
+### 步骤 3：高级超参数调优与检索模式打擂对比
+
+两套评测执行器均已全量支持底层核心调度参数，可通过 CLI 灵活调整并对比评测表现：
+
+```bash
+# 1. 跑纯向量检索基准 (Naive RAG Baseline，不依赖知识图谱)
+python evaluation/runner.py --project eval_benchmark --mode naive --chunk-top-k 10
+
+# 2. 跑图谱混合模式 + 大配额 + 显式开启重排
+python evaluation/deepeval_runner.py --project eval_benchmark \
+  --mode mix \
+  --top-k 40 \
+  --chunk-top-k 20 \
+  --enable-rerank \
+  --threshold 0.7
+
+# 3. 对比测试：显式关闭重排 (--no-rerank) 观察 Precision 变化
+python evaluation/deepeval_runner.py --project eval_benchmark --mode mix --no-rerank
+
+# 4. 注入用户自定义附加提示词 (限制字数与格式)
+python evaluation/deepeval_runner.py --project eval_benchmark \
+  --user-prompt "请直接给出核心结论，采用无序列表组织，控制在150字以内。"
+```
+
+| 参数项 | 说明 | 默认值 | 作用场景 |
+|---|---|---|---|
+| `--mode, -m` | 查询检索模式 (`naive`/`local`/`global`/`hybrid`/`mix`) | `mix` | 横向对比不同图谱与向量融合算法的质量差异 |
+| `--top-k` | KG 图谱实体/关系候选上限 | `40` | 调整知识图谱检索深度与召回量 |
+| `--chunk-top-k` | 文本切片向量检索候选上限 | `None` (服务端20) | 调整纯文本切片召回配额 |
+| `--enable-rerank` | 显式开启检索重排 | 默认生效 | 提升切片精密度 (Context Precision) |
+| `--no-rerank` | 显式关闭检索重排 | - | 对照实验，观察重排对排序质量的影响 |
+| `--user-prompt` | 附加输出 System Prompt | `None` | 约束大模型回答风格、字数与格式 |
+| `--max-total-tokens` | 上下文最大 Token 预算 | `None` (服务端30000) | 限制注入 Prompt 的硬性预算 |
+
+---
+
+## 🔒 生产环境安全与二开适配原则
+
+1. **多租户严格物理隔离**：
+   - 评测脚本所有请求均显式注入 `X-Project-Id`，禁止向默认根库混入测试数据。
+2. **强制 JWT Bearer 鉴权对齐**：
+   - 自动适配生产服务端 `AUTH_ACCOUNTS` 配置，通过 `/login` 获取 Token 并携带请求，严禁裸调。
+3. **官方源码 0 侵入**：
+   - 本套件完全位于根目录 `evaluation/` 下，执行 `git status --porcelain lightrag/` 恒定为空。

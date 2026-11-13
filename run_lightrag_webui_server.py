@@ -209,8 +209,86 @@ update_uvicorn_mode_config()
 app: FastAPI = official_server.create_app(global_args)
 
 
+from evaluation.eval_studio_template import render_eval_studio_html
+
+
+@app.get("/eval-studio", response_class=HTMLResponse)
+async def eval_studio_console():
+    """Interactive Evaluation & Project Studio (Eval Studio)."""
+    return HTMLResponse(render_eval_studio_html())
+
+
+@app.get("/evalflow", response_class=HTMLResponse)
+async def evalflow_embedded_console():
+    """Embedded EvalFlow MLflow Evaluation Platform Dashboard."""
+    mlflow_url = os.getenv("MLFLOW_TRACKING_URI", "http://49.233.222.54:9128/#/experiments/11")
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>EvalFlow 评测中台 - LightRAG</title>
+    <style>
+        body, html {{ margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+        .header {{ height: 44px; background: #0f172a; color: #f8fafc; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font-size: 13px; border-bottom: 1px solid #1e293b; box-sizing: border-box; }}
+        .header .title {{ display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: 0.3px; }}
+        .header .badge {{ background: #0284c7; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }}
+        .header a {{ color: #38bdf8; text-decoration: none; margin-left: 16px; font-size: 12px; transition: color 0.15s; }}
+        .header a:hover {{ color: #7dd3fc; }}
+        iframe {{ width: 100%; height: calc(100% - 44px); border: none; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">
+            <span>EvalFlow 评测与可观察性中台</span>
+            <span class="badge">LightRAG 生产大盘</span>
+        </div>
+        <div>
+            <a href="/eval-studio">⚙️ 评测工坊 (Eval Studio)</a>
+            <a href="{mlflow_url}" target="_blank">↗ 在新标签页打开</a>
+            <a href="/webui/">← 返回 LightRAG 控制台</a>
+        </div>
+    </div>
+    <iframe src="{mlflow_url}"></iframe>
+</body>
+</html>""")
+
+
+
 # 5. Build Enterprise Operations Router (/ops)
 ops_router = APIRouter(prefix="/ops", tags=["Enterprise Operations"])
+
+
+class WorkspaceCreateRequest(BaseModel):
+    tenant_id: str = "__default"
+    project_id: str
+    name: str
+    code: Optional[str] = None
+    description: Optional[str] = ""
+
+
+class DatasetUpdateRequest(BaseModel):
+    corpus_manifest: Optional[Dict[str, Any]] = None
+    cases: List[Dict[str, Any]] = []
+
+
+class DatasetGenerateRequest(BaseModel):
+    project_id: str
+    size: int = 4
+    method: str = "native"
+    incremental: bool = False
+    base_dataset: Optional[str] = None
+    output_name: Optional[str] = None
+
+
+class MatrixRunRequest(BaseModel):
+    project_id: str
+    dataset: str
+    matrix_mode: List[str] = ["mix", "naive"]
+    top_k: int = 40
+    limit: Optional[int] = None
+    mlflow: bool = True
+
 
 
 class WorkspaceSelectRequest(BaseModel):
@@ -362,6 +440,67 @@ async def select_workspace(payload: WorkspaceSelectRequest, response: Response):
         "project_id": project_id,
         "message": f"Active workspace switched to {tenant_id}:{project_id}",
     }
+
+
+@ops_router.post("/workspaces")
+async def create_workspace(payload: WorkspaceCreateRequest):
+    """Explicitly creates a new multi-tenant project with revisions/rev_1 and metadata."""
+    try:
+        meta = workspace_mgr.create_project(
+            tenant_id=payload.tenant_id,
+            project_id=payload.project_id,
+            name=payload.name,
+            code=payload.code,
+            description=payload.description or "",
+        )
+        await dynamic_rag_proxy.ensure_instance(payload.tenant_id, payload.project_id)
+        return {
+            "status": "success",
+            "message": f"Project '{payload.project_id}' created successfully.",
+            "project": meta,
+        }
+    except FileExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Failed to create workspace project: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@ops_router.delete("/workspaces/{tenant_id}/{project_id}")
+async def delete_workspace(tenant_id: str, project_id: str, response: Response):
+    """Safely archives and deletes a project with reader lease drain verification."""
+    t_id = (tenant_id or "__default").strip()
+    p_id = (project_id or "").strip()
+    
+    # 平台默认项目绝对禁止删除
+    if p_id == "11111111-1111-4111-8111-111111111111":
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete the platform default project.",
+        )
+
+    curr_tenant, curr_project = current_workspace_ctx.get()
+    # 若删除的是当前正在激活的项目，系统自动平滑将上下文切回默认项目并下发 Cookie
+    if t_id == curr_tenant and p_id == curr_project:
+        logger.info(f"Deleting active workspace {t_id}:{p_id}. Falling back to default project...")
+        current_workspace_ctx.set(("__default", "11111111-1111-4111-8111-111111111111"))
+        response.set_cookie("x_tenant_id", "__default", path="/", samesite="lax")
+        response.set_cookie("x_project_id", "11111111-1111-4111-8111-111111111111", path="/", samesite="lax")
+
+    try:
+        dynamic_rag_proxy.invalidate_cache(t_id, p_id)
+        res = await workspace_mgr.archive_delete_project(t_id, p_id)
+        return res
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception as e:
+        logger.error(f"Failed to delete workspace project: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @ops_router.get("/candidates")
@@ -628,6 +767,273 @@ async def get_document_content(
         "chunks_count": len(chunks),
         "chunks": chunks,
     }
+
+
+# -------------------------------------------------------------
+# Evaluation & Dataset Operations Router Extension
+# -------------------------------------------------------------
+datasets_dir = repo_root / "evaluation" / "datasets"
+datasets_dir.mkdir(parents=True, exist_ok=True)
+
+
+class EvalTaskManager:
+    def __init__(self):
+        self._tasks: Dict[str, Dict[str, Any]] = {}
+
+    def create_task(self, task_type: str, params: Dict[str, Any]) -> str:
+        import uuid
+        tid = f"task_{uuid.uuid4().hex[:12]}"
+        self._tasks[tid] = {
+            "task_id": tid,
+            "type": task_type,
+            "status": "running",
+            "progress": 5,
+            "logs": [f"[{datetime.now().strftime('%H:%M:%S')}] 任务初始化成功，正在后台拉起子进程..."],
+            "params": params,
+            "result_url": None,
+            "error": None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        return tid
+
+    def update_task(self, task_id: str, **kwargs):
+        if task_id in self._tasks:
+            self._tasks[task_id].update(kwargs)
+
+    def append_log(self, task_id: str, line: str):
+        if task_id in self._tasks:
+            clean_line = line.strip()
+            if clean_line:
+                self._tasks[task_id]["logs"].append(clean_line)
+                if len(self._tasks[task_id]["logs"]) > 120:
+                    self._tasks[task_id]["logs"] = self._tasks[task_id]["logs"][-120:]
+
+    def get_task(self, task_id: str) -> Optional[Dict[str, Any]]:
+        return self._tasks.get(task_id)
+
+
+eval_task_mgr = EvalTaskManager()
+
+
+@ops_router.get("/evaluation/datasets")
+async def list_evaluation_datasets():
+    """Lists all available benchmark testset datasets."""
+    datasets_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for f in sorted(datasets_dir.glob("*.json")):
+        try:
+            stat = f.stat()
+            with open(f, "r", encoding="utf-8") as jf:
+                data = json.load(jf)
+            manifest = data.get("corpus_manifest", {})
+            cases = data.get("cases") or data.get("test_cases") or []
+            results.append({
+                "name": f.name,
+                "project_id": manifest.get("project_id", data.get("project_id", "unknown")),
+                "revision_id": manifest.get("revision_id", "rev_1"),
+                "cases_count": len(cases),
+                "size_bytes": stat.st_size,
+                "updated_at": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+            })
+        except Exception as ex:
+            logger.warning(f"Failed to inspect dataset {f.name}: {ex}")
+    return {"total": len(results), "datasets": results}
+
+
+@ops_router.get("/evaluation/datasets/{dataset_name}")
+async def get_evaluation_dataset_detail(dataset_name: str):
+    """Retrieves full cases and lineage manifest of a testset."""
+    safe_name = Path(dataset_name).name
+    p = datasets_dir / safe_name
+    if not p.exists():
+        raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found.")
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if "cases" not in data and "test_cases" in data:
+            data["cases"] = data["test_cases"]
+        return data
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"Failed to read dataset: {ex}")
+
+
+
+@ops_router.put("/evaluation/datasets/{dataset_name}")
+async def update_evaluation_dataset(dataset_name: str, payload: DatasetUpdateRequest):
+    """Persists updated cases and manifest back to dataset JSON."""
+    safe_name = Path(dataset_name).name
+    p = datasets_dir / safe_name
+    try:
+        current_data = {}
+        if p.exists():
+            with open(p, "r", encoding="utf-8") as f:
+                current_data = json.load(f)
+
+        manifest = payload.corpus_manifest or current_data.get("corpus_manifest", {})
+        cases = payload.cases
+        # Re-index test_number
+        for idx, item in enumerate(cases):
+            item["test_number"] = idx + 1
+
+        to_save = {
+            "corpus_manifest": manifest,
+            "cases": cases,
+        }
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(to_save, f, ensure_ascii=False, indent=2)
+
+        return {
+            "status": "success",
+            "message": f"Successfully persisted {len(cases)} cases to {safe_name}.",
+            "dataset_name": safe_name,
+            "cases_count": len(cases),
+        }
+    except Exception as ex:
+        logger.error(f"Failed to update dataset {safe_name}: {ex}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(ex))
+
+
+@ops_router.get("/evaluation/tasks/{task_id}")
+async def get_evaluation_task(task_id: str):
+    """Retrieves real-time status and logs of background eval/synthesis tasks."""
+    t = eval_task_mgr.get_task(task_id)
+    if not t:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return t
+
+
+async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
+    eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
+    py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
+    out_filename = req.output_name.strip() if req.output_name else f"lineage_benchmark_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    if not out_filename.endswith(".json"):
+        out_filename += ".json"
+    out_path = datasets_dir / Path(out_filename).name
+
+    cmd = [
+        py_exec,
+        str(repo_root / "evaluation" / "dataset_generator.py"),
+        "--from-project", req.project_id,
+        "--size", str(req.size),
+        "--output", str(out_path),
+    ]
+    if req.incremental:
+        cmd.append("--incremental")
+        if req.base_dataset:
+            base_p = datasets_dir / Path(req.base_dataset).name
+            if base_p.exists():
+                cmd.extend(["--base-dataset", str(base_p)])
+
+    eval_task_mgr.append_log(task_id, f"正在执行出题命令: {' '.join(cmd)}")
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            cwd=str(repo_root),
+        )
+        eval_task_mgr.update_task(task_id, progress=25)
+        while True:
+            line = await proc.stdout.readline()
+            if not line:
+                break
+            text = line.decode("utf-8", errors="ignore").rstrip()
+            if text:
+                eval_task_mgr.append_log(task_id, text)
+                if "Step" in text or "切片" in text:
+                    eval_task_mgr.update_task(task_id, progress=min(85, eval_task_mgr.get_task(task_id)["progress"] + 15))
+        
+        await proc.wait()
+        if proc.returncode == 0:
+            eval_task_mgr.update_task(task_id, status="completed", progress=100)
+            eval_task_mgr.append_log(task_id, f"🎉 题库自动合成圆满完成！输出文件: {out_path.name}")
+        else:
+            eval_task_mgr.update_task(task_id, status="failed", error=f"Process exited with code {proc.returncode}")
+            eval_task_mgr.append_log(task_id, f"❌ 进程异常退出 (code: {proc.returncode})")
+    except Exception as ex:
+        eval_task_mgr.update_task(task_id, status="failed", error=str(ex))
+        eval_task_mgr.append_log(task_id, f"❌ 执行异常: {ex}")
+
+
+@ops_router.post("/evaluation/datasets/generate")
+async def generate_dataset_endpoint(req: DatasetGenerateRequest):
+    """Asynchronously generates or evolves a dataset using DeepEval synthesis."""
+    tid = eval_task_mgr.create_task("dataset_generate", req.dict())
+    asyncio.create_task(_run_dataset_generate_bg(tid, req))
+    return {"status": "accepted", "task_id": tid, "message": "Dataset generation started in background."}
+
+
+async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
+    eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
+    py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
+    dataset_path = datasets_dir / Path(req.dataset).name
+    if not dataset_path.exists():
+        eval_task_mgr.update_task(task_id, status="failed", error=f"Dataset {req.dataset} not found")
+        return
+
+    modes_str = ",".join(req.matrix_mode)
+    cmd = [
+        py_exec,
+        str(repo_root / "evaluation" / "deepeval_runner.py"),
+        "--dataset", str(dataset_path),
+        "--project", req.project_id,
+        "--matrix-mode", modes_str,
+        "--matrix-top-k", str(req.top_k),
+    ]
+    if req.limit and req.limit > 0:
+        cmd.extend(["--limit", str(req.limit)])
+    if req.mlflow:
+        cmd.append("--mlflow")
+
+    eval_task_mgr.append_log(task_id, f"⚔️ 正在启动多参数打擂: {' '.join(cmd)}")
+    captured_runs = []
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            cwd=str(repo_root),
+        )
+        while True:
+            line = await proc.stdout.readline()
+            if not line:
+                break
+            text = line.decode("utf-8", errors="ignore").rstrip()
+            if text:
+                eval_task_mgr.append_log(task_id, text)
+                if "Run ID:" in text:
+                    parts = text.split("Run ID:")
+                    if len(parts) > 1:
+                        rid = parts[1].strip().split()[0]
+                        if rid not in captured_runs:
+                            captured_runs.append(rid)
+
+        await proc.wait()
+        if proc.returncode == 0:
+            compare_url = "http://49.233.222.54:9128/#/experiments/11"
+            if len(captured_runs) >= 2:
+                import urllib.parse
+                runs_json = json.dumps(captured_runs[:2])
+                exp_json = json.dumps(["11"])
+                compare_url = f"http://49.233.222.54:9128/#/compare-runs?runs={urllib.parse.quote(runs_json)}&experiments={urllib.parse.quote(exp_json)}"
+
+            eval_task_mgr.update_task(task_id, status="completed", progress=100, result_url=compare_url)
+            eval_task_mgr.append_log(task_id, f"🏆 矩阵打擂圆满完成！MLflow 对比大屏: {compare_url}")
+        else:
+            eval_task_mgr.update_task(task_id, status="failed", error=f"Process exited with code {proc.returncode}")
+            eval_task_mgr.append_log(task_id, f"❌ 打擂进程异常退出 (code: {proc.returncode})")
+    except Exception as ex:
+        eval_task_mgr.update_task(task_id, status="failed", error=str(ex))
+        eval_task_mgr.append_log(task_id, f"❌ 打擂异常: {ex}")
+
+
+@ops_router.post("/evaluation/matrix-run")
+async def run_matrix_evaluation_endpoint(req: MatrixRunRequest):
+    """Asynchronously starts a multi-parameter battle evaluation."""
+    tid = eval_task_mgr.create_task("matrix_evaluation", req.dict())
+    asyncio.create_task(_run_matrix_evaluation_bg(tid, req))
+    return {"status": "accepted", "task_id": tid, "message": "Matrix evaluation started in background."}
+
 
 app.include_router(ops_router)
 

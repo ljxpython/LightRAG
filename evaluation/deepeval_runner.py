@@ -26,6 +26,8 @@ sys.path.insert(0, str(repo_root))
 from dotenv import load_dotenv
 load_dotenv(repo_root / ".env", override=False)
 
+from evaluation.mlflow_adapter import MLflowEvaluationTracker
+
 # Setup Clean Console Logger
 logger = logging.getLogger("deepeval_runner")
 logger.setLevel(logging.INFO)
@@ -323,6 +325,9 @@ async def run_deepeval_suite(
     enable_rerank: Optional[bool] = None,
     user_prompt: Optional[str] = None,
     max_total_tokens: Optional[int] = None,
+    mlflow_enabled: bool = True,
+    experiment_name: Optional[str] = None,
+    mlflow_tracking_uri: Optional[str] = None,
 ):
     print("=" * 80)
     print("🎯 启动独立外挂式 DeepEval 工业级断言与诊断评测")
@@ -336,6 +341,7 @@ async def run_deepeval_suite(
     print(f"   • 目标服务:    {rag_url}")
     print(f"   • 断言阈值:    {threshold} (>= {threshold} 为 PASS)")
     print(f"   • 并发限制:    {concurrency}")
+    print(f"   • MLflow 上报: {'开启 (' + (mlflow_tracking_uri or 'http://49.233.222.54:9128') + ')' if mlflow_enabled else '关闭'}")
     print("=" * 80)
 
     if not DEEPEVAL_AVAILABLE:
@@ -353,6 +359,21 @@ async def run_deepeval_suite(
     if not test_cases:
         print("❌ 测试集内容为空！")
         return
+
+    # Bloodline & Lineage Validation Guard
+    manifest = data.get("corpus_manifest")
+    if manifest:
+        print("\n🛡️ [Lineage Guard] 正在核查评测集数据血缘契约...")
+        bound_project = manifest.get("project_id")
+        rev_id = manifest.get("revision_id")
+        hash_sig = manifest.get("snapshot_hash", "")
+        print(f"   • 签约项目:  {bound_project} (修订号: {rev_id})")
+        print(f"   • 文档指纹:  {hash_sig[:30]}...")
+        print(f"   • 语料规模:  共包含 {manifest.get('total_docs', 0)} 篇物理入库文档")
+        if bound_project and bound_project != project_id:
+            logger.warning(f"⚠️ [血缘告警] 评测集声明绑定项目为【{bound_project}】，当前运行指定为【{project_id}】，请注意避免测试误判！")
+        else:
+            print("   ✅ 血缘指纹与目标项目 100% 契合！")
 
     # Step 1: JWT Authentication
     print(f"\n🔑 [Step 1/3] 正在向 {rag_url} 获取操作令牌...")
@@ -483,6 +504,38 @@ async def run_deepeval_suite(
     print(f"   • 报表保存 (JSON): {json_path}")
     print("=" * 80)
 
+    # Step 4: MLflow Tracking Integration
+    if mlflow_enabled:
+        print("\n📡 [Step 4/4] 正在将评测指标、超参数与推理证据链同步至 MLflow 平台...")
+        tracker = MLflowEvaluationTracker(
+            tracking_uri=mlflow_tracking_uri,
+            experiment_name=experiment_name,
+            enabled=True,
+        )
+        run_name = f"deepeval_{project_id}_{mode}_topk{top_k}"
+        with tracker.start_run(run_name=run_name, tags={"framework": "DeepEval", "project": project_id, "mode": mode}) as run:
+            if run:
+                tracker.log_params({
+                    "project": project_id,
+                    "mode": mode,
+                    "top_k": top_k,
+                    "chunk_top_k": chunk_top_k,
+                    "enable_rerank": enable_rerank,
+                    "threshold": threshold,
+                    "dataset": dataset_path.name,
+                    "total_cases": total_cases,
+                })
+                tracker.log_metrics({
+                    "faithfulness": avg_scores["faithfulness"],
+                    "answer_relevancy": avg_scores["answer_relevancy"],
+                    "contextual_recall": avg_scores["contextual_recall"],
+                    "contextual_precision": avg_scores["contextual_precision"],
+                    "pass_rate": round(success_cases / total_cases, 4) if total_cases else 0.0,
+                })
+                tracker.log_results_table(results, framework="deepeval", artifact_file="deepeval_cases.json")
+                tracker.log_artifacts([csv_path, json_path])
+                print("   ✅ MLflow 指标与证据链大表同步完成！")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run DeepEval Evaluation for LightRAG")
@@ -566,25 +619,106 @@ def main():
         default=None,
         help="Limit number of test cases to evaluate (useful for rapid probing)",
     )
+    parser.add_argument(
+        "--mlflow",
+        dest="mlflow_enabled",
+        action="store_true",
+        default=True,
+        help="Enable syncing metrics and reasoning table to remote MLflow platform (default: True)",
+    )
+    parser.add_argument(
+        "--no-mlflow",
+        dest="mlflow_enabled",
+        action="store_false",
+        help="Disable syncing to MLflow",
+    )
+    parser.add_argument(
+        "--experiment-name",
+        type=str,
+        default=None,
+        help="Target MLflow experiment name (default: lightrag-production-evaluation)",
+    )
+    parser.add_argument(
+        "--mlflow-tracking-uri",
+        type=str,
+        default=None,
+        help="Target MLflow server URI (default: http://49.233.222.54:9128)",
+    )
+
+    parser.add_argument(
+        "--matrix-mode",
+        type=str,
+        default=None,
+        help="Comma-separated retrieval modes for matrix benchmark evaluation (e.g. 'mix,naive')",
+    )
+    parser.add_argument(
+        "--matrix-top-k",
+        type=str,
+        default=None,
+        help="Comma-separated top-k values for matrix evaluation (e.g. '20,40')",
+    )
 
     args = parser.parse_args()
 
-    asyncio.run(
-        run_deepeval_suite(
-            dataset_path=args.dataset,
-            project_id=args.project,
-            rag_url=args.rag_url,
-            top_k=args.top_k,
-            concurrency=args.concurrency,
-            threshold=args.threshold,
-            limit=args.limit,
-            mode=args.mode,
-            chunk_top_k=args.chunk_top_k,
-            enable_rerank=args.enable_rerank,
-            user_prompt=args.user_prompt,
-            max_total_tokens=args.max_total_tokens,
+    modes = [m.strip() for m in args.matrix_mode.split(",") if m.strip()] if args.matrix_mode else [args.mode]
+    top_ks = [int(k.strip()) for k in args.matrix_top_k.split(",") if k.strip()] if args.matrix_top_k else [args.top_k]
+
+    if len(modes) > 1 or len(top_ks) > 1:
+        print("=" * 80)
+        print("⚔️  启动 LightRAG 多参数矩阵打擂横向对比评测 (Matrix Evaluation)")
+        print(f"   • 评测模式组合: {modes}")
+        print(f"   • Top-K 候选组合: {top_ks}")
+        print(f"   • 总打擂轮次:   {len(modes) * len(top_ks)} 轮")
+        print("=" * 80)
+
+        for m in modes:
+            for k in top_ks:
+                print(f"\n▶️ [打擂子任务] 正在运行模式: mode={m}, top_k={k}...")
+                asyncio.run(
+                    run_deepeval_suite(
+                        dataset_path=args.dataset,
+                        project_id=args.project,
+                        rag_url=args.rag_url,
+                        top_k=k,
+                        concurrency=args.concurrency,
+                        threshold=args.threshold,
+                        limit=args.limit,
+                        mode=m,
+                        chunk_top_k=args.chunk_top_k,
+                        enable_rerank=args.enable_rerank,
+                        user_prompt=args.user_prompt,
+                        max_total_tokens=args.max_total_tokens,
+                        mlflow_enabled=args.mlflow_enabled,
+                        experiment_name=args.experiment_name,
+                        mlflow_tracking_uri=args.mlflow_tracking_uri,
+                    )
+                )
+
+        print("\n" + "=" * 80)
+        print("🏁 全参数矩阵打擂评测执行完毕！")
+        print(f"🔗 请访问 MLflow 平台大屏勾选上述 Runs 进行可视化横向打擂对比 (Compare Runs):")
+        print(f"   {args.mlflow_tracking_uri or 'http://49.233.222.54:9128'}")
+        print("=" * 80)
+    else:
+        asyncio.run(
+            run_deepeval_suite(
+                dataset_path=args.dataset,
+                project_id=args.project,
+                rag_url=args.rag_url,
+                top_k=args.top_k,
+                concurrency=args.concurrency,
+                threshold=args.threshold,
+                limit=args.limit,
+                mode=args.mode,
+                chunk_top_k=args.chunk_top_k,
+                enable_rerank=args.enable_rerank,
+                user_prompt=args.user_prompt,
+                max_total_tokens=args.max_total_tokens,
+                mlflow_enabled=args.mlflow_enabled,
+                experiment_name=args.experiment_name,
+                mlflow_tracking_uri=args.mlflow_tracking_uri,
+            )
         )
-    )
 
 
 if __name__ == "__main__":

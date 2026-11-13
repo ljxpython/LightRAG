@@ -9,7 +9,8 @@ import {
   ChevronRightIcon,
   ShieldCheckIcon,
   BookOpenIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  ActivityIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip'
@@ -63,6 +64,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Release Control',
     labelZh: '版本发布',
     icon: RocketIcon
+  },
+  {
+    id: 'evaluation',
+    label: 'Eval Studio',
+    labelZh: '评测工坊',
+    icon: ActivityIcon
   }
 ]
 

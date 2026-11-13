@@ -1,0 +1,155 @@
+{
+  "dataset_id": "ds_eval_benchmark_1794497854",
+  "project_id": "eval_benchmark",
+  "engine": "native",
+  "model": "deepseek-v4.1-flash",
+  "timestamp": "2026-11-12T23:37:34",
+  "total_cases": 2,
+  "corpus_manifest": {
+    "project_id": "eval_benchmark",
+    "revision_id": "rev_1",
+    "snapshot_hash": "sha256:85a7e7d49a7fc08cb6a5c6b71022d97d4f0b04f15411bda4d19e1c47257c2366",
+    "total_docs": 12,
+    "total_chunks": 9,
+    "docs": [
+      {
+        "doc_id": "doc-005b6e08a174c047f40415b8a36bf169",
+        "file_name": "02_rag_architecture.md",
+        "file_path": "02_rag_architecture.md",
+        "content_hash": "cde97f29f1d045af4ace8711a4b40dc2",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-00e71df22262087fd8ad820708997657",
+        "file_name": "api.md",
+        "file_path": "api.md",
+        "content_hash": "b49b29cee57c8c094bf3342c0839ea8a",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-0b2e0470e548662701e34c1b6a3dc251",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "0b2e0470e548662701e34c1b6a3dc251",
+        "status": "ACTIVE",
+        "chunks_count": 0
+      },
+      {
+        "doc_id": "doc-4196743d82222700a3d2bd37053898fe",
+        "file_name": "operations.md",
+        "file_path": "operations.md",
+        "content_hash": "897db4c291f060f8b9526a3e132b81ab",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-4b02ab67eb1f7ef43f330301f01ebb75",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "4b02ab67eb1f7ef43f330301f01ebb75",
+        "status": "ACTIVE",
+        "chunks_count": 0
+      },
+      {
+        "doc_id": "doc-63c2e2e10bd0f73118a9c316a14fd2fb",
+        "file_name": "01_lightrag_overview.md",
+        "file_path": "01_lightrag_overview.md",
+        "content_hash": "43885d0b4bf9beb71d6b0d9910c35607",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-67dbdc031cc9f18168dcbf983c2a3c9d",
+        "file_name": "04_supported_databases.md",
+        "file_path": "04_supported_databases.md",
+        "content_hash": "d205d8cef950c84f5aa969dd46bf8288",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-6cd007d62737e5a12b005b4414d7b899",
+        "file_name": "release.md",
+        "file_path": "release.md",
+        "content_hash": "dd82cea5142f6aa71521a4cbaf7c4c4b",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-b732f38b4b96b31caee5cb9976e2eec2",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "b732f38b4b96b31caee5cb9976e2eec2",
+        "status": "ACTIVE",
+        "chunks_count": 0
+      },
+      {
+        "doc_id": "doc-bf022586a7228e2c085d369d1891711b",
+        "file_name": "03_lightrag_improvements.md",
+        "file_path": "03_lightrag_improvements.md",
+        "content_hash": "33cf6cfe009c4582f5c7822bfc2d9140",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-bf4d3c18d08efcbdb7d505c0777f5141",
+        "file_name": "questions.json",
+        "file_path": "questions.json",
+        "content_hash": "db7de2e28297c7fa997f669717c5d2e2",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-ca1463ca8a5d662e7b9dfe7f69b731de",
+        "file_name": "05_evaluation_and_deployment.md",
+        "file_path": "05_evaluation_and_deployment.md",
+        "content_hash": "8e8c9f2cab667198ee3294275f9f35cb",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "test_id": "GEN_001_conditional",
+      "question": "某团队部署了一个未重新训练的大模型，希望回答“本月刚发布”的公司合规问题，并强制要求答案必须来自内部文档。他们采用 LightRAG，但边界条件是：内部知识库尚未收录该月文档，且没有接入任何其他外部知识源。按 LightRAG 框架的定位与原理，系统应如何判断这类问题的可回答性？是否应把模型凭参数记忆生成的答案当作已由文档 grounding 的准确结果？",
+      "ground_truth": "不应。LightRAG 的核心原理是把大语言模型与外部知识检索结合，用实际文档对输出进行 grounding，从而显著减少幻觉，并在不重新训练模型的情况下补充最新信息；但它本身不替代知识库，也不保证在没有检索依据时产生事实正确的答案。在该边界条件下，内部知识库未收录相关文档且没有外部知识源，系统没有可供 grounding 的最新文档，因此不能把模型凭参数记忆生成的答案标记为“已由文档 grounding”或准确结果。合理判断是：基于现有知识库无法可靠回答，应提示需要补充内部文档或接入外部知识源；只有知识库收录相关文档后，LightRAG 才能通过检索该文档并让回答基于文档来提供最新且可追溯的回答。",
+      "contexts": [
+        "# LightRAG Framework Overview\n\n## What is LightRAG?\n\n**LightRAG** is a Simple and Fast Retrieval-Augmented Generation framework. LightRAG was developed by HKUDS (Hong Kong University Data Science Lab). The framework provides developers with tools to build RAG applications efficiently.\n\n## Problem Statement\n\nLarge language models face several limitations. LLMs have a knowledge cutoff date that prevents them from accessing recent information. Large language models generate hallucinations when providing responses without factual grounding. LLMs lack domain-specific expertise in specialized fields.\n\n## How LightRAG Solves These Problems\n\nLightRAG solves the hallucination problem by combining large language models with external knowledge retrieval. The framework ensures accurate responses by grounding LLM outputs in actual documents. LightRAG provides contextual responses that reduce hallucinations significantly. The system enables efficient retrieval from external knowledge bases to supplement LLM capabilities.\n\n## Core Benefits\n\nLightRAG offers accuracy through document-grounded responses. The framework provides up-to-date information without model retraining. LightRAG enables domain expertise through specialized document collections. The system delivers cost-effectiveness by avoiding expensive model fine-tuning. LightRAG ensures transparency by showing source documents for each response."
+      ],
+      "source_doc_ids": [
+        "doc-63c2e2e10bd0f73118a9c316a14fd2fb"
+      ],
+      "source_docs": [
+        "01_lightrag_overview.md"
+      ],
+      "source_chunk_ids": [
+        "doc-63c2e2e10bd0f73118a9c316a14fd2fb-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "eval_benchmark"
+    },
+    {
+      "test_id": "GEN_002_conditional",
+      "question": "某团队要在资源受限环境下部署 RAG：假设他们没有配置向量数据库，embedding 模型因许可证问题被完全禁用，但保留了一个可返回文档片段的关键词搜索引擎和一个可用的大语言模型（LLM）。请判断：该配置是否仍能作为标准 RAG 系统正常运行？哪些组件或能力会缺失/降级？如果搜索引擎仍能返回相关文本片段，LLM 能否生成回答，其依据和局限是什么？",
+      "ground_truth": "不能作为标准 RAG 系统完整运行。按知识切片，RAG 系统由检索系统、embedding 模型和 LLM 三个主要组件协同工作；向量数据库是检索系统的主要存储，但搜索引擎也可充当检索系统，因此缺少向量数据库本身不必然使检索完全失效。然而 embedding 模型负责把文档和查询转换为向量，并支持查询与文档之间的语义相似匹配；该组件被禁用后，系统无法完成向量化表示和语义相似检索，检索只能依赖搜索引擎的关键词/文本匹配能力，语义匹配能力降级。LLM 仍可基于搜索引擎返回的文档片段生成连贯回答，但这是“搜索引擎检索 + LLM 生成”的降级方案，不等同于具备 embedding 语义检索能力的标准 RAG；若搜索引擎无法返回相关上下文，LLM 也缺少可依据的检索上下文，回答的文档 grounded 性会受限。",
+      "contexts": [
+        "# RAG System Architecture\n\n## Main Components of RAG Systems\n\nA RAG system consists of three main components that work together to provide intelligent responses.\n\n### Component 1: Retrieval System\n\nThe retrieval system is the first component of a RAG system. A retrieval system finds relevant documents from large document collections. Vector databases serve as the primary storage for the retrieval system. Search engines can also function as retrieval systems in RAG architectures.\n\n### Component 2: Embedding Model\n\nThe embedding model is the second component of a RAG system. An embedding model converts text into vector representations for similarity search. The embedding model transforms documents and queries into numerical vectors. These vector representations enable semantic similarity matching between queries and documents.\n\n### Component 3: Large Language Model\n\nThe large language model is the third component of a RAG system. An LLM generates responses based on retrieved context from documents. The large language model synthesizes information from multiple sources into coherent answers. LLMs provide natural language generation capabilities for the RAG system.\n\n## How Components Work Together\n\nThe retrieval system fetches relevant documents for a user query. The embedding model enables similarity matching between query and documents. The LLM generates the final response using retrieved context. These three components collaborate to provide accurate, contextual responses."
+      ],
+      "source_doc_ids": [
+        "doc-005b6e08a174c047f40415b8a36bf169"
+      ],
+      "source_docs": [
+        "02_rag_architecture.md"
+      ],
+      "source_chunk_ids": [
+        "doc-005b6e08a174c047f40415b8a36bf169-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "eval_benchmark"
+    }
+  ]
+}

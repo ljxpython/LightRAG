@@ -1,0 +1,167 @@
+{
+  "dataset_id": "ds_eval_benchmark_1794493898",
+  "project_id": "eval_benchmark",
+  "engine": "native",
+  "model": "deepseek-v4.1-flash",
+  "timestamp": "2026-11-12T22:31:38",
+  "total_cases": 2,
+  "corpus_manifest": {
+    "project_id": "eval_benchmark",
+    "revision_id": "rev_1",
+    "snapshot_hash": "sha256:85a7e7d49a7fc08cb6a5c6b71022d97d4f0b04f15411bda4d19e1c47257c2366",
+    "total_docs": 12,
+    "total_chunks": 9,
+    "docs": [
+      {
+        "doc_id": "doc-005b6e08a174c047f40415b8a36bf169",
+        "file_name": "02_rag_architecture.md",
+        "file_path": "02_rag_architecture.md",
+        "content_hash": "cde97f29f1d045af4ace8711a4b40dc2",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-00e71df22262087fd8ad820708997657",
+        "file_name": "api.md",
+        "file_path": "api.md",
+        "content_hash": "b49b29cee57c8c094bf3342c0839ea8a",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-0b2e0470e548662701e34c1b6a3dc251",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "0b2e0470e548662701e34c1b6a3dc251",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-4196743d82222700a3d2bd37053898fe",
+        "file_name": "operations.md",
+        "file_path": "operations.md",
+        "content_hash": "897db4c291f060f8b9526a3e132b81ab",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-4b02ab67eb1f7ef43f330301f01ebb75",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "4b02ab67eb1f7ef43f330301f01ebb75",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-63c2e2e10bd0f73118a9c316a14fd2fb",
+        "file_name": "01_lightrag_overview.md",
+        "file_path": "01_lightrag_overview.md",
+        "content_hash": "43885d0b4bf9beb71d6b0d9910c35607",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-67dbdc031cc9f18168dcbf983c2a3c9d",
+        "file_name": "04_supported_databases.md",
+        "file_path": "04_supported_databases.md",
+        "content_hash": "d205d8cef950c84f5aa969dd46bf8288",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-6cd007d62737e5a12b005b4414d7b899",
+        "file_name": "release.md",
+        "file_path": "release.md",
+        "content_hash": "dd82cea5142f6aa71521a4cbaf7c4c4b",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-b732f38b4b96b31caee5cb9976e2eec2",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "b732f38b4b96b31caee5cb9976e2eec2",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-bf022586a7228e2c085d369d1891711b",
+        "file_name": "03_lightrag_improvements.md",
+        "file_path": "03_lightrag_improvements.md",
+        "content_hash": "33cf6cfe009c4582f5c7822bfc2d9140",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-bf4d3c18d08efcbdb7d505c0777f5141",
+        "file_name": "questions.json",
+        "file_path": "questions.json",
+        "content_hash": "db7de2e28297c7fa997f669717c5d2e2",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      },
+      {
+        "doc_id": "doc-ca1463ca8a5d662e7b9dfe7f69b731de",
+        "file_name": "05_evaluation_and_deployment.md",
+        "file_path": "05_evaluation_and_deployment.md",
+        "content_hash": "8e8c9f2cab667198ee3294275f9f35cb",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "ACTIVE"
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "test_id": "GEN_001_conditional",
+      "question": "假设一个团队已有 Milvus 和 Qdrant 两套向量数据库，业务要求在不同项目间无缝切换存储后端，同时希望减少 RAG 框架的配置复杂度并改善查询响应速度；但他们要求“零业务代码改动”且必须在两周内给出结论。基于该知识切片，应如何判断 LightRAG 是否适合？哪些结论可以下，哪些不能仅凭切片下？",
+      "ground_truth": "基于切片可做出架构层面的判断：LightRAG 相比传统 RAG 更强调简单 API、更快检索性能、更好的多向量数据库后端集成和灵活存储后端选择，因此在“需要多后端切换、降低配置复杂度、优化检索速度”的方向上更契合，团队可优先评估 LightRAG。但切片没有给出具体性能数值、支持的后端清单、迁移成本，也没有说明 Milvus 与 Qdrant 是否被原生无缝支持，因此不能仅凭切片保证查询延迟一定降低、不能保证“零业务代码改动”、也不能承诺两周内完成无风险迁移。边界约束下，正确结论是：LightRAG 在原理和设计目标上适合该场景，但必须补充实际后端兼容性验证、基准测试和迁移工作量评估；若“零改动”是硬性条件，则切片不足以证明其满足，需实测后再决策。",
+      "contexts": [
+        "# LightRAG Improvements Over Traditional RAG\n\n## Key Improvements\n\nLightRAG improves upon traditional RAG approaches in several significant ways.\n\n### Simpler API Design\n\nLightRAG offers a simpler API compared to traditional RAG frameworks. The framework provides intuitive interfaces for developers. Traditional RAG systems often require complex configuration and setup. LightRAG focuses on ease of use while maintaining functionality.\n\n### Faster Retrieval Performance\n\nLightRAG delivers faster retrieval performance than traditional RAG approaches. The framework optimizes document retrieval operations for speed. Traditional RAG systems often suffer from slow query response times. LightRAG achieves high quality results with improved performance.\n\n### Better Vector Database Integration\n\nLightRAG provides better integration with various vector databases. The framework supports multiple vector database backends seamlessly. Traditional RAG approaches typically lock developers into specific database choices. LightRAG enables flexible storage backend selection.\n\n### Optimized Prompting Strategies\n\nLightRAG implements optimized prompting strategies for better results. The framework uses refined prompt templates for accurate responses. Traditional RAG systems often use generic prompting approaches. LightRAG balances simplicity with high quality output.\n\n## Design Philosophy\n\nLightRAG prioritizes ease of use without sacrificing quality. The framework combines speed with accuracy in retrieval operations. LightRAG maintains flexibility in database and model selection."
+      ],
+      "source_doc_ids": [
+        "doc-bf022586a7228e2c085d369d1891711b"
+      ],
+      "source_docs": [
+        "03_lightrag_improvements.md"
+      ],
+      "source_chunk_ids": [
+        "doc-bf022586a7228e2c085d369d1891711b-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "eval_benchmark"
+    },
+    {
+      "test_id": "GEN_002_conditional",
+      "question": "某团队正在开发环境中搭建 LightRAG 原型，约束条件是：部署必须尽量简单，能够进行高效的向量相似度搜索，并且明确不引入图数据库、文档数据库，也不采用面向大规模集群的高性能向量组件。根据 LightRAG 支持的向量数据库，应优先选择哪一个？请结合各数据库特性说明排除理由。",
+      "ground_truth": "应优先选择 ChromaDB。知识切片说明 ChromaDB 提供适合开发环境的简单部署，并具备高效的向量相似度搜索能力，正好满足“开发环境、部署简单、高效向量检索”的约束。Neo4j 是图数据库，侧重图关系建模与向量能力结合；MongoDB Atlas Vector Search 结合文档存储与向量搜索；Milvus 面向大规模向量集合的高性能搜索；Qdrant 强调生产就绪和带过滤的快速相似搜索。这些选项分别涉及图数据库、文档数据库、大规模集群或生产级基础设施，与题设排除条件不完全匹配，因此在该约束下 ChromaDB 更合适。",
+      "contexts": [
+        "# LightRAG Vector Database Support\n\n## Supported Vector Databases\n\nLightRAG supports multiple vector databases for flexible deployment options.\n\n### ChromaDB\n\nChromaDB is a vector database supported by LightRAG. ChromaDB provides simple deployment for development environments. The database offers efficient vector similarity search capabilities.\n\n### Neo4j\n\nNeo4j is a graph database supported by LightRAG. Neo4j enables graph-based knowledge representation alongside vector search. The database combines relationship modeling with vector capabilities.\n\n### Milvus\n\nMilvus is a vector database supported by LightRAG. Milvus provides high-performance vector search at scale. The database handles large-scale vector collections efficiently.\n\n### Qdrant\n\nQdrant is a vector database supported by LightRAG. Qdrant offers fast similarity search with filtering capabilities. The database provides production-ready vector search infrastructure.\n\n### MongoDB Atlas Vector Search\n\nMongoDB Atlas Vector Search is supported by LightRAG. MongoDB Atlas combines document storage with vector search capabilities. The database enables unified data management for RAG applications.\n\n### Redis\n\nRedis is supported by LightRAG for vector search operations. Redis provides in-memory vector search with low latency. The database offers fast retrieval for real-time applications.\n\n### Built-in Nano-VectorDB\n\nLightRAG includes a built-in nano-vectordb for simple deployments. Nano-vectordb eliminates external database dependencies for small projects. The built-in database provides basic vector search functionality without additional setup.\n\n## Database Selection Benefits\n\nThe multiple database support enables developers to choose appropriate storage backends. LightRAG adapts to different deployment scenarios from development to production. Users can select databases based on scale, performance, and infrastructure requirements."
+      ],
+      "source_doc_ids": [
+        "doc-67dbdc031cc9f18168dcbf983c2a3c9d"
+      ],
+      "source_docs": [
+        "04_supported_databases.md"
+      ],
+      "source_chunk_ids": [
+        "doc-67dbdc031cc9f18168dcbf983c2a3c9d-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "eval_benchmark"
+    }
+  ]
+}

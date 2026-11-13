@@ -279,3 +279,116 @@ class TenantWorkspaceManager:
             )
 
         return next_rev_num
+
+    def create_project(
+        self,
+        tenant_id: str,
+        project_id: str,
+        name: str,
+        code: Optional[str] = None,
+        description: str = "",
+    ) -> Dict[str, Any]:
+        """Explicitly creates a new workspace project with CAS directory structure and metadata."""
+        import re
+
+        tenant = (tenant_id or "__default").strip()
+        proj = (project_id or "").strip()
+        if not proj or not re.match(r"^[a-zA-Z0-9_\-]+$", proj):
+            raise ValueError(
+                f"Invalid project_id '{proj}': must contain only alphanumeric, underscore, or hyphen (1-64 chars)."
+            )
+
+        p_dir = self.storage_root / tenant / proj
+        if p_dir.exists() and (p_dir / "active").exists():
+            raise FileExistsError(f"Project '{proj}' already exists under tenant '{tenant}'.")
+
+        # 1. Initialize revisions and rev_1 directory
+        revisions_dir = p_dir / "revisions"
+        rev1_dir = revisions_dir / "rev_1"
+        rev1_dir.mkdir(parents=True, exist_ok=True)
+        (p_dir / "candidates").mkdir(parents=True, exist_ok=True)
+
+        # 2. Atomic CAS symlink active -> revisions/rev_1
+        active_symlink = p_dir / "active"
+        tmp_symlink = p_dir / "active.tmp"
+        rel_target = Path("revisions") / "rev_1"
+        if tmp_symlink.is_symlink() or tmp_symlink.exists():
+            tmp_symlink.unlink()
+        tmp_symlink.symlink_to(rel_target, target_is_directory=True)
+        os.replace(str(tmp_symlink), str(active_symlink))
+
+        # 3. Save metadata
+        display_name = name.strip() if name and name.strip() else proj
+        saved_meta = self.save_project_meta(
+            tenant_id=tenant,
+            project_id=proj,
+            name=display_name,
+            code=code.strip() if code else None,
+            description=description.strip() if description else "",
+        )
+        logger.info(f"Explicitly created workspace project {tenant}:{proj} at {p_dir}")
+        return saved_meta
+
+    async def archive_delete_project(
+        self,
+        tenant_id: str,
+        project_id: str,
+        wait_lease_timeout: float = 5.0,
+    ) -> Dict[str, Any]:
+        """Safely archives and deletes a workspace project after verifying reader lease drain."""
+        tenant = (tenant_id or "__default").strip()
+        proj = (project_id or "").strip()
+        if not proj:
+            raise ValueError("project_id cannot be empty")
+
+        p_dir = self.storage_root / tenant / proj
+        # Also check legacy root directory for eval_benchmark or legacy projects
+        if not p_dir.exists() and tenant == "__default":
+            legacy_dir = self.storage_root / proj
+            if legacy_dir.exists():
+                p_dir = legacy_dir
+
+        if not p_dir.exists():
+            raise FileNotFoundError(f"Project '{proj}' not found under tenant '{tenant}'.")
+
+        # 1. Reader Lease Drain Check
+        active_ver = self.get_active_version_name(tenant, proj)
+        start_wait = asyncio.get_event_loop().time()
+        while True:
+            active_readers = await self.lease_mgr.get_active_count(tenant, proj, active_ver)
+            if active_readers == 0:
+                break
+            if asyncio.get_event_loop().time() - start_wait >= wait_lease_timeout:
+                raise RuntimeError(
+                    f"Cannot delete project '{tenant}:{proj}': {active_readers} active query leases in progress."
+                )
+            await asyncio.sleep(0.2)
+
+        # 2. Evict and finalize memory instances
+        key = f"{tenant}:{proj}"
+        async with self._lock:
+            self._active_versions.pop(key, None)
+            rag = self._rag_instances.pop(key, None)
+            if rag is not None and hasattr(rag, "finalize_storages"):
+                try:
+                    await rag.finalize_storages()
+                except Exception as ex:
+                    logger.warning(f"Error finalizing storages during project deletion: {ex}")
+
+        # 3. Soft-delete / Cold Archive: move to .trash directory with timestamp
+        trash_root = self.storage_root / ".trash"
+        trash_root.mkdir(parents=True, exist_ok=True)
+        timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        target_trash = trash_root / f"{tenant}_{proj}_{timestamp_str}"
+
+        shutil.move(str(p_dir), str(target_trash))
+        logger.info(f"Safely archived and deleted project {tenant}:{proj} -> {target_trash}")
+
+        return {
+            "status": "success",
+            "tenant_id": tenant,
+            "project_id": proj,
+            "archived_path": str(target_trash),
+            "message": f"Project '{proj}' safely moved to cold archive (.trash).",
+        }
+
