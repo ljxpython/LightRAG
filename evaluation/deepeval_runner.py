@@ -341,16 +341,19 @@ async def evaluate_single_case_deepeval(
     metric_reasons: Dict[str, str] = {}
     metric_passed: Dict[str, bool] = {}
 
+    # 从环境变量读取裁判单指标熔断超时，默认放宽至 180 秒
+    metric_timeout = float(os.getenv("EVAL_METRIC_TIMEOUT_SECONDS", "180.0"))
+
     async def _measure_one(name, metric):
         try:
-            await asyncio.wait_for(metric.a_measure(test_case), timeout=75.0)
+            await asyncio.wait_for(metric.a_measure(test_case), timeout=metric_timeout)
             score = round(float(metric.score), 4) if metric.score is not None else 0.0
             passed = bool(metric.is_successful())
             reason = metric.reason or "No specific reason provided."
             return name, score, passed, reason
         except asyncio.TimeoutError:
-            logger.warning(f"   ⚠️ 指标 [{name}] 评分超时 (75s 熔断保护生效)")
-            return name, None, False, "Metric evaluation timed out after 75s."
+            logger.warning(f"   ⚠️ 指标 [{name}] 评分超时 ({int(metric_timeout)}s 熔断保护生效)")
+            return name, None, False, f"Metric evaluation timed out after {int(metric_timeout)}s."
         except Exception as e:
             logger.warning(f"   ⚠️ 指标 [{name}] 计算异常: {e}")
             return name, None, False, f"Error during metric evaluation: {str(e)}"
@@ -370,12 +373,13 @@ async def evaluate_single_case_deepeval(
         "question": question,
         "project": project_id,
         "contexts_count": len(safe_contexts),
+        "contexts": safe_contexts,  # 检索侧真实召回切片原文，供用户在报告与前端检视
         "scores": metric_scores,
         "reasons": metric_reasons,
         "passed": metric_passed,
         "overall_score": overall_score,
         "all_passed": all_passed,
-        "answer": answer,
+        "answer": answer,  # 生成侧大模型回答
         "ground_truth": ground_truth,
     }
 

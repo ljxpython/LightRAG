@@ -74,10 +74,28 @@ class CatalogManager:
                     progress INTEGER DEFAULT 0,
                     runs_json TEXT,
                     result_url TEXT,
+                    overall_score REAL,
+                    pass_rate REAL,
+                    metrics_summary_json TEXT,
+                    report_file TEXT,
                     created_at TEXT,
                     completed_at TEXT
                 );
             """)
+            # Auto-migrate existing eval_runs columns
+            cursor = conn.execute("PRAGMA table_info(eval_runs)")
+            existing_cols = {row[1] for row in cursor.fetchall()}
+            for col, col_type in [
+                ("overall_score", "REAL"),
+                ("pass_rate", "REAL"),
+                ("metrics_summary_json", "TEXT"),
+                ("report_file", "TEXT"),
+            ]:
+                if col not in existing_cols:
+                    try:
+                        conn.execute(f"ALTER TABLE eval_runs ADD COLUMN {col} {col_type};")
+                    except Exception:
+                        pass
             conn.commit()
 
     def upsert_project(
@@ -187,9 +205,14 @@ class CatalogManager:
         progress: int,
         runs: Optional[List[str]] = None,
         result_url: Optional[str] = None,
+        overall_score: Optional[float] = None,
+        pass_rate: Optional[float] = None,
+        metrics_summary: Optional[Dict[str, Any]] = None,
+        report_file: Optional[str] = None,
     ):
         now = datetime.now(timezone.utc).isoformat() if status in ("completed", "failed") else None
         runs_json = json.dumps(runs) if runs else None
+        metrics_json = json.dumps(metrics_summary) if metrics_summary is not None else None
         with self._get_conn() as conn:
             conn.execute("""
                 UPDATE eval_runs SET
@@ -197,10 +220,89 @@ class CatalogManager:
                     progress = ?,
                     runs_json = COALESCE(?, runs_json),
                     result_url = COALESCE(?, result_url),
+                    overall_score = COALESCE(?, overall_score),
+                    pass_rate = COALESCE(?, pass_rate),
+                    metrics_summary_json = COALESCE(?, metrics_summary_json),
+                    report_file = COALESCE(?, report_file),
                     completed_at = COALESCE(?, completed_at)
                 WHERE task_id = ?;
-            """, (status, progress, runs_json, result_url, now, task_id))
+            """, (status, progress, runs_json, result_url, overall_score, pass_rate, metrics_json, report_file, now, task_id))
             conn.commit()
+
+    def list_eval_runs(self, project_id: Optional[str] = None, limit: int = 50) -> List[Dict[str, Any]]:
+        with self._get_conn() as conn:
+            if project_id and project_id != "all":
+                cursor = conn.execute("""
+                    SELECT task_id, project_id, dataset_name, modes_json, top_k, limit_count,
+                           status, progress, runs_json, result_url, overall_score, pass_rate,
+                           metrics_summary_json, report_file, created_at, completed_at
+                    FROM eval_runs
+                    WHERE project_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT ?;
+                """, (project_id, limit))
+            else:
+                cursor = conn.execute("""
+                    SELECT task_id, project_id, dataset_name, modes_json, top_k, limit_count,
+                           status, progress, runs_json, result_url, overall_score, pass_rate,
+                           metrics_summary_json, report_file, created_at, completed_at
+                    FROM eval_runs
+                    ORDER BY created_at DESC
+                    LIMIT ?;
+                """, (limit,))
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                results.append({
+                    "task_id": r[0],
+                    "project_id": r[1],
+                    "dataset_name": r[2],
+                    "modes": json.loads(r[3]) if r[3] else [],
+                    "top_k": r[4],
+                    "limit_count": r[5],
+                    "status": r[6],
+                    "progress": r[7],
+                    "runs": json.loads(r[8]) if r[8] else [],
+                    "result_url": r[9],
+                    "overall_score": r[10],
+                    "pass_rate": r[11],
+                    "metrics_summary": json.loads(r[12]) if r[12] else {},
+                    "report_file": r[13],
+                    "created_at": r[14],
+                    "completed_at": r[15],
+                })
+            return results
+
+    def get_eval_run(self, task_id: str) -> Optional[Dict[str, Any]]:
+        with self._get_conn() as conn:
+            cursor = conn.execute("""
+                SELECT task_id, project_id, dataset_name, modes_json, top_k, limit_count,
+                       status, progress, runs_json, result_url, overall_score, pass_rate,
+                       metrics_summary_json, report_file, created_at, completed_at
+                FROM eval_runs
+                WHERE task_id = ?;
+            """, (task_id,))
+            r = cursor.fetchone()
+            if not r:
+                return None
+            return {
+                "task_id": r[0],
+                "project_id": r[1],
+                "dataset_name": r[2],
+                "modes": json.loads(r[3]) if r[3] else [],
+                "top_k": r[4],
+                "limit_count": r[5],
+                "status": r[6],
+                "progress": r[7],
+                "runs": json.loads(r[8]) if r[8] else [],
+                "result_url": r[9],
+                "overall_score": r[10],
+                "pass_rate": r[11],
+                "metrics_summary": json.loads(r[12]) if r[12] else {},
+                "report_file": r[13],
+                "created_at": r[14],
+                "completed_at": r[15],
+            }
 
     def sync_from_filesystem(self, storage_root: Path, datasets_dir: Path):
         """Self-healing scan: populates catalog.sqlite from existing physical files."""

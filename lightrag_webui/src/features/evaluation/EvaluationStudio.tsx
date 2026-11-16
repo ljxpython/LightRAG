@@ -29,6 +29,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { toast } from 'sonner'
+import EvaluationTaskCenter from './EvaluationTaskCenter'
 import Button from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import {
@@ -133,8 +134,8 @@ function getCaseContexts(c: TestCase | null | undefined): string[] {
 export default function EvaluationStudio() {
   const { currentTenantId, currentProjectId } = useWorkspaceStore()
 
-  // 顶层子视图切换：'cases' (考题表格) | 'mlflow' (内嵌评测大屏)
-  const [activeSubTab, setActiveSubTab] = useState<'cases' | 'mlflow'>('cases')
+  // 顶层子视图切换：'cases' (考题表格) | 'tasks' (打擂任务大厅) | 'mlflow' (内嵌评测大屏)
+  const [activeSubTab, setActiveSubTab] = useState<'cases' | 'tasks' | 'mlflow'>('cases')
 
   // MLflow 评测平台接入地址（默认直连生产真实端口 9128，支持用户持久化微调）
   const [mlflowUrl, setMlflowUrl] = useState<string>(() => {
@@ -699,7 +700,7 @@ export default function EvaluationStudio() {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer',
                 activeSubTab === 'cases'
-                  ? 'bg-background text-foreground shadow-xs'
+                  ? 'bg-background text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -708,11 +709,27 @@ export default function EvaluationStudio() {
             </button>
             <button
               type="button"
+              onClick={() => setActiveSubTab('tasks')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer relative',
+                activeSubTab === 'tasks'
+                  ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400 font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <SwordsIcon className="size-3.5 text-indigo-500" />
+              <span>打擂任务大厅</span>
+              {matrixTaskStatus && matrixTaskStatus.status === 'running' && (
+                <span className="size-2 rounded-full bg-amber-500 animate-ping absolute -top-0.5 -right-0.5" />
+              )}
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveSubTab('mlflow')}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer',
                 activeSubTab === 'mlflow'
-                  ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400'
+                  ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400 font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -789,7 +806,18 @@ export default function EvaluationStudio() {
       </div>
 
       {/* 2. 核心内容区域：按 activeSubTab 渲染 */}
-      {activeSubTab === 'mlflow' ? (
+      {activeSubTab === 'tasks' ? (
+        /* ----------------------------------------------------------------- */
+        /* 视图 C：评测任务大厅与成果总览看板 */
+        /* ----------------------------------------------------------------- */
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <EvaluationTaskCenter
+            currentProjectId={currentProjectId}
+            onSwitchToTestsets={() => setActiveSubTab('cases')}
+            onTriggerNewBattle={() => setMatrixOpen(true)}
+          />
+        </div>
+      ) : activeSubTab === 'mlflow' ? (
         /* ----------------------------------------------------------------- */
         /* 视图 B：嵌入式 MLflow 评测大屏 */
         /* ----------------------------------------------------------------- */

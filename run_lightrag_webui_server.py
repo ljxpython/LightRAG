@@ -102,6 +102,16 @@ def resolve_project_working_dir(tenant_id: str, project_id: str) -> Path:
     return workspace_mgr.get_active_dir(tenant_id, project_id)
 
 
+def _get_current_project_id(fallback: str = "11111111-1111-4111-8111-111111111111") -> str:
+    try:
+        ws = current_workspace_ctx.get()
+        if ws and isinstance(ws, tuple) and len(ws) > 1 and ws[1]:
+            return str(ws[1])
+    except Exception:
+        pass
+    return fallback
+
+
 class DynamicTenantRagProxy:
     """Dynamic RAG Proxy that intercepts LightRAG calls and routes them to the tenant-specific LightRAG instance."""
 
@@ -842,6 +852,7 @@ datasets_dir.mkdir(parents=True, exist_ok=True)
 class EvalTaskManager:
     def __init__(self):
         self._tasks: Dict[str, Dict[str, Any]] = {}
+        self._processes: Dict[str, asyncio.subprocess.Process] = {}
 
     def create_task(self, task_type: str, params: Dict[str, Any]) -> str:
         import uuid
@@ -858,6 +869,37 @@ class EvalTaskManager:
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
         return tid
+
+    def register_process(self, task_id: str, proc: asyncio.subprocess.Process):
+        self._processes[task_id] = proc
+
+    async def abort_task(self, task_id: str) -> bool:
+        proc = self._processes.get(task_id)
+        if proc and proc.returncode is None:
+            try:
+                proc.terminate()
+                try:
+                    await asyncio.wait_for(proc.wait(), timeout=3.0)
+                except asyncio.TimeoutError:
+                    proc.kill()
+                    await proc.wait()
+            except Exception as e:
+                logger.warning(f"Error terminating process for {task_id}: {e}")
+        self._processes.pop(task_id, None)
+        self.update_task(task_id, status="aborted", progress=0)
+        self.append_log(task_id, "🛑 用户手动中止了打擂评测任务。")
+        try:
+            from catalog_manager import catalog_mgr
+            catalog_mgr.update_eval_run(task_id, status="aborted", progress=0)
+        except Exception:
+            pass
+        return True
+
+    def list_running_tasks(self) -> List[Dict[str, Any]]:
+        return [
+            t for t in self._tasks.values()
+            if t.get("status") == "running"
+        ]
 
     def update_task(self, task_id: str, **kwargs):
         if task_id in self._tasks:
@@ -928,8 +970,7 @@ async def check_evaluation_readiness(dataset_name: str, project_id: Optional[str
     if not p.exists():
         raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found.")
 
-    curr_ws = current_workspace_ctx.get()
-    proj_id = project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+    proj_id = project_id or _get_current_project_id()
 
     # 1. 读取题库中声明的原料文档
     try:
@@ -1093,13 +1134,225 @@ async def get_evaluation_task(task_id: str):
     return t
 
 
+def _find_matching_report_file(created_at_iso: Optional[str], completed_at_iso: Optional[str]) -> Optional[str]:
+    res_dir = repo_root / "evaluation" / "results"
+    if not res_dir.exists():
+        return None
+    candidates = list(res_dir.glob("deepeval_report_*.json"))
+    if not candidates:
+        return None
+
+    time_str = completed_at_iso or created_at_iso
+    if not time_str:
+        return None
+
+    target_dt = None
+    try:
+        from dateutil import parser as dt_parser
+        target_dt = dt_parser.parse(time_str).astimezone()
+    except Exception:
+        pass
+
+    if not target_dt:
+        return None
+
+    best_file = None
+    min_diff = float("inf")
+    for f in candidates:
+        m = re.search(r"deepeval_report_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\.json", f.name)
+        if m:
+            try:
+                from datetime import datetime
+                f_dt = datetime(
+                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                    int(m.group(4)), int(m.group(5)), int(m.group(6))
+                ).astimezone()
+                diff = abs((target_dt - f_dt).total_seconds())
+                if diff < 600 and diff < min_diff:
+                    min_diff = diff
+                    best_file = f.name
+            except Exception:
+                pass
+    return best_file
+
+
+@ops_router.get("/evaluation/runs")
+async def list_evaluation_runs(
+    project_id: Optional[str] = None,
+    limit: int = 50,
+):
+    """Lists evaluation battle runs, aggregating active running and completed runs."""
+    from catalog_manager import catalog_mgr
+
+    curr_ws = current_workspace_ctx.get()
+    curr_proj = curr_ws[1] if curr_ws and isinstance(curr_ws, tuple) and len(curr_ws) > 1 else None
+    p_id = project_id or curr_proj
+
+    # 1. Fetch from SQLite
+    db_runs = catalog_mgr.list_eval_runs(project_id=p_id, limit=limit)
+    db_run_map = {r["task_id"]: r for r in db_runs}
+
+    # 2. Merge running memory tasks
+    running_tasks = eval_task_mgr.list_running_tasks()
+    merged_results = []
+
+    # Prepend active running tasks
+    for rt in running_tasks:
+        tid = rt["task_id"]
+        rt_proj = (rt.get("params") or {}).get("project_id")
+        if p_id and p_id != "all" and rt_proj and rt_proj != p_id:
+            continue
+
+        db_item = db_run_map.pop(tid, None)
+        item = {
+            "task_id": tid,
+            "project_id": rt_proj or (db_item["project_id"] if db_item else (p_id or "default")),
+            "dataset_name": (rt.get("params") or {}).get("dataset") or (db_item["dataset_name"] if db_item else "testset.json"),
+            "modes": (rt.get("params") or {}).get("matrix_mode") or (db_item["modes"] if db_item else ["mix"]),
+            "top_k": (rt.get("params") or {}).get("top_k") or (db_item["top_k"] if db_item else 40),
+            "limit_count": (rt.get("params") or {}).get("limit") or (db_item["limit_count"] if db_item else None),
+            "status": rt.get("status", "running"),
+            "progress": rt.get("progress", 10),
+            "runs": rt.get("runs") or (db_item["runs"] if db_item else []),
+            "result_url": rt.get("result_url") or (db_item["result_url"] if db_item else None),
+            "overall_score": rt.get("overall_score") or (db_item["overall_score"] if db_item else None),
+            "pass_rate": rt.get("pass_rate") or (db_item["pass_rate"] if db_item else None),
+            "metrics_summary": rt.get("metrics_summary") or (db_item["metrics_summary"] if db_item else {}),
+            "report_file": rt.get("report_file") or (db_item["report_file"] if db_item else None),
+            "created_at": rt.get("created_at") or (db_item["created_at"] if db_item else datetime.now(timezone.utc).isoformat()),
+            "completed_at": rt.get("completed_at") or (db_item["completed_at"] if db_item else None),
+            "recent_logs": rt.get("logs", [])[-15:],
+        }
+        merged_results.append(item)
+
+    # Append remaining runs from SQLite
+    res_dir = repo_root / "evaluation" / "results"
+    for r in db_run_map.values():
+        if r.get("status") == "completed" and (r.get("overall_score") is None or not r.get("report_file")):
+            rep_file = r.get("report_file")
+            target_p = None
+            if rep_file and (res_dir / rep_file).exists():
+                target_p = res_dir / rep_file
+            else:
+                matched_name = _find_matching_report_file(r.get("created_at"), r.get("completed_at"))
+                if matched_name and (res_dir / matched_name).exists():
+                    target_p = res_dir / matched_name
+                    r["report_file"] = matched_name
+
+            if target_p and target_p.exists():
+                try:
+                    cdata = json.loads(target_p.read_text(encoding="utf-8"))
+                    if isinstance(cdata, list) and cdata:
+                        tot = len(cdata)
+                        ps = sum(1 for c in cdata if c.get("all_passed"))
+                        r["pass_rate"] = round(ps / tot, 4)
+                        scs = [c.get("overall_score") for c in cdata if c.get("overall_score") is not None]
+                        r["overall_score"] = round(sum(scs) / len(scs), 4) if scs else 0.0
+                        msums: Dict[str, List[float]] = {}
+                        for c in cdata:
+                            for mk, mv in (c.get("scores") or {}).items():
+                                if mv is not None:
+                                    try:
+                                        msums.setdefault(mk, []).append(float(mv))
+                                    except (ValueError, TypeError):
+                                        pass
+                        r["metrics_summary"] = {k: round(sum(v) / len(v), 4) for k, v in msums.items() if v}
+                except Exception:
+                    pass
+
+        merged_results.append(r)
+
+    return merged_results
+
+
+@ops_router.get("/evaluation/runs/{task_id}")
+async def get_evaluation_run_detail(task_id: str):
+    """Retrieves full details of an evaluation run including test case scores and reasons."""
+    from catalog_manager import catalog_mgr
+
+    run_info = catalog_mgr.get_eval_run(task_id)
+    mem_task = eval_task_mgr.get_task(task_id)
+
+    if not run_info and not mem_task:
+        raise HTTPException(status_code=404, detail=f"Eval run {task_id} not found")
+
+    base = run_info or {
+        "task_id": task_id,
+        "project_id": (mem_task.get("params") or {}).get("project_id", "default"),
+        "dataset_name": (mem_task.get("params") or {}).get("dataset", "testset.json"),
+        "modes": (mem_task.get("params") or {}).get("matrix_mode", ["mix"]),
+        "top_k": (mem_task.get("params") or {}).get("top_k", 40),
+        "limit_count": (mem_task.get("params") or {}).get("limit"),
+        "status": mem_task.get("status", "running"),
+        "progress": mem_task.get("progress", 0),
+        "runs": mem_task.get("runs", []),
+        "result_url": mem_task.get("result_url"),
+        "overall_score": mem_task.get("overall_score"),
+        "pass_rate": mem_task.get("pass_rate"),
+        "metrics_summary": mem_task.get("metrics_summary", {}),
+        "report_file": mem_task.get("report_file"),
+        "created_at": mem_task.get("created_at"),
+        "completed_at": mem_task.get("completed_at"),
+    }
+
+    if mem_task:
+        base["logs"] = mem_task.get("logs", [])
+        base["progress"] = mem_task.get("progress", base.get("progress", 0))
+        base["status"] = mem_task.get("status", base.get("status"))
+
+    cases = []
+    report_name = base.get("report_file")
+    res_dir = repo_root / "evaluation" / "results"
+    target_report = None
+    if report_name and (res_dir / Path(report_name).name).exists():
+        target_report = res_dir / Path(report_name).name
+    else:
+        matched_name = _find_matching_report_file(base.get("created_at"), base.get("completed_at"))
+        if matched_name and (res_dir / matched_name).exists():
+            target_report = res_dir / matched_name
+            base["report_file"] = matched_name
+
+    if target_report and target_report.exists():
+        try:
+            cases = json.loads(target_report.read_text(encoding="utf-8"))
+            if isinstance(cases, list) and cases and base.get("overall_score") is None:
+                tot = len(cases)
+                ps = sum(1 for c in cases if c.get("all_passed"))
+                base["pass_rate"] = round(ps / tot, 4)
+                scs = [c.get("overall_score") for c in cases if c.get("overall_score") is not None]
+                base["overall_score"] = round(sum(scs) / len(scs), 4) if scs else 0.0
+                msums: Dict[str, List[float]] = {}
+                for c in cases:
+                    for mk, mv in (c.get("scores") or {}).items():
+                        if mv is not None:
+                            try:
+                                msums.setdefault(mk, []).append(float(mv))
+                            except (ValueError, TypeError):
+                                pass
+                base["metrics_summary"] = {k: round(sum(v) / len(v), 4) for k, v in msums.items() if v}
+        except Exception as e:
+            logger.warning(f"Failed to read report file {target_report}: {e}")
+
+    base["cases"] = cases
+    return base
+
+
+@ops_router.post("/evaluation/tasks/{task_id}/abort")
+async def abort_evaluation_task(task_id: str):
+    """Aborts a currently running evaluation task."""
+    mem_task = eval_task_mgr.get_task(task_id)
+    if not mem_task:
+        raise HTTPException(status_code=404, detail="Task not found in active memory")
+    await eval_task_mgr.abort_task(task_id)
+    return {"status": "aborted", "task_id": task_id, "message": "Evaluation task successfully aborted"}
+
+
 async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
     eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
     py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
     
     # 字段智能归一化
-    curr_ws = current_workspace_ctx.get()
-    proj_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+    proj_id = req.project_id or _get_current_project_id()
     num_cases = req.test_cases_count if req.test_cases_count is not None else req.size
     is_incremental = req.differential if req.differential is not None else req.incremental
     raw_name = req.output_name or req.dataset_name or f"synth_{proj_id[:8]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -1133,6 +1386,7 @@ async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
             stderr=asyncio.subprocess.STDOUT,
             cwd=str(repo_root),
         )
+        eval_task_mgr.register_process(task_id, proc)
         eval_task_mgr.update_task(task_id, progress=25)
         while True:
             line = await proc.stdout.readline()
@@ -1148,7 +1402,11 @@ async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
                     eval_task_mgr.update_task(task_id, progress=min(85, eval_task_mgr.get_task(task_id)["progress"] + 15))
         
         await proc.wait()
-        if proc.returncode == 0:
+        eval_task_mgr._processes.pop(task_id, None)
+        curr_t = eval_task_mgr.get_task(task_id)
+        if curr_t and curr_t.get("status") == "aborted":
+            eval_task_mgr.append_log(task_id, f"🛑 任务已确认中止退出 (exit code: {proc.returncode})")
+        elif proc.returncode == 0:
             eval_task_mgr.update_task(task_id, status="completed", progress=100)
             eval_task_mgr.append_log(task_id, f"🎉 题库自动合成圆满完成！输出文件: {out_path.name}")
             try:
@@ -1180,8 +1438,7 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
     eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
     py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
     
-    curr_ws = current_workspace_ctx.get()
-    proj_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+    proj_id = req.project_id or _get_current_project_id()
     raw_dataset = req.dataset or req.dataset_name or "business_qa.json"
     modes_list = req.matrix_mode or req.modes or ["mix", "naive"]
     
@@ -1209,6 +1466,7 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
     eval_task_mgr.update_task(task_id, progress=10)
     captured_runs = []
     captured_exp_id = None
+    captured_report = None
     try:
         sub_env = {**os.environ, "PYTHONUNBUFFERED": "1"}
         proc = await asyncio.create_subprocess_exec(
@@ -1218,6 +1476,7 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
             stderr=asyncio.subprocess.STDOUT,
             cwd=str(repo_root),
         )
+        eval_task_mgr.register_process(task_id, proc)
         while True:
             line = await proc.stdout.readline()
             if not line:
@@ -1228,6 +1487,11 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
                 pm = re.search(r"\[PROGRESS:\s*(\d+)%\]", text)
                 if pm:
                     eval_task_mgr.update_task(task_id, progress=int(pm.group(1)))
+
+                # 动态提取报告文件路径
+                m_rep = re.search(r"deepeval_report_\d+_\d+\.json", text)
+                if m_rep:
+                    captured_report = m_rep.group(0)
 
                 # 动态提取结构化 MLflow run 与 experiment 信息
                 m_ml = re.search(r"\[MLFLOW_RUN\]\s+run_id=(\S+)\s+experiment_id=(\S+)", text)
@@ -1246,7 +1510,11 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
                             captured_runs.append(rid)
 
         await proc.wait()
-        if proc.returncode == 0:
+        eval_task_mgr._processes.pop(task_id, None)
+        curr_t = eval_task_mgr.get_task(task_id)
+        if curr_t and curr_t.get("status") == "aborted":
+            eval_task_mgr.append_log(task_id, f"🛑 任务已确认中止退出 (exit code: {proc.returncode})")
+        elif proc.returncode == 0:
             mlflow_host = os.getenv("MLFLOW_TRACKING_URI", "http://49.233.222.54:9128").rstrip("/")
             active_exp = captured_exp_id or "11"
             compare_url = f"{mlflow_host}/#/experiments/{active_exp}"
@@ -1258,7 +1526,56 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
             elif len(captured_runs) == 1:
                 compare_url = f"{mlflow_host}/#/experiments/{active_exp}/runs/{captured_runs[0]}"
 
-            eval_task_mgr.update_task(task_id, status="completed", progress=100, result_url=compare_url, runs=captured_runs)
+            # 解析报告提取核心综合指标
+            overall_score = None
+            pass_rate = None
+            metrics_summary = None
+            report_filename = captured_report
+            if not report_filename:
+                res_dir = repo_root / "evaluation" / "results"
+                if res_dir.exists():
+                    all_jsons = sorted(res_dir.glob("deepeval_report_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+                    if all_jsons:
+                        report_filename = all_jsons[0].name
+
+            if report_filename:
+                target_json = repo_root / "evaluation" / "results" / report_filename
+                if target_json.exists():
+                    try:
+                        report_data = json.loads(target_json.read_text(encoding="utf-8"))
+                        if isinstance(report_data, list) and len(report_data) > 0:
+                            total_cases = len(report_data)
+                            passed_cases = sum(1 for c in report_data if c.get("all_passed"))
+                            pass_rate = round(passed_cases / total_cases, 4)
+
+                            valid_scores = [c.get("overall_score") for c in report_data if c.get("overall_score") is not None]
+                            overall_score = round(sum(valid_scores) / len(valid_scores), 4) if valid_scores else 0.0
+
+                            m_sums: Dict[str, List[float]] = {}
+                            for c in report_data:
+                                for mk, mv in (c.get("scores") or {}).items():
+                                    if mv is not None:
+                                        try:
+                                            m_sums.setdefault(mk, []).append(float(mv))
+                                        except (ValueError, TypeError):
+                                            pass
+                            metrics_summary = {
+                                k: round(sum(vals) / len(vals), 4) for k, vals in m_sums.items() if vals
+                            }
+                    except Exception as e:
+                        logger.warning(f"Failed to parse eval report {target_json}: {e}")
+
+            eval_task_mgr.update_task(
+                task_id,
+                status="completed",
+                progress=100,
+                result_url=compare_url,
+                runs=captured_runs,
+                overall_score=overall_score,
+                pass_rate=pass_rate,
+                metrics_summary=metrics_summary,
+                report_file=report_filename,
+            )
             eval_task_mgr.append_log(task_id, f"🏆 矩阵打擂圆满完成！MLflow 对比大屏: {compare_url}")
 
             # 同步更新 SQLite catalog 记录
@@ -1270,9 +1587,13 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
                     progress=100,
                     runs=captured_runs,
                     result_url=compare_url,
+                    overall_score=overall_score,
+                    pass_rate=pass_rate,
+                    metrics_summary=metrics_summary,
+                    report_file=report_filename,
                 )
-            except Exception:
-                pass
+            except Exception as ex:
+                logger.warning(f"Failed to update eval run in catalog: {ex}")
         else:
             eval_task_mgr.update_task(task_id, status="failed", error=f"Process exited with code {proc.returncode}")
             eval_task_mgr.append_log(task_id, f"❌ 打擂进程异常退出 (code: {proc.returncode})")
@@ -1287,8 +1608,7 @@ async def run_matrix_evaluation_endpoint(req: MatrixRunRequest):
     tid = eval_task_mgr.create_task("matrix_evaluation", req.dict())
     try:
         from catalog_manager import catalog_mgr
-        curr_ws = current_workspace_ctx.get()
-        p_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+        p_id = req.project_id or _get_current_project_id()
         catalog_mgr.record_eval_run(
             task_id=tid,
             project_id=p_id,
