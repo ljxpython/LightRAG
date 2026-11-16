@@ -1197,6 +1197,11 @@ export const loginToServer = async (username: string, password: string): Promise
   return response.data;
 }
 
+export const exchangeSsoTicket = async (ticket: string): Promise<LoginResponse> => {
+  const response = await axiosInstance.post('/auth/sso-exchange', { ticket });
+  return response.data;
+}
+
 /**
  * Updates an entity's properties in the knowledge graph
  * @param entityName The name of the entity to update

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/state'
 import { activateLoginIdentityFromToken } from '@/lib/loginIdentity'
 import { markVersionCheckedFromLogin } from '@/lib/versionCheckCache'
-import { loginToServer, getAuthStatus } from '@/api/lightrag'
+import { loginToServer, getAuthStatus, exchangeSsoTicket } from '@/api/lightrag'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
@@ -108,6 +108,36 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
         if (isAuthenticated) {
           navigate('/')
           return
+        }
+
+        // Check for SSO ticket in URL search or hash search
+        const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '')
+        const urlParams = new URLSearchParams(searchStr)
+        const ssoTicket = urlParams.get('sso_ticket') || urlParams.get('ticket')
+        if (ssoTicket) {
+          try {
+            const exchangeRes = await exchangeSsoTicket(ssoTicket)
+            if (exchangeRes.access_token) {
+              activateLoginIdentityFromToken(exchangeRes.access_token)
+              login(
+                exchangeRes.access_token,
+                false,
+                exchangeRes.core_version,
+                exchangeRes.api_version,
+                exchangeRes.webui_title || null,
+                exchangeRes.webui_description || null
+              )
+              // Clean ticket from URL bar
+              const cleanUrl = window.location.pathname + window.location.hash.split('?')[0]
+              window.history.replaceState({}, document.title, cleanUrl)
+              toast.success(t('login.successMessage', '登录成功'))
+              navigate('/')
+              return
+            }
+          } catch (ticketErr) {
+            console.error('SSO ticket exchange failed:', ticketErr)
+            toast.error(t('login.errorSsoTicketInvalid', '免密登录票据已失效，请重新登录'))
+          }
         }
 
         // Check auth status

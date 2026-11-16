@@ -4,10 +4,10 @@
 
 | Task | 描述 | 负责环境 | 状态 | 交付产物 |
 |---|---|---|---|---|
-| **Task 1** | 设计外挂 SSO 票据验签与穿透委托鉴权核心模块 | 本地 / sshmy2 | [ ] 待开始 | `sso_auth_delegator.py`, 单测套件 |
-| **Task 2** | 改造 `run_lightrag_webui_server.py` 服务端入口与中间件 | sshmy2 | [ ] 待开始 | 改造外挂 server 入口，废除伪 admin 注入 |
-| **Task 3** | 前端 WebUI 登录交互与 SSO 票据自动兑换闭环 | 本地 / sshmy2 | [ ] 待开始 | `LoginPage.tsx` 票据自动消费与无感重定向 |
-| **Task 4** | 宿主机环境配置固化、服务重启与 4 级生产流水线全量验收 | sshmy2 | [ ] 待开始 | `.env` 配置、systemd 守护探活、端到端测试日志 |
+| **Task 1** | 设计外挂 SSO 票据验签与穿透委托鉴权核心模块 | 本地 / sshmy2 | [x] 已完成 | `sso_auth_delegator.py`, 单测套件 (9 passed) |
+| **Task 2** | 改造 `run_lightrag_webui_server.py` 服务端入口与中间件 | sshmy2 | [x] 已完成 | 改造外挂 server 入口，废除伪 admin 注入，集成测试 (5 passed) |
+| **Task 3** | 前端 WebUI 登录交互与 SSO 票据自动兑换闭环 | 本地 / sshmy2 | [x] 已完成 | `LoginPage.tsx` 票据自动消费与无感重定向，TypeScript 0 报错 |
+| **Task 4** | 宿主机环境配置固化、服务重启与 4 级生产流水线全量验收 | sshmy2 | [x] 已完成 | `.env` 配置、systemd 守护探活通过、全量单测 14/14 绿灯通过 |
 
 ---
 

@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import sys
 from contextvars import ContextVar
 from datetime import datetime, timezone
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -208,6 +209,62 @@ initialize_config()
 update_uvicorn_mode_config()
 app: FastAPI = official_server.create_app(global_args)
 
+# 4.1 Plug in Pass-Through Authentication and SSO Delegator (Zero upstream touch)
+import sso_auth_delegator
+from lightrag.api.auth import auth_handler
+
+_orig_verify_password = auth_handler.verify_password
+
+def _delegated_verify_password(username: str, plain_password: str) -> bool:
+    # 1. Check local static accounts first (admin fallback)
+    if username in auth_handler.accounts:
+        return _orig_verify_password(username, plain_password)
+    # 2. Pass-through credential validation against AI Agent Platform
+    ok, user_info, err = sso_auth_delegator.authenticate_via_agent_platform(
+        username=username,
+        password=plain_password,
+    )
+    if ok and user_info:
+        role = user_info.get("role", "user")
+        if hasattr(auth_handler, "roles"):
+            auth_handler.roles[username] = role
+        logger.info(f"Pass-through authentication successful for user: {username} (role: {role})")
+        return True
+    logger.warning(f"Pass-through authentication failed for user: {username}, reason: {err}")
+    # 3. Dummy check to prevent timing attacks
+    return _orig_verify_password(username, plain_password)
+
+auth_handler.verify_password = _delegated_verify_password
+
+
+@app.post("/auth/sso-exchange")
+async def sso_exchange(request: Request):
+    """Exchange a short-lived presigned SSO ticket for a native LightRAG session token."""
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+    ticket = body.get("ticket") or body.get("sso_ticket")
+    if not ticket:
+        raise HTTPException(status_code=400, detail="Missing SSO ticket")
+    secret = sso_auth_delegator.get_sso_secret()
+    payload = sso_auth_delegator.verify_sso_ticket(ticket, secret)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired SSO ticket")
+    username = payload.get("username", "user")
+    role = payload.get("role", "user")
+    if hasattr(auth_handler, "roles"):
+        auth_handler.roles[username] = role
+    token = auth_handler.create_token(username=username, role=role)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "username": username,
+        "role": role,
+        "tenant_id": payload.get("tenant_id"),
+        "project_id": payload.get("project_id"),
+    }
+
 
 from evaluation.eval_studio_template import render_eval_studio_html
 
@@ -273,20 +330,26 @@ class DatasetUpdateRequest(BaseModel):
 
 
 class DatasetGenerateRequest(BaseModel):
-    project_id: str
+    project_id: Optional[str] = None
     size: int = 4
+    test_cases_count: Optional[int] = None
     method: str = "native"
     incremental: bool = False
+    differential: Optional[bool] = None
     base_dataset: Optional[str] = None
     output_name: Optional[str] = None
+    dataset_name: Optional[str] = None
 
 
 class MatrixRunRequest(BaseModel):
-    project_id: str
-    dataset: str
-    matrix_mode: List[str] = ["mix", "naive"]
+    project_id: Optional[str] = None
+    dataset: Optional[str] = None
+    dataset_name: Optional[str] = None
+    matrix_mode: Optional[List[str]] = None
+    modes: Optional[List[str]] = None
     top_k: int = 40
     limit: Optional[int] = None
+    eval_engine: Optional[str] = "deepeval"
     mlflow: bool = True
 
 
@@ -857,6 +920,134 @@ async def get_evaluation_dataset_detail(dataset_name: str):
         raise HTTPException(status_code=500, detail=f"Failed to read dataset: {ex}")
 
 
+@ops_router.get("/evaluation/datasets/{dataset_name}/readiness")
+async def check_evaluation_readiness(dataset_name: str, project_id: Optional[str] = Query(None)):
+    """Validates whether target knowledge base has required source documents to run this dataset."""
+    safe_name = Path(dataset_name).name
+    p = datasets_dir / safe_name
+    if not p.exists():
+        raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found.")
+
+    curr_ws = current_workspace_ctx.get()
+    proj_id = project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+
+    # 1. 读取题库中声明的原料文档
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        manifest = data.get("corpus_manifest", {})
+        cases = data.get("cases") or data.get("test_cases") or []
+        required_docs = manifest.get("source_docs", [])
+        if not required_docs:
+            req_set = set()
+            for c in cases:
+                for sd in c.get("source_docs", []):
+                    req_set.add(Path(sd).name)
+            required_docs = list(req_set)
+        else:
+            required_docs = [Path(d).name for d in required_docs]
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"Failed to inspect dataset requirements: {ex}")
+
+    # 2. 读取目标知识库的物理文档清单
+    current_docs = []
+    try:
+        target_dir = None
+        for cand in [
+            storage_root / proj_id,
+            storage_root / "__default" / proj_id,
+            storage_root / "default" / proj_id,
+        ]:
+            if cand.exists() and cand.is_dir():
+                target_dir = cand
+                break
+
+        if target_dir:
+            docs_file = None
+            active_link = target_dir / "active"
+            if active_link.exists():
+                docs_file = active_link.resolve() / "kv_store_full_docs.json"
+            elif (target_dir / "rev_1").exists():
+                docs_file = target_dir / "rev_1" / "kv_store_full_docs.json"
+
+            if docs_file and docs_file.exists():
+                raw_docs = json.loads(docs_file.read_text(encoding="utf-8"))
+                for doc_meta in raw_docs.values():
+                    fp = doc_meta.get("file_path") or doc_meta.get("title") or ""
+                    if fp:
+                        current_docs.append(Path(fp).name)
+    except Exception as ex:
+        logger.warning(f"Failed to read project docs for {proj_id}: {ex}")
+
+    # 3. 计算就绪度与缺失覆盖
+    matched = [d for d in required_docs if d in current_docs]
+    missing = [d for d in required_docs if d not in current_docs]
+    total_req = len(required_docs)
+
+    if total_req == 0:
+        coverage = 1.0
+        status = "ready"
+        message = "该题库为自由探索/全局问答集，可在任意知识库上直接运行打擂。"
+    elif len(matched) == total_req:
+        coverage = 1.0
+        status = "ready"
+        message = f"契约完美就绪！当前知识库 100% 具备评测所需的全部 {total_req} 篇原材料文档。"
+    elif len(matched) == 0:
+        coverage = 0.0
+        status = "missing"
+        message = f"原材料完全缺失！当前知识库缺少题库所需的全部 {total_req} 篇文档，强行运行必然全部失分！"
+    else:
+        coverage = round(len(matched) / total_req, 2)
+        status = "partial"
+        message = f"部分原材料就绪 ({len(matched)}/{total_req})，缺失 {len(missing)} 篇文档，打擂可能出现部分失分。"
+
+    return {
+        "status": status,
+        "dataset_name": safe_name,
+        "project_id": proj_id,
+        "coverage_rate": coverage,
+        "total_required": total_req,
+        "matched_docs": matched,
+        "missing_docs": missing,
+        "total_project_docs": len(current_docs),
+        "message": message,
+    }
+
+
+@ops_router.delete("/evaluation/datasets/{dataset_name}")
+async def delete_evaluation_dataset(dataset_name: str):
+    """Safely moves a custom dataset to .trash folder (preserves standard benchmarks)."""
+    safe_name = Path(dataset_name).name
+    if safe_name in ("business_qa.json", "sample_lightrag.json"):
+        raise HTTPException(status_code=400, detail=f"基准题库 '{safe_name}' 为系统级受保护资产，禁止删除。")
+
+    p = datasets_dir / safe_name
+    if not p.exists():
+        raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found.")
+
+    try:
+        trash_dir = datasets_dir / ".trash"
+        trash_dir.mkdir(parents=True, exist_ok=True)
+        dest = trash_dir / f"{int(time.time())}_{safe_name}"
+        shutil.move(str(p), str(dest))
+
+        # 同步归档到 SQLite catalog
+        try:
+            from catalog_manager import catalog_mgr
+            catalog_mgr.archive_dataset(safe_name)
+        except Exception:
+            pass
+
+        return {
+            "status": "success",
+            "message": f"题库 '{safe_name}' 已安全移入回收站归档。",
+            "dataset_name": safe_name,
+        }
+    except Exception as ex:
+        logger.error(f"Failed to delete dataset {safe_name}: {ex}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(ex))
+
+
 
 @ops_router.put("/evaluation/datasets/{dataset_name}")
 async def update_evaluation_dataset(dataset_name: str, payload: DatasetUpdateRequest):
@@ -905,19 +1096,27 @@ async def get_evaluation_task(task_id: str):
 async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
     eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
     py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
-    out_filename = req.output_name.strip() if req.output_name else f"lineage_benchmark_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    
+    # 字段智能归一化
+    curr_ws = current_workspace_ctx.get()
+    proj_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+    num_cases = req.test_cases_count if req.test_cases_count is not None else req.size
+    is_incremental = req.differential if req.differential is not None else req.incremental
+    raw_name = req.output_name or req.dataset_name or f"synth_{proj_id[:8]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    out_filename = raw_name.strip()
     if not out_filename.endswith(".json"):
         out_filename += ".json"
     out_path = datasets_dir / Path(out_filename).name
 
     cmd = [
         py_exec,
+        "-u",
         str(repo_root / "evaluation" / "dataset_generator.py"),
-        "--from-project", req.project_id,
-        "--size", str(req.size),
+        "--from-project", proj_id,
+        "--size", str(num_cases),
         "--output", str(out_path),
     ]
-    if req.incremental:
+    if is_incremental:
         cmd.append("--incremental")
         if req.base_dataset:
             base_p = datasets_dir / Path(req.base_dataset).name
@@ -926,8 +1125,10 @@ async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
 
     eval_task_mgr.append_log(task_id, f"正在执行出题命令: {' '.join(cmd)}")
     try:
+        sub_env = {**os.environ, "PYTHONUNBUFFERED": "1"}
         proc = await asyncio.create_subprocess_exec(
             *cmd,
+            env=sub_env,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             cwd=str(repo_root),
@@ -940,13 +1141,25 @@ async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
             text = line.decode("utf-8", errors="ignore").rstrip()
             if text:
                 eval_task_mgr.append_log(task_id, text)
-                if "Step" in text or "切片" in text:
+                pm = re.search(r"\[PROGRESS:\s*(\d+)%\]", text)
+                if pm:
+                    eval_task_mgr.update_task(task_id, progress=int(pm.group(1)))
+                elif "Step" in text or "切片" in text:
                     eval_task_mgr.update_task(task_id, progress=min(85, eval_task_mgr.get_task(task_id)["progress"] + 15))
         
         await proc.wait()
         if proc.returncode == 0:
             eval_task_mgr.update_task(task_id, status="completed", progress=100)
             eval_task_mgr.append_log(task_id, f"🎉 题库自动合成圆满完成！输出文件: {out_path.name}")
+            try:
+                from catalog_manager import catalog_mgr
+                catalog_mgr.upsert_dataset(
+                    name=out_path.name,
+                    project_id=proj_id,
+                    cases_count=num_cases,
+                )
+            except Exception:
+                pass
         else:
             eval_task_mgr.update_task(task_id, status="failed", error=f"Process exited with code {proc.returncode}")
             eval_task_mgr.append_log(task_id, f"❌ 进程异常退出 (code: {proc.returncode})")
@@ -966,17 +1179,24 @@ async def generate_dataset_endpoint(req: DatasetGenerateRequest):
 async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
     eval_venv_python = repo_root / "evaluation" / ".eval_venv" / "bin" / "python"
     py_exec = str(eval_venv_python) if eval_venv_python.exists() else sys.executable
-    dataset_path = datasets_dir / Path(req.dataset).name
+    
+    curr_ws = current_workspace_ctx.get()
+    proj_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+    raw_dataset = req.dataset or req.dataset_name or "business_qa.json"
+    modes_list = req.matrix_mode or req.modes or ["mix", "naive"]
+    
+    dataset_path = datasets_dir / Path(raw_dataset).name
     if not dataset_path.exists():
-        eval_task_mgr.update_task(task_id, status="failed", error=f"Dataset {req.dataset} not found")
+        eval_task_mgr.update_task(task_id, status="failed", error=f"Dataset {raw_dataset} not found")
         return
 
-    modes_str = ",".join(req.matrix_mode)
+    modes_str = ",".join(modes_list)
     cmd = [
         py_exec,
+        "-u",
         str(repo_root / "evaluation" / "deepeval_runner.py"),
         "--dataset", str(dataset_path),
-        "--project", req.project_id,
+        "--project", proj_id,
         "--matrix-mode", modes_str,
         "--matrix-top-k", str(req.top_k),
     ]
@@ -986,10 +1206,14 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
         cmd.append("--mlflow")
 
     eval_task_mgr.append_log(task_id, f"⚔️ 正在启动多参数打擂: {' '.join(cmd)}")
+    eval_task_mgr.update_task(task_id, progress=10)
     captured_runs = []
+    captured_exp_id = None
     try:
+        sub_env = {**os.environ, "PYTHONUNBUFFERED": "1"}
         proc = await asyncio.create_subprocess_exec(
             *cmd,
+            env=sub_env,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             cwd=str(repo_root),
@@ -1001,24 +1225,54 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
             text = line.decode("utf-8", errors="ignore").rstrip()
             if text:
                 eval_task_mgr.append_log(task_id, text)
-                if "Run ID:" in text:
+                pm = re.search(r"\[PROGRESS:\s*(\d+)%\]", text)
+                if pm:
+                    eval_task_mgr.update_task(task_id, progress=int(pm.group(1)))
+
+                # 动态提取结构化 MLflow run 与 experiment 信息
+                m_ml = re.search(r"\[MLFLOW_RUN\]\s+run_id=(\S+)\s+experiment_id=(\S+)", text)
+                if m_ml:
+                    rid = m_ml.group(1).strip()
+                    eid = m_ml.group(2).strip()
+                    if rid and rid not in captured_runs:
+                        captured_runs.append(rid)
+                    if eid:
+                        captured_exp_id = eid
+                elif "Run ID:" in text:
                     parts = text.split("Run ID:")
                     if len(parts) > 1:
                         rid = parts[1].strip().split()[0]
-                        if rid not in captured_runs:
+                        if rid and rid not in captured_runs:
                             captured_runs.append(rid)
 
         await proc.wait()
         if proc.returncode == 0:
-            compare_url = "http://49.233.222.54:9128/#/experiments/11"
+            mlflow_host = os.getenv("MLFLOW_TRACKING_URI", "http://49.233.222.54:9128").rstrip("/")
+            active_exp = captured_exp_id or "11"
+            compare_url = f"{mlflow_host}/#/experiments/{active_exp}"
             if len(captured_runs) >= 2:
                 import urllib.parse
-                runs_json = json.dumps(captured_runs[:2])
-                exp_json = json.dumps(["11"])
-                compare_url = f"http://49.233.222.54:9128/#/compare-runs?runs={urllib.parse.quote(runs_json)}&experiments={urllib.parse.quote(exp_json)}"
+                runs_json = json.dumps(captured_runs)
+                exp_json = json.dumps([active_exp])
+                compare_url = f"{mlflow_host}/compare-runs?runs={urllib.parse.quote(runs_json)}&experiments={urllib.parse.quote(exp_json)}"
+            elif len(captured_runs) == 1:
+                compare_url = f"{mlflow_host}/#/experiments/{active_exp}/runs/{captured_runs[0]}"
 
-            eval_task_mgr.update_task(task_id, status="completed", progress=100, result_url=compare_url)
+            eval_task_mgr.update_task(task_id, status="completed", progress=100, result_url=compare_url, runs=captured_runs)
             eval_task_mgr.append_log(task_id, f"🏆 矩阵打擂圆满完成！MLflow 对比大屏: {compare_url}")
+
+            # 同步更新 SQLite catalog 记录
+            try:
+                from catalog_manager import catalog_mgr
+                catalog_mgr.update_eval_run(
+                    task_id=task_id,
+                    status="completed",
+                    progress=100,
+                    runs=captured_runs,
+                    result_url=compare_url,
+                )
+            except Exception:
+                pass
         else:
             eval_task_mgr.update_task(task_id, status="failed", error=f"Process exited with code {proc.returncode}")
             eval_task_mgr.append_log(task_id, f"❌ 打擂进程异常退出 (code: {proc.returncode})")
@@ -1031,6 +1285,20 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
 async def run_matrix_evaluation_endpoint(req: MatrixRunRequest):
     """Asynchronously starts a multi-parameter battle evaluation."""
     tid = eval_task_mgr.create_task("matrix_evaluation", req.dict())
+    try:
+        from catalog_manager import catalog_mgr
+        curr_ws = current_workspace_ctx.get()
+        p_id = req.project_id or (curr_ws.project_id if curr_ws else "11111111-1111-4111-8111-111111111111")
+        catalog_mgr.record_eval_run(
+            task_id=tid,
+            project_id=p_id,
+            dataset_name=req.dataset or req.dataset_name or "business_qa.json",
+            modes=req.matrix_mode or req.modes or ["mix", "hybrid"],
+            top_k=req.top_k,
+            limit_count=req.limit,
+        )
+    except Exception as ex:
+        logger.warning(f"Failed to record eval run in catalog: {ex}")
     asyncio.create_task(_run_matrix_evaluation_bg(tid, req))
     return {"status": "accepted", "task_id": tid, "message": "Matrix evaluation started in background."}
 
@@ -1115,16 +1383,40 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
             # Check if embed mode is requested
             is_embed = request.query_params.get("embed") in ("true", "1", "yes")
 
-            # Check or generate SSO token
-            sso_token = request.query_params.get("token")
-            # If no valid token provided or token is not a standard 3-part JWT, auto-mint a long-lived JWT
-            if not sso_token or len(sso_token.split(".")) != 3:
-                try:
-                    from lightrag.api.auth import auth_handler
-                    sso_token = auth_handler.create_token(username="admin", role="admin", custom_expire_hours=24 * 365)
-                except Exception as ex:
-                    logger.warning(f"Failed to create auto SSO token: {ex}")
-                    sso_token = None
+            # Check SSO ticket or explicit JWT token
+            sso_ticket = request.query_params.get("sso_ticket") or request.query_params.get("ticket")
+            sso_token = None
+            sso_user = None
+
+            if sso_ticket:
+                sso_secret = sso_auth_delegator.get_sso_secret()
+                ticket_payload = sso_auth_delegator.verify_sso_ticket(sso_ticket, sso_secret)
+                if ticket_payload:
+                    sso_user = ticket_payload.get("username", "user")
+                    sso_role = ticket_payload.get("role", "user")
+                    try:
+                        from lightrag.api.auth import auth_handler
+                        if hasattr(auth_handler, "roles"):
+                            auth_handler.roles[sso_user] = sso_role
+                        sso_token = auth_handler.create_token(username=sso_user, role=sso_role)
+                        logger.info(f"Verified SSO ticket for user {sso_user}, minted native token")
+                    except Exception as ex:
+                        logger.warning(f"Failed to mint token from SSO ticket: {ex}")
+                else:
+                    logger.warning("Invalid or expired SSO ticket provided in query params")
+            elif request.query_params.get("token"):
+                raw_token = request.query_params.get("token")
+                if raw_token and len(raw_token.split(".")) == 3:
+                    sso_token = raw_token
+                    # Extract subject identity from valid token
+                    try:
+                        import jwt
+                        token_secret = os.getenv("TOKEN_SECRET", "")
+                        if token_secret:
+                            decoded = jwt.decode(raw_token, token_secret, algorithms=["HS256"], options={"verify_signature": False})
+                            sso_user = decoded.get("sub")
+                    except Exception:
+                        sso_user = None
 
             if sso_token:
                 response.set_cookie("LIGHTRAG-API-TOKEN", sso_token, path="/", samesite="lax")
@@ -1142,9 +1434,12 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
 (function() {{
     try {{
         var token = {json.dumps(sso_token) if sso_token else 'null'};
+        var ssoUser = {json.dumps(sso_user) if sso_user else 'null'};
         if (token) {{
             localStorage.setItem('LIGHTRAG-API-TOKEN', token);
-            localStorage.setItem('LIGHTRAG-PREVIOUS-USER', 'admin');
+            if (ssoUser) {{
+                localStorage.setItem('LIGHTRAG-PREVIOUS-USER', ssoUser);
+            }}
         }}
         var urlParams = new URLSearchParams(window.location.search);
         var targetProj = urlParams.get('project_id') || urlParams.get('project') || {json.dumps(project_id)};
@@ -1228,6 +1523,16 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(TenantResolutionMiddleware)
+
+
+@app.on_event("startup")
+async def on_startup_sync_catalog():
+    try:
+        from catalog_manager import catalog_mgr
+        catalog_mgr.sync_from_filesystem(storage_root, datasets_dir)
+        logger.info("✅ catalog.sqlite 元数据关系表已成功同步就绪！")
+    except Exception as ex:
+        logger.warning(f"Failed to sync catalog on startup: {ex}")
 
 
 def main():
