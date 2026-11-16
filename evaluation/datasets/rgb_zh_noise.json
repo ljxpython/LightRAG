@@ -1,0 +1,1486 @@
+{
+  "dataset_id": "rgb_zh_noise",
+  "dataset_name": "华为 RGB 噪声鲁棒性基准 (ZH)",
+  "benchmark_source": "Huawei Noah RGB Benchmark (AAAI 2024)",
+  "timestamp": "2026-11-16T11:09:50.455558+00:00",
+  "total_cases": 30,
+  "corpus_manifest": {
+    "documents": [
+      {
+        "file_name": "rgb_pos_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_pos_000",
+        "title": "主题报道：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "positive",
+        "sample_id": 0,
+        "sha256": "a979060a6356f67133152455f69f46d543201d2e1cf3bc3715aacc30cba9371c",
+        "char_count": 1287
+      },
+      {
+        "file_name": "rgb_noise_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_noise_000",
+        "title": "背景参考资讯：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "noise",
+        "sample_id": 0,
+        "sha256": "2e4d4c323bbef23e22be115437e6934985ca0b2ae3b8d8883ff0cf38ace97d6f",
+        "char_count": 768
+      },
+      {
+        "file_name": "rgb_pos_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_pos_001",
+        "title": "主题报道：RCEP具体包括哪些国家",
+        "type": "positive",
+        "sample_id": 1,
+        "sha256": "bef6020538afae9e91b6bec15fe73493887aa39b637c24cc0da6e62178bc7b55",
+        "char_count": 1399
+      },
+      {
+        "file_name": "rgb_noise_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_noise_001",
+        "title": "背景参考资讯：RCEP具体包括哪些国家",
+        "type": "noise",
+        "sample_id": 1,
+        "sha256": "6c74ce8023e1d3d60968ec728dcc926f1ac289bb87b1f8b96787f7372b280511",
+        "char_count": 963
+      },
+      {
+        "file_name": "rgb_pos_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_pos_002",
+        "title": "主题报道：第七届香港立法会议员宣誓仪式的时间",
+        "type": "positive",
+        "sample_id": 2,
+        "sha256": "b9ce126b2aa74b4e01903d849bbea76e0712fe70d4454b2f2d4396172b3be755",
+        "char_count": 1536
+      },
+      {
+        "file_name": "rgb_noise_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_noise_002",
+        "title": "背景参考资讯：第七届香港立法会议员宣誓仪式的时间",
+        "type": "noise",
+        "sample_id": 2,
+        "sha256": "989c30f912a8f5c595d4895e15c957e8f358dcd08f1a8b8c4066c365d6978e43",
+        "char_count": 931
+      },
+      {
+        "file_name": "rgb_pos_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_pos_003",
+        "title": "主题报道：首趟RCEP班列的起点？",
+        "type": "positive",
+        "sample_id": 3,
+        "sha256": "82768201566fa01f18aca59408fbf35c00294f26db02a01f504206fde23ecf9d",
+        "char_count": 954
+      },
+      {
+        "file_name": "rgb_noise_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_noise_003",
+        "title": "背景参考资讯：首趟RCEP班列的起点？",
+        "type": "noise",
+        "sample_id": 3,
+        "sha256": "413197677c3edc54994867dfd8c0a18fc0ca9723ba445b71e3ce5dda5549f3dc",
+        "char_count": 1076
+      },
+      {
+        "file_name": "rgb_pos_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_pos_004",
+        "title": "主题报道：香港第七届立法会选举有多少个议席？",
+        "type": "positive",
+        "sample_id": 4,
+        "sha256": "8266dd71ac4a0c83b787fc0089817e0e0aeec92efaf3ceca6385ac43aa943c0b",
+        "char_count": 2852
+      },
+      {
+        "file_name": "rgb_noise_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_noise_004",
+        "title": "背景参考资讯：香港第七届立法会选举有多少个议席？",
+        "type": "noise",
+        "sample_id": 4,
+        "sha256": "ef30c082b5af51a02c3f73752df711548ce450af2c1f25067b663bbe8eb96b6e",
+        "char_count": 983
+      },
+      {
+        "file_name": "rgb_pos_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_pos_005",
+        "title": "主题报道：2021年香港GDP增长了多少？",
+        "type": "positive",
+        "sample_id": 5,
+        "sha256": "c8db6e27dafdc11dc55081dd215c2023c57f31b2565e44323689cbf4a9fd96c8",
+        "char_count": 1136
+      },
+      {
+        "file_name": "rgb_noise_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_noise_005",
+        "title": "背景参考资讯：2021年香港GDP增长了多少？",
+        "type": "noise",
+        "sample_id": 5,
+        "sha256": "9e8b7ae3e2eaa154d4dfc03ce4b33dac1558b04e252eea856007c25c13db3d08",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_pos_006",
+        "title": "主题报道：2021年北京大兴机场年旅客吞吐量",
+        "type": "positive",
+        "sample_id": 6,
+        "sha256": "4ac2732fb58f58bae07e3ddb685785d57e46fa05e5ce4aa666f592a3229709bc",
+        "char_count": 938
+      },
+      {
+        "file_name": "rgb_noise_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_noise_006",
+        "title": "背景参考资讯：2021年北京大兴机场年旅客吞吐量",
+        "type": "noise",
+        "sample_id": 6,
+        "sha256": "79eb098e19ce23782a25a036fc049b505b3d72406010b057ac5504772da06cd6",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_pos_007",
+        "title": "主题报道：2022年春节档首日票房冠军",
+        "type": "positive",
+        "sample_id": 7,
+        "sha256": "63c4142b166c3779775717e25b85a92b38501a374562e87b7e464b9cbd90949b",
+        "char_count": 1142
+      },
+      {
+        "file_name": "rgb_noise_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_noise_007",
+        "title": "背景参考资讯：2022年春节档首日票房冠军",
+        "type": "noise",
+        "sample_id": 7,
+        "sha256": "24d62b3a163e9e19ce4669cc44b0e36b795229559bcf8ef8b9f463c8013af117",
+        "char_count": 908
+      },
+      {
+        "file_name": "rgb_pos_008_2022春运开始时间.md",
+        "doc_id": "rgb_pos_008",
+        "title": "主题报道：2022春运开始时间",
+        "type": "positive",
+        "sample_id": 8,
+        "sha256": "b979a37f8d4c811fbbec72f096ddf9e53e1649a2e74db5a2173631639040d676",
+        "char_count": 3019
+      },
+      {
+        "file_name": "rgb_noise_008_2022春运开始时间.md",
+        "doc_id": "rgb_noise_008",
+        "title": "背景参考资讯：2022春运开始时间",
+        "type": "noise",
+        "sample_id": 8,
+        "sha256": "dd87b84d2c0b923d5495b8d556c8f6e9d32d747c68a3072394db5e934ee3d9b0",
+        "char_count": 881
+      },
+      {
+        "file_name": "rgb_pos_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_pos_009",
+        "title": "主题报道：2022年春运首日火车票什么时候开售",
+        "type": "positive",
+        "sample_id": 9,
+        "sha256": "a5a66aab3e64de0785415a7e78ffdda14ac1141e5e9166d7760e9c8230be330a",
+        "char_count": 1534
+      },
+      {
+        "file_name": "rgb_noise_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_noise_009",
+        "title": "背景参考资讯：2022年春运首日火车票什么时候开售",
+        "type": "noise",
+        "sample_id": 9,
+        "sha256": "c5d5337b54a227c3af843e7aeb0c4120ea852141111b6a4cd5a23ab2f1a17ea8",
+        "char_count": 1171
+      },
+      {
+        "file_name": "rgb_pos_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_pos_010",
+        "title": "主题报道：2022年特斯拉交付量",
+        "type": "positive",
+        "sample_id": 10,
+        "sha256": "1d18c9a5a1f15ee5c7d8021c0ecbd0bd48a3b53f635d43646e9854eab1ad034a",
+        "char_count": 2015
+      },
+      {
+        "file_name": "rgb_noise_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_noise_010",
+        "title": "背景参考资讯：2022年特斯拉交付量",
+        "type": "noise",
+        "sample_id": 10,
+        "sha256": "44ada347363ac23c879e8458c0df8afc102163621ddc0c2affa5a978d849ccf7",
+        "char_count": 1143
+      },
+      {
+        "file_name": "rgb_pos_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_pos_011",
+        "title": "主题报道：2023年世界人工智能大会在哪举办",
+        "type": "positive",
+        "sample_id": 11,
+        "sha256": "ee80b817ab489b0ee76aa6ded6e94ecf7df11087600b587ca1fa376de03938af",
+        "char_count": 2061
+      },
+      {
+        "file_name": "rgb_noise_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_noise_011",
+        "title": "背景参考资讯：2023年世界人工智能大会在哪举办",
+        "type": "noise",
+        "sample_id": 11,
+        "sha256": "2ae963ebbb45b9526acef40b69fcec0408b1b80ac65512f81594e285852b12bb",
+        "char_count": 933
+      },
+      {
+        "file_name": "rgb_pos_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_pos_012",
+        "title": "主题报道：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "positive",
+        "sample_id": 12,
+        "sha256": "01db2dd8279b8b8e328b866593c0e45a9e59a85c2dafea5f89b65042c45a97e0",
+        "char_count": 1281
+      },
+      {
+        "file_name": "rgb_noise_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_noise_012",
+        "title": "背景参考资讯：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "noise",
+        "sample_id": 12,
+        "sha256": "c58a4bb20f55eeb0feba95252affd4351454e6aa4494d6b3bd81034f3ff06c27",
+        "char_count": 741
+      },
+      {
+        "file_name": "rgb_pos_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_pos_013",
+        "title": "主题报道：美国2021年GDP增长多少",
+        "type": "positive",
+        "sample_id": 13,
+        "sha256": "cd0015864107d5e478f4de0d070238ad6e8f09739462050cbb30bfd49e1ed9e3",
+        "char_count": 1263
+      },
+      {
+        "file_name": "rgb_noise_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_noise_013",
+        "title": "背景参考资讯：美国2021年GDP增长多少",
+        "type": "noise",
+        "sample_id": 13,
+        "sha256": "8076879f0633ca83eab21abadbf05fa850fe93c0403932bff533cc7a1c11cccd",
+        "char_count": 1206
+      },
+      {
+        "file_name": "rgb_pos_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_pos_014",
+        "title": "主题报道：2021年中国城镇新增就业了多少人",
+        "type": "positive",
+        "sample_id": 14,
+        "sha256": "bde6b364200978e97d1915249b390aacc65d2350e5080c02a1a7ce32ab04daba",
+        "char_count": 1014
+      },
+      {
+        "file_name": "rgb_noise_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_noise_014",
+        "title": "背景参考资讯：2021年中国城镇新增就业了多少人",
+        "type": "noise",
+        "sample_id": 14,
+        "sha256": "644652ca5e11e1f9a025c0e10add3fafe2f875015fd97534f70bd2602259cecd",
+        "char_count": 1153
+      },
+      {
+        "file_name": "rgb_pos_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_pos_015",
+        "title": "主题报道：黑石集团预测2022年美联储将加息几次",
+        "type": "positive",
+        "sample_id": 15,
+        "sha256": "dbdffb8d05ce630599635e5e46b4af7eaab6f22d0da14e42e4b68705b2d47600",
+        "char_count": 1798
+      },
+      {
+        "file_name": "rgb_noise_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_noise_015",
+        "title": "背景参考资讯：黑石集团预测2022年美联储将加息几次",
+        "type": "noise",
+        "sample_id": 15,
+        "sha256": "e0bb4db908b24d31d376d7f46a355dfbc40df7cad7124de81816592a927f92c0",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_pos_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_pos_016",
+        "title": "主题报道：2021年中国电影市场总票房是多少？",
+        "type": "positive",
+        "sample_id": 16,
+        "sha256": "1b363281eab52af5df87be80b0da362658f933e121740aa7652d1857b7f793ca",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_noise_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_noise_016",
+        "title": "背景参考资讯：2021年中国电影市场总票房是多少？",
+        "type": "noise",
+        "sample_id": 16,
+        "sha256": "f7f99eace7a8f1aa8107966b04b35e8d575c376ba47ac2ddaa470453e12f206c",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_pos_017",
+        "title": "主题报道：《李茂扮太子》是什么类型的电影",
+        "type": "positive",
+        "sample_id": 17,
+        "sha256": "9eb0f4b3d509d89cabcdd3f1398544b816b0ffb132ac3a5ddc7940eba8add2b4",
+        "char_count": 3344
+      },
+      {
+        "file_name": "rgb_noise_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_noise_017",
+        "title": "背景参考资讯：《李茂扮太子》是什么类型的电影",
+        "type": "noise",
+        "sample_id": 17,
+        "sha256": "70b46d07a63e64c1f752af56e2321275e3abe2f1565dd06f4fcebea87f98dc18",
+        "char_count": 876
+      },
+      {
+        "file_name": "rgb_pos_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_pos_018",
+        "title": "主题报道：2021赛季中超冠军",
+        "type": "positive",
+        "sample_id": 18,
+        "sha256": "11f89f53b0fbc0fe4c3b8e01f659dba52e0f45782b1022386240e1f2b467d025",
+        "char_count": 1416
+      },
+      {
+        "file_name": "rgb_noise_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_noise_018",
+        "title": "背景参考资讯：2021赛季中超冠军",
+        "type": "noise",
+        "sample_id": 18,
+        "sha256": "d4d02909531339ad289f8068c6d555cdc289e0c44f4dbde0e49fc2be1eaaaa2f",
+        "char_count": 1176
+      },
+      {
+        "file_name": "rgb_pos_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_pos_019",
+        "title": "主题报道：2022年1月5日全国新增确诊病例数？",
+        "type": "positive",
+        "sample_id": 19,
+        "sha256": "7beb5f7b7006753a451c4cea9d0e6a1a0daa7107c57cdd7b93ec63bd632c835d",
+        "char_count": 720
+      },
+      {
+        "file_name": "rgb_noise_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_noise_019",
+        "title": "背景参考资讯：2022年1月5日全国新增确诊病例数？",
+        "type": "noise",
+        "sample_id": 19,
+        "sha256": "1695a8f3fcbd7ee796c88f3ddfe461bdc8284f15620e042c5d85229d75f2273e",
+        "char_count": 1072
+      },
+      {
+        "file_name": "rgb_pos_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_pos_020",
+        "title": "主题报道：我国2021年人口出生率",
+        "type": "positive",
+        "sample_id": 20,
+        "sha256": "9843b6422ceba75e2b0006fe0a10520eea7d5e17f483bb44d47b73b731cd13b5",
+        "char_count": 1548
+      },
+      {
+        "file_name": "rgb_noise_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_noise_020",
+        "title": "背景参考资讯：我国2021年人口出生率",
+        "type": "noise",
+        "sample_id": 20,
+        "sha256": "9c9fa06fe517f9cd54bdd2eb3eb898f7b86756e8c3674eb86cbf960218ac888e",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_pos_021",
+        "title": "主题报道：塔里木油田2021年的油气产量是多少？",
+        "type": "positive",
+        "sample_id": 21,
+        "sha256": "7444ba95361d251d300425440ba45b7abc3ae829fbd6289fc0a1d8d9cccf11e2",
+        "char_count": 760
+      },
+      {
+        "file_name": "rgb_noise_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_noise_021",
+        "title": "背景参考资讯：塔里木油田2021年的油气产量是多少？",
+        "type": "noise",
+        "sample_id": 21,
+        "sha256": "72acac05757afa1324a325d78148cdbc397440af8ce4ea8d8b2c4637cc81f023",
+        "char_count": 904
+      },
+      {
+        "file_name": "rgb_pos_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_pos_022",
+        "title": "主题报道：2022年冬奥会开幕式总导演是谁",
+        "type": "positive",
+        "sample_id": 22,
+        "sha256": "ef40e2418f74bacc4d5b4a69c83a35537ef0c4a14a8553f5bba632fd7e6169c4",
+        "char_count": 3508
+      },
+      {
+        "file_name": "rgb_noise_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_noise_022",
+        "title": "背景参考资讯：2022年冬奥会开幕式总导演是谁",
+        "type": "noise",
+        "sample_id": 22,
+        "sha256": "da10c58f7b663476c66e4400218dce9774b893c0ee789f6ac4bb2ee4c1c86c33",
+        "char_count": 953
+      },
+      {
+        "file_name": "rgb_pos_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_pos_023",
+        "title": "主题报道：中国第三艘航母名字",
+        "type": "positive",
+        "sample_id": 23,
+        "sha256": "9db8248d1c7ab23889ff7f3c6e72e536caf2c7dc03ff372c27e931f72c95e3fb",
+        "char_count": 2409
+      },
+      {
+        "file_name": "rgb_noise_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_noise_023",
+        "title": "背景参考资讯：中国第三艘航母名字",
+        "type": "noise",
+        "sample_id": 23,
+        "sha256": "a71fb3b1ba6791cfb1ad2e319dabddde0bfe10cd33a2014687d5d22cc2972f9b",
+        "char_count": 887
+      },
+      {
+        "file_name": "rgb_pos_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_pos_024",
+        "title": "主题报道：河南2021年的粮食总产量是多少？",
+        "type": "positive",
+        "sample_id": 24,
+        "sha256": "dca255b0fd21a65d894fe9073910bfd3a48051aa422120bd318082770aae0965",
+        "char_count": 1264
+      },
+      {
+        "file_name": "rgb_noise_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_noise_024",
+        "title": "背景参考资讯：河南2021年的粮食总产量是多少？",
+        "type": "noise",
+        "sample_id": 24,
+        "sha256": "17ddb4c1f5ce421074144aafa5ea5214d791090064c9540eebea1f979265573c",
+        "char_count": 1180
+      },
+      {
+        "file_name": "rgb_pos_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_pos_025",
+        "title": "主题报道：苹果M1芯片首席设计师去了哪家公司",
+        "type": "positive",
+        "sample_id": 25,
+        "sha256": "18f1a492ed718622ec9731054043777ffa171dfdf5ddc22ed147b77b3ceb008e",
+        "char_count": 4031
+      },
+      {
+        "file_name": "rgb_noise_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_noise_025",
+        "title": "背景参考资讯：苹果M1芯片首席设计师去了哪家公司",
+        "type": "noise",
+        "sample_id": 25,
+        "sha256": "114c8c3cad03723175c0847369e5dce29b7e89fe91b65b5904e5cf519a34064b",
+        "char_count": 1334
+      },
+      {
+        "file_name": "rgb_pos_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_pos_026",
+        "title": "主题报道：长安汽车2021年销量同比增长多少？",
+        "type": "positive",
+        "sample_id": 26,
+        "sha256": "226b49e21ce9e51f0e8e5407ae9255cad6a346762515f9c285da0ccdccbb749b",
+        "char_count": 2100
+      },
+      {
+        "file_name": "rgb_noise_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_noise_026",
+        "title": "背景参考资讯：长安汽车2021年销量同比增长多少？",
+        "type": "noise",
+        "sample_id": 26,
+        "sha256": "3e76ba08a41cda950a55479bd381acd4ed4a539ba473284fed7197b07929a974",
+        "char_count": 1022
+      },
+      {
+        "file_name": "rgb_pos_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_pos_027",
+        "title": "主题报道：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "positive",
+        "sample_id": 27,
+        "sha256": "aabc42bcd2499f92a0fbdd9b32410b55ed8bbb90b83b396bfa2b0495db6ce06e",
+        "char_count": 889
+      },
+      {
+        "file_name": "rgb_noise_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_noise_027",
+        "title": "背景参考资讯：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "noise",
+        "sample_id": 27,
+        "sha256": "6db53d67dde513bcc64b068f8d17ad9e21c08a3c9f2a4807b2943c1f5781eb1f",
+        "char_count": 1029
+      },
+      {
+        "file_name": "rgb_pos_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_pos_028",
+        "title": "主题报道：2021年宝马全球销量？",
+        "type": "positive",
+        "sample_id": 28,
+        "sha256": "f5183b555e5d20b14e00493db8741e9eab1da19920280ec951577e8f098a563f",
+        "char_count": 800
+      },
+      {
+        "file_name": "rgb_noise_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_noise_028",
+        "title": "背景参考资讯：2021年宝马全球销量？",
+        "type": "noise",
+        "sample_id": 28,
+        "sha256": "6288306dd1e5bbf236d3cb87fba998209c227975318ea799385e3af4c475312f",
+        "char_count": 1300
+      },
+      {
+        "file_name": "rgb_pos_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_pos_029",
+        "title": "主题报道：2021年中国外贸进出口规模是多少美元",
+        "type": "positive",
+        "sample_id": 29,
+        "sha256": "a2ad7dc47957f0fa569420d8dfc0c286ee6733f78f8a36fcb0829596db88c8e6",
+        "char_count": 1919
+      },
+      {
+        "file_name": "rgb_noise_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_noise_029",
+        "title": "背景参考资讯：2021年中国外贸进出口规模是多少美元",
+        "type": "noise",
+        "sample_id": 29,
+        "sha256": "e24dc9d9a1709f96d9cc063d646b946983811cf4bec39119e21c4c736df3eb0c",
+        "char_count": 1165
+      },
+      {
+        "file_name": "rgb_int_000_第七届香港立法会议员宣誓仪式及首次会议的时间.md",
+        "doc_id": "rgb_int_000",
+        "title": "跨事件综合分析档案：第七届香港立法会议员宣誓仪式及首次会议的时间",
+        "type": "integration",
+        "sample_id": 0,
+        "sha256": "2b727a4374243a199a4c49a7d38dfe55b317c113723b448447850d266d0ca985",
+        "char_count": 3402
+      },
+      {
+        "file_name": "rgb_int_001_2021年香港和澳门的GDP增长率.md",
+        "doc_id": "rgb_int_001",
+        "title": "跨事件综合分析档案：2021年香港和澳门的GDP增长率",
+        "type": "integration",
+        "sample_id": 1,
+        "sha256": "890f43158019cba468379a5601db4697b05fb57ea44607b390134b8747a5c3a7",
+        "char_count": 1379
+      },
+      {
+        "file_name": "rgb_int_002_2022年和2023年春节档首日票房冠军.md",
+        "doc_id": "rgb_int_002",
+        "title": "跨事件综合分析档案：2022年和2023年春节档首日票房冠军",
+        "type": "integration",
+        "sample_id": 2,
+        "sha256": "6c3149417c6d3f0803a3b926fce96db0dc632041e7b375af2208a85382c26503",
+        "char_count": 5249
+      },
+      {
+        "file_name": "rgb_int_003_2022春运的开始和结束时间是什么时候.md",
+        "doc_id": "rgb_int_003",
+        "title": "跨事件综合分析档案：2022春运的开始和结束时间是什么时候？",
+        "type": "integration",
+        "sample_id": 3,
+        "sha256": "b8b9848931054508d326a8823d7e1259c7c3f39a13a2fe258871afab0a46c0a4",
+        "char_count": 1620
+      },
+      {
+        "file_name": "rgb_int_004_2022年和2023年春运首日火车票分别的时间.md",
+        "doc_id": "rgb_int_004",
+        "title": "跨事件综合分析档案：2022年和2023年春运首日火车票分别的时间",
+        "type": "integration",
+        "sample_id": 4,
+        "sha256": "3f6ee1bde6bc48ed771afacda3a0726b587f13b7e666a0eb1ce4bc5b4bd4539c",
+        "char_count": 5521
+      },
+      {
+        "file_name": "rgb_int_005_2022年特斯拉和比亚迪交付量.md",
+        "doc_id": "rgb_int_005",
+        "title": "跨事件综合分析档案：2022年特斯拉和比亚迪交付量",
+        "type": "integration",
+        "sample_id": 5,
+        "sha256": "aa5ddbc1cf01731ccdea01440b1c04338a38e9a7955ee62e3fd84b1d6834b76f",
+        "char_count": 3264
+      },
+      {
+        "file_name": "rgb_int_006_李茂扮太子_是什么类型的电影_它的导演是谁.md",
+        "doc_id": "rgb_int_006",
+        "title": "跨事件综合分析档案：《李茂扮太子》是什么类型的电影？它的导演是谁？",
+        "type": "integration",
+        "sample_id": 6,
+        "sha256": "0d9413157b4e66d3bc34df658af2f4bb6b8ede53b3e72b0a314386e232b77ed0",
+        "char_count": 3543
+      },
+      {
+        "file_name": "rgb_int_007_我国2021年人口的出生率和死亡率是多少.md",
+        "doc_id": "rgb_int_007",
+        "title": "跨事件综合分析档案：我国2021年人口的出生率和死亡率是多少？",
+        "type": "integration",
+        "sample_id": 7,
+        "sha256": "d0fe02d6b25b8ecdf251d3a0a18a45eaaf682e303129cb3678b9b20c875d19d2",
+        "char_count": 1635
+      },
+      {
+        "file_name": "rgb_int_008_塔里木油田2021年和2022年的油气产量分别是.md",
+        "doc_id": "rgb_int_008",
+        "title": "跨事件综合分析档案：塔里木油田2021年和2022年的油气产量分别是多少？",
+        "type": "integration",
+        "sample_id": 8,
+        "sha256": "72ac336ca1fd40824e438b3c0080be04589a577ca77efee19924891798f162bb",
+        "char_count": 666
+      },
+      {
+        "file_name": "rgb_int_009_2021年宝马和奔驰的全球销量分别是多少.md",
+        "doc_id": "rgb_int_009",
+        "title": "跨事件综合分析档案：2021年宝马和奔驰的全球销量分别是多少？",
+        "type": "integration",
+        "sample_id": 9,
+        "sha256": "f562d6199c5d7aa771cc0afecac14a44939206c02add3a6e80872f6b465a1ed2",
+        "char_count": 1099
+      },
+      {
+        "file_name": "rgb_int_010_2021年中国和美国经济分别增长了多少.md",
+        "doc_id": "rgb_int_010",
+        "title": "跨事件综合分析档案：2021年中国和美国经济分别增长了多少？",
+        "type": "integration",
+        "sample_id": 10,
+        "sha256": "e243ef447a40c90e5ab78c5fa288cdb5bf3bccb7f5515a2a506fb0c131572be1",
+        "char_count": 3448
+      },
+      {
+        "file_name": "rgb_int_011_2022年英特尔和英伟达全年营收.md",
+        "doc_id": "rgb_int_011",
+        "title": "跨事件综合分析档案：2022年英特尔和英伟达全年营收",
+        "type": "integration",
+        "sample_id": 11,
+        "sha256": "71c9807a609f6062a61471ede623a2ae92b1226ced8bab291883cea91b217705",
+        "char_count": 2301
+      },
+      {
+        "file_name": "rgb_int_012_踏冰逐梦_的主演和导演是谁.md",
+        "doc_id": "rgb_int_012",
+        "title": "跨事件综合分析档案：《踏冰逐梦》的主演和导演是谁？",
+        "type": "integration",
+        "sample_id": 12,
+        "sha256": "ae95e5c2c0a3a05860c4f2fb31b8e69aba93e871ff99788a3c4c7eddcc6855a2",
+        "char_count": 3029
+      },
+      {
+        "file_name": "rgb_int_013_北京冬奥会美国和中国分别获得多少金牌.md",
+        "doc_id": "rgb_int_013",
+        "title": "跨事件综合分析档案：北京冬奥会美国和中国分别获得多少金牌？",
+        "type": "integration",
+        "sample_id": 13,
+        "sha256": "79c1dc38257a4b2b5f39228e9b6411cb89a3d6bce50c381a5ee416639399a3e4",
+        "char_count": 3235
+      },
+      {
+        "file_name": "rgb_int_014_2022年澳网男单和女单冠军分别是谁.md",
+        "doc_id": "rgb_int_014",
+        "title": "跨事件综合分析档案：2022年澳网男单和女单冠军分别是谁？",
+        "type": "integration",
+        "sample_id": 14,
+        "sha256": "b961527ae12fca20c2656f41f1615b2a3195acc326d9ebe0707357a4891ec90e",
+        "char_count": 7159
+      },
+      {
+        "file_name": "rgb_int_015_北京冬奥会澳大利亚和新西兰运动员数量.md",
+        "doc_id": "rgb_int_015",
+        "title": "跨事件综合分析档案：北京冬奥会澳大利亚和新西兰运动员数量",
+        "type": "integration",
+        "sample_id": 15,
+        "sha256": "d4e8270db38fb3cba3295d53c0b822ec4e61318a4306f08fd50178c771b57fa0",
+        "char_count": 1408
+      },
+      {
+        "file_name": "rgb_int_016_北京冬奥会和冬残奥会的开幕日期分别是什么时候.md",
+        "doc_id": "rgb_int_016",
+        "title": "跨事件综合分析档案：北京冬奥会和冬残奥会的开幕日期分别是什么时候?",
+        "type": "integration",
+        "sample_id": 16,
+        "sha256": "19d16d02520f540032ed29c7d98de0a23793c5132f8fd13371642a6a0d465afe",
+        "char_count": 936
+      },
+      {
+        "file_name": "rgb_int_017_北京冬奥会的第一棒和最后一棒火炬手分别是谁.md",
+        "doc_id": "rgb_int_017",
+        "title": "跨事件综合分析档案：北京冬奥会的第一棒和最后一棒火炬手分别是谁？",
+        "type": "integration",
+        "sample_id": 17,
+        "sha256": "b1f33da8aed1ec1fd92250084325f5b7052b2dfafe80ae3bba7c42e9853a328a",
+        "char_count": 4038
+      },
+      {
+        "file_name": "rgb_int_018_2022和2023年春节档票房冠军分别哪部电影.md",
+        "doc_id": "rgb_int_018",
+        "title": "跨事件综合分析档案：2022和2023年春节档票房冠军分别哪部电影",
+        "type": "integration",
+        "sample_id": 18,
+        "sha256": "dca1a7d4ef696114b40d8fa2021d848510de2f317b3e20b036fc468cb7650c5a",
+        "char_count": 4966
+      },
+      {
+        "file_name": "rgb_int_019_北京冬奥会男子1500米速度滑冰和短道速滑中谁获.md",
+        "doc_id": "rgb_int_019",
+        "title": "跨事件综合分析档案：北京冬奥会男子1500米速度滑冰和短道速滑中谁获得了金牌？",
+        "type": "integration",
+        "sample_id": 19,
+        "sha256": "e69eda9e045ba7eb1dd267809b3e0fdda969d01f58ecd633044edf3a004d1df6",
+        "char_count": 448
+      },
+      {
+        "file_name": "rgb_int_020_北京冬奥会女子和男子500米速度滑冰金牌分别是谁.md",
+        "doc_id": "rgb_int_020",
+        "title": "跨事件综合分析档案：北京冬奥会女子和男子500米速度滑冰金牌分别是谁",
+        "type": "integration",
+        "sample_id": 20,
+        "sha256": "d2c2e7824614479a5e1aa05d4a4ab2b272a97f176c91c6c440bdfee80728a937",
+        "char_count": 909
+      },
+      {
+        "file_name": "rgb_int_021_人世间_的导演和编剧是谁.md",
+        "doc_id": "rgb_int_021",
+        "title": "跨事件综合分析档案：《人世间》的导演和编剧是谁？",
+        "type": "integration",
+        "sample_id": 21,
+        "sha256": "cefb3a015829a7468048eebb92a5ef9df0294c919755f1daf8216d4d949105ed",
+        "char_count": 8015
+      },
+      {
+        "file_name": "rgb_int_022_花样滑冰女子和男子单人滑比赛金牌得主分别是谁.md",
+        "doc_id": "rgb_int_022",
+        "title": "跨事件综合分析档案：花样滑冰女子和男子单人滑比赛金牌得主分别是谁？",
+        "type": "integration",
+        "sample_id": 22,
+        "sha256": "6cbd02e4698ba014097cb4b63b17dd93cd7c3845b032eee6d9328dab025e317e",
+        "char_count": 4112
+      },
+      {
+        "file_name": "rgb_int_023_iPhone_SE_3的芯片是什么_起售价多少.md",
+        "doc_id": "rgb_int_023",
+        "title": "跨事件综合分析档案：iPhone SE 3的芯片是什么，起售价多少",
+        "type": "integration",
+        "sample_id": 23,
+        "sha256": "776c34a7a2564468a9aa26d9f1bc8bd4b250b1f962f529a2a1f9451f6b81bfc1",
+        "char_count": 4340
+      },
+      {
+        "file_name": "rgb_int_024_邓伦逃税多少钱_被罚了多少钱.md",
+        "doc_id": "rgb_int_024",
+        "title": "跨事件综合分析档案：邓伦逃税多少钱，被罚了多少钱",
+        "type": "integration",
+        "sample_id": 24,
+        "sha256": "14b07e07c530b0a639717565a8a88587d848a60e2b3dd49e0ba709716d28277e",
+        "char_count": 2286
+      },
+      {
+        "file_name": "rgb_int_025_MU5735航班坠毁的时间和地点.md",
+        "doc_id": "rgb_int_025",
+        "title": "跨事件综合分析档案：MU5735航班坠毁的时间和地点",
+        "type": "integration",
+        "sample_id": 25,
+        "sha256": "75e64ef0fcdd60cb1b7090f5482c8f6c6482a98d226f455f0b10a68191884252",
+        "char_count": 1113
+      },
+      {
+        "file_name": "rgb_int_026_2022年考研和高考报名人数分别是多少.md",
+        "doc_id": "rgb_int_026",
+        "title": "跨事件综合分析档案：2022年考研和高考报名人数分别是多少？",
+        "type": "integration",
+        "sample_id": 26,
+        "sha256": "078e56e431d66790714689cb1d7fcabdde871b3734457637ccdc389eee834df0",
+        "char_count": 5191
+      },
+      {
+        "file_name": "rgb_int_027_心居_的主演有谁_导演是谁.md",
+        "doc_id": "rgb_int_027",
+        "title": "跨事件综合分析档案：《心居》的主演有谁，导演是谁？",
+        "type": "integration",
+        "sample_id": 27,
+        "sha256": "6ddeca92bbb3b22f8a19cad9196b534f4cf1b308cd7f3c09a5a04b3e82feee9b",
+        "char_count": 5306
+      },
+      {
+        "file_name": "rgb_int_028_卡塔尔世界杯德国队和法国队在哪个组.md",
+        "doc_id": "rgb_int_028",
+        "title": "跨事件综合分析档案：卡塔尔世界杯德国队和法国队在哪个组",
+        "type": "integration",
+        "sample_id": 28,
+        "sha256": "ba896c45bed52b701663a3119f80f88d5bcb47706a506888d30596fb6a65f1a3",
+        "char_count": 6615
+      },
+      {
+        "file_name": "rgb_int_029_上海和北京2021年的GDP分别是多少.md",
+        "doc_id": "rgb_int_029",
+        "title": "跨事件综合分析档案：上海和北京2021年的GDP分别是多少？",
+        "type": "integration",
+        "sample_id": 29,
+        "sha256": "ab2cc3f40cee4feca5fb33c225a1fbf1946cc648af80c07fdcc31b010a871fd4",
+        "char_count": 1601
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "rgb_source_id": 0,
+      "question": "印控克什米尔地区寺庙踩踏事故死亡人数",
+      "expected_output": "12人",
+      "ground_truth": "12人",
+      "contexts": [
+        "当时，大批民众聚集在寺庙门口，大门打开后人群立刻涌入，一名女子直接摔倒在地，随后其他人也跟着摔倒。 而在今年年初，位于印控查谟和克什米尔地区的瓦希诺德维寺也发生一起踩踏事件，造成至少12人死亡、14人受伤。当天，大批印度民众聚集在此庆贺新年，不少人未经许可涌入寺庙，导致踩踏事件发生，事后印度总理莫迪也在第一时间就此事发声。",
+        "Nov 10, 2022 ... ... 年，孟买埃尔芬斯通车站一座狭窄的步行桥发生踩踏事故，造成23人死亡；今年1月，印控克什米尔地区一座印度教寺庙发生踩踏事故，造成12人死亡。",
+        "海外网1月1日电 据印度新德里电视台报道，位于印控查谟和克什米尔地区的瓦希诺德维寺发生踩踏事件，目前已造成12人死亡、14人受伤。  当地时间1月1日，大批印度民众聚集在瓦希诺德维寺庆贺新年，期间发生踩踏事故。警方证实，12人在踩踏事故中丧生，14人受伤，救援行动立即展开，所有伤者已被送往医院，部分伤者情况严重。 当地官员透露，事件发生在寺庙外，当时有大量民众涌入寺庙，有的人甚至未经许可就进入寺庙，紧接着踩踏事件就发生了。",
+        "印度总理莫迪发声称，对踩踏事件造成的生命损失深感悲痛，并向死者家属表示哀悼。 （原标题：大批印度民众涌入寺庙贺新年引发踩踏事故 12人死亡14人受伤） 来源：海外网 流程编辑：TF063  \r                             如遇作品内容、版权等问题，请在相关文章刊发之日起30日内与本网联系。版权侵权联系电话：010-85202353\r                          \r                   RCEP生效！全球最大自由贸易区正式启航                 \r                   阿富汗发放中国援助物资 当地民众：“孩子们终于能吃上一顿饱饭了”                 \r                   阿富汗前总统加尼称不知会被带出国：“最大错误”就是相信美国！",
+        "印度近年来发生过不少类似的悲惨事件：2013年，因为有传言称一座桥即将坍塌，中央邦德蒂亚地区发生踩踏事故，造成115人死亡；2017年，孟买埃尔芬斯通车站一座狭窄的步行桥发生踩踏事故，造成23人死亡；今年1月，印控克什米尔地区一座印度教寺庙发生踩踏事故，造成12人死亡。 莫尔维吊桥垮塌时，桥上人流量约为五六百人，其中包括妇女和儿童，而上桥需要买票，这意味着当局原本可以按照吊桥的承受能力减少售票量，从而控制人群数量。",
+        "Jan 1, 2022 ... 海外网1月1日电 据印度新德里电视台报道，位于印控查谟和克什米尔地区的瓦希诺德维寺发生踩踏事件，目前已造成12人死亡、14人受伤。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_000_印控克什米尔地区寺庙踩踏事故死亡人数.md"
+      ]
+    },
+    {
+      "id": 2,
+      "rgb_source_id": 1,
+      "question": "RCEP具体包括哪些国家",
+      "expected_output": "东盟、中国、日本、韩国、澳大利亚、新西兰",
+      "ground_truth": "东盟、中国、日本、韩国、澳大利亚、新西兰",
+      "contexts": [
+        "RCEP(Regional Comprehensive Economic Partnership)，即区域全面经济伙伴关系协定  　　RCEP是Regional Comprehensive Economic Partnership的缩写，即区域全面经济伙伴关系协定，RCEP由东盟十国发起，邀请中国、日本、韩国、澳大利亚、新西兰、印度共同参加(“10+6”)，通过削减关税及非关税壁垒，建立16国统一市场的自由贸易协定。  　　RCEP是东盟国家近年来首次提出，并以东盟为主导的区域经济一体化合作，是成员国间相互开放市场、实施区域经济一体化的组织形式。RCEP主要成员国计划包括与东盟已经签署自由贸易协定的国家，即中国、日本、韩国、澳大利亚、新西兰、印度。",
+        "2万亿美元，约占全球GDP的30%，占全球贸易总额的近28%（根据2019年数据），RCEP是朝着全球贸易和投资规则的理想框架迈出的重要一步。其次，RCEP是区域内经贸规则的“整合器”。RCEP整合了东盟与中国、日本、韩国、澳大利亚、新西兰多个“10+1”自贸协定以及中、日、韩、澳、新西兰5国之间已有的多对自贸伙伴关系，尤其是在中日和韩日间建立了新的自贸伙伴关系。",
+        "RCEP最早由东盟十国发起，邀请中国、日本、韩国、澳大利亚、新西兰、印度共同参加（“10+6”），旨在通过削减关税及非关税壁垒，建立16国统一市场的自由贸易协定。这意味着，如果达成，RCEP将会形成人口约35亿、GDP总和约为23万亿美元、占世界贸易总量约30%的贸易集团。这在给所有参与国家带来实质性贸易量增加的同时，也将会给各国企业在地区与国际市场扩大投资和增加市场份额带来莫大实惠。",
+        "7亿，GDP达26万亿美元，出口总额达5.2万亿美元，均占全球总量约30%。RCEP自贸区的建成意味着全球约三分之一的经济体量将形成一体化大市场。RCEP囊括了东亚地区主要国家，将为区域和全球经济增长注入强劲动力。  　　RCEP是区域内经贸规则的“整合器”。RCEP整合了东盟与中国、日本、韩国、澳大利亚、新西兰多个“10+1”自贸协定以及中、日、韩、澳、新西兰5国之间已有的多对自贸伙伴关系，还在中日和日韩间建立了新的自贸伙伴关系。",
+        "此外，成员国还在知识产权、电子商务、竞争、政府采购和中小企业等领域制订了高标准的自由贸易规则。 　　根据RCEP规定，协定签署后，RCEP各成员国将各自履行国内法律审批程序。协定生效需15个成员中至少9个成员批准，其中至少包括6个东盟成员国和中国、日本、韩国、澳大利亚和新西兰中至少3个国家。 　　新签署的协定吸引了全世界的注意力，具有以下重要意义：首先，RCEP是当今世界上最大的自由贸易协定。该协定覆盖22亿人口，约占世界人口的30%，国内生产总值（GDP）达26.",
+        "Nov 15, 2020 ... RCEP成员国包括东盟10国与中国、日本、韩国、澳大利亚、新西兰。RCEP是全球最大的自贸协定，15个成员国总人口、经济体量、贸易总额均占全球总量约30% ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_001_RCEP具体包括哪些国家.md"
+      ]
+    },
+    {
+      "id": 3,
+      "rgb_source_id": 2,
+      "question": "第七届香港立法会议员宣誓仪式的时间",
+      "expected_output": "1月3日",
+      "ground_truth": "1月3日",
+      "contexts": [
+        "时间：2021-12-29 14:58:03\t\t\t\t\r \t\t\t\t\t\t\t\t 来源：海外网\t\t\t\t\t\t\t\t 分享到微信朋友圈 据香港大公文汇全媒体报道，香港第七届立法会议员的宣誓仪式将在2022年1月3日上午11时在立法会会议厅举行，由行政长官林郑月娥监誓。 宣誓仪式前，候任议员将面向  香港立法会 据香港大公文汇全媒体报道，香港第七届立法会议员的宣誓仪式将在2022年1月3日上午11时在立法会会议厅举行，由行政长官林郑月娥监誓。 宣誓仪式前，候任议员将面向国旗及区旗肃立，同唱国歌，之后逐一宣誓。",
+        "原标题：新一届香港立法会议员宣誓，细节之中见深意 来源：人民日报客户端 2022年1月3日上午，香港特区第七届立法会议员宣誓仪式举行。在高悬的国徽之下，全场齐声高唱国歌，从宣誓议员到监誓人，庄重而严谨。对比上一届立法会宣誓时的画面，思忖香港这几年来的风风雨雨，让了解和关心香港的人们无比感慨。 此次宣誓仪式有很多细节区别以往，而这些细节的安排很值得观察，也透露出深意。 这是香港立法会议员第一次在国徽下宣誓。",
+        "2022年1月3日上午，香港特区第七届立法会议员宣誓仪式举行。在高悬的国徽之下，全场齐声高唱国歌，从宣誓议员到监誓人，庄重而严谨。对比上一届立法会宣誓时的画面，思忖香港这几年来的风风雨雨，让了解和关心香港的人们无比感慨。 　　此次宣誓仪式有很多细节区别以往，而这些细节的安排很值得观察，也透露出深意。  　　这是香港立法会议员第一次在国徽下宣誓。根据去年十月修订生效的《2021年国旗及国徽（修订）条例》，在立法会综合大楼会议厅正中间的墙上高悬中华人民共和国国徽。",
+        "国务院港澳事务办公室发言人1月3日发表谈话，对香港特别行政区第七届立法会议员宣誓就任表示祝贺，希望议员们依法履职，担当尽责，服务香港、贡献国家，树新风、展新貌、开新局，以工作实效取信于民。 发言人表示，1月3日上午，新当选的香港特别行政区第七届立法会全部90名议员在庄严的国徽下郑重宣誓，表示拥护中华人民共和国香港特别行政区基本法，效忠中华人民共和国香港特别行政区。宣誓就职仪式庄重严肃，展现了立法会议员们的良好精神风貌。",
+        "Jan 4, 2022 ... 2022年1月3日上午，香港特区第七届立法会议员宣誓仪式举行。在高悬的国徽之下，全场齐声高唱国歌，从宣誓议员到监誓人，庄重而严谨。对比上一届立法会 ...",
+        "Jan 4, 2022 ... 1月3日上午，香港特区立法会综合大楼会议厅，香港特区第七届立法会90位新 ... 宣誓仪式开始前半个多小时，不少议员已陆续抵达会议厅，神情庄重。11时 ...",
+        "Jan 3, 2022 ... 2022年1月3日上午，香港特区第七届立法会议员宣誓仪式举行。在高悬的国徽之下，全场齐声高唱国歌，从宣誓议员到监誓人，庄重而严谨。",
+        "Jan 3, 2022 ... 1月3日上午，香港特区第七届立法会已依法组成，新当选的立法会90名议员在行政长官监誓下完成宣誓。图为新当选的议员宣誓。 中新社记者李志华摄.",
+        "Jul 7, 2022 ... 去年底，孙东实现了从象牙塔到议事厅的身份转变，当选为立法会选委会界别议员。今年1月3日，第七届立法会90位议员在立法会会议厅举行宣誓仪式，包括孙 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_002_第七届香港立法会议员宣誓仪式的时间.md"
+      ]
+    },
+    {
+      "id": 4,
+      "rgb_source_id": 3,
+      "question": "首趟RCEP班列的起点？",
+      "expected_output": "南宁",
+      "ground_truth": "南宁",
+      "contexts": [
+        "2022年1月1日零点刚过，随着汽笛声响，满载800多吨货物的X9101次集装箱班列从南宁国际铁路港开出，一路朝着终点站越南河内进发。  \t这是RCEP(区域全面经济伙伴关系协定)生效后，我国首趟开往RCEP成员国的国际货运班列。    \t我国首趟开往RCEP成员国的国际货运班列从南宁国际铁路港发出(央广网发 冯登海 摄)  \t“南宁国际铁路港自2018年5月开通运营以来，累计到发货物1218万吨，每年到发货物量约270万吨。”广西宁铁国际物流有限公司总经理宋坚强介绍。",
+        "来自东盟等多个国家的货物通过海运入境，再经铁路港进入到云南、贵州、四川、重庆等地。  \tRCEP协定生效后，进出口货物的成本降低了，运输时间也缩短了。中国南宁―越南河内班列运行时间之前需要72小时，目前仅需约24小时，运行时长减少40多个小时，基本实现了次日可达。  \t东盟水果更是实现了从海运、陆运到空运的飞跃，加速度进入中国市场。  \t今年5月13日，广西对RCEP成员国水果进口航线正式通航，进一步扩大了南宁乃至广西在中国进口生鲜方面的影响力。",
+        "Sep 19, 2022 ... 我国首趟开往RCEP成员国的国际货运班列从南宁国际铁路港发出(央广网发冯登海 ... 平陆运河起点位于南宁横州市西津库区平塘江口(央广网发横州市融媒体 ...",
+        "RCEP生效后首趟国际货运班列从广西南宁启程",
+        "班列发车。人民网 吴明江摄  \t人民网南宁1月1日电 （吴明江）2022年1月1日凌晨00:05，一趟满载货物的货运班列从南宁国际铁路港启程，开赴越南河内。这是《区域全面经济伙伴关系协定》（RCEP协定）生效后首趟开往RCEP成员国的国际货运班列。    \t该趟国际货运班列共23个40英尺集装箱、2个20英尺集装箱，货物包括电子元件、日用百货、化工产品等一般贸易和跨境电商货物，总重800多吨，货值达1000多万美元，将于28小时后抵达越南河内。    \t列车开行仪式现场。人民网 吴明江摄"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_003_首趟RCEP班列的起点.md"
+      ]
+    },
+    {
+      "id": 5,
+      "rgb_source_id": 4,
+      "question": "香港第七届立法会选举有多少个议席？",
+      "expected_output": "90",
+      "ground_truth": "90",
+      "contexts": [
+        "立法会是香港的立法机构，亦是香港的一院制议会。第七届立法会（英语：Seventh Legislative Council）经2021年12月19日的选举产生，90名议员分别从地方选区普选20位、功能团体间选30位、选举委员会产生40名。任期原由2020年10月1日开始，但因全国人大常委会通过《全国人民代表大会常务委员会关于香港特别行政区第六届立法会继续履行职责的决定》，延长第六届立法会任期不少于一年。",
+        "香港特区第七届立法会选举投票于2021年12月19日顺利结束，这是完善香港特区选举制度后的首次立法会选举。153名候选人竞选90个议席，包括选举委员会选举的议员40人、功能团体选举的议员30人和分区直接选举的议员20人。",
+        "香港特区第七届立法会选举投票于12月19日23时左右结束。经过点票,香港选举事务处于20日公布第七届立法会分区直接选举界别、选举委员会界别和功能团体界别投票结果。 第七届立法会90个议席已全部顺利产生,其中包括选举委员会选举的议员40人、功能团体选举的议员30人和分区直接选举的议员20人。",
+        "香港特区第七届立法会选举，是落实以爱国者为主体的“港人治港”原则的生动实践，将有效提高特区治理效能，推动解决香港社会深层次问题，着力改善民生福祉，为香港实现长治久安、更好融入国家发展大局奠定坚实基础。 根据新修订的香港基本法附件二，香港特区立法会议员从70人增至90人，其中选举委员会选举产生的议员40人，功能界别选举产生的议员30人，分区直接选举产生的议员20人。",
+        "当局只允许所谓“爱国者”候选人参加竞选，泛民主派人士当中一些人被关进了监狱，一些人被迫流亡海外，一些原本希望参选的人被认定不符合“爱国者治港”标准而不得参选，另一些人决定抵制他们所说的当局上演的这场假选举。 星期天的投票率只有30%，比上一届选举的投票率几乎少了一半。选举结果不出所料，几乎所有90个议席由亲北京的建制派人士囊括，所谓温和派的候选人几乎全军覆没。 只有20个议席、也就是不到全部议席四分之一的席位经最能直接反映民意的直选产生，比往届少了一半。",
+        "12月19日，香港顺利举行完善选举制度后首次立法会选举投票，工作人员点票现场。（新华社记者 吕小炜 摄） 　　香港特区第七届立法会功能团体界别选举的30个议席12月20日上午揭晓。至此，第七届立法会90个议席全部顺利产生。 　　此次选举是完善香港特区选举制度后的首次立法会选举。根据全国人大常委会修订的《中华人民共和国香港特别行政区基本法附件二香港特别行政区立法会的产生办法和表决程序》，新一届香港特区立法会由90名议员组成，其中包括选举委员会选举的议员40人、功能团体选举的议员30人和分区直接选举的议员20人。",
+        "由2004年至2020年，选举委员会只负责行政长官选举的提名及投票，不会参与立法会的提名工作（尽管大部分选举委员会代表为属功能组别的选民投票选出）。  2021年，中华人民共和国全国人民代表大会自行决定香港立法会议员席次选举修改为“432”方案，也就是选举委员会选出40席、功能界别选出30席、地区直选20席，合计90席。  在2010年政改投票当中，特区政府提出地区直选增加5席并获得通过，2012年起之地区直选议席增至35席。但纵使增加了议席，在分组点票制度下，代表全港选民的直选议员提出的议案，通常被选民基础少的功能界别议员否决。",
+        "其它香港系列条目  香港特别行政区立法会（英语：Legislative Council of the Hong Kong Special Administrative Region）[1]，是香港特别行政区的立法机关[2]，亦有对香港特别行政区政府的监察权。现今立法会共设议席90席；地区直选议员占20席、功能界别议员占30席、选举委员会界别议员占40席。  第一届立法会成立于1998年7月1日，应届议员任期为两年。自第二届立法会（2000年）开始，每届议员任期改为四年（第六届为五年[注 5]）。2012年起，立法会议席增加至70个。2021年3月11日，中华人民共和国全国人民代表大会通过《关于完善香港特别行政区选举制度的决定》，立法会议席增加至90个，同时大幅修改议席构成。",
+        "12月19日，香港顺利举行完善选举制度后首次立法会选举投票，工作人员点票现场。新华社记者 吕小炜 摄 　　新华社香港12月20日电（记者查文晔）香港特区第七届立法会功能团体界别选举的30个议席20日上午揭晓。至此，第七届立法会90个议席全部顺利产生。 　　此次选举是完善香港特区选举制度后的首次立法会选举。",
+        "Jan 1, 2022 ... 香港特区第七届立法会选举投票于2021年12月19日顺利结束，这是完善香港特区选举制度后的首次立法会选举。153名候选人竞选90个议席，包括选举委员会 ...",
+        "Dec 20, 2021 ... 第七届立法会90个议席已全部顺利产生,其中包括选举委员会选举的议员40人、功能团体选举的议员30人和分区直接选举的议员20人。 40人当选新一届选举委员会界 ...",
+        "Dec 22, 2021 ... 选举委员会产生的议员，比较能够照顾全体利益，也包括国家的利益。 新的选举制度引入了充分竞争。 香港特区第七届立法会选举当选议员陈勇. 总共90个议席里 ...",
+        "2021年3月11日，中华人民共和国全国人民代表大会通过《关于完善香港特别行政区选举制度的决定》，立法会议席增加至90个，同时大幅修改议席构成。现时的立法会届别为第七届 ...",
+        "Dec 20, 2021 ... 至此，第七届立法会90个议席全部顺利产生。 此次选举是完善香港特区选举制度后的首次立法会选举。根据全国人大常委会修订的《中华人民共和国香港特别 ...",
+        "Dec 20, 2021 ... 北京自导自演、自吹自擂的香港第七届立法会选举星期天收场。 ... 选举结果不出所料，几乎所有90个议席由亲北京的建制派人士囊括，所谓温和派的候选人 ...",
+        "Jan 3, 2022 ... 香港特区第七届立法会选举投票于2021年12月19日顺利结束，这是完善香港特区选举制度后的首次立法会选举。153名候选人竞选90个议席，包括选举委员会 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_004_香港第七届立法会选举有多少个议席.md"
+      ]
+    },
+    {
+      "id": 6,
+      "rgb_source_id": 5,
+      "question": "2021年香港GDP增长了多少？",
+      "expected_output": "6.4%",
+      "ground_truth": "6.4%",
+      "contexts": [
+        "企业投资也获得增加，这些都是拉动经济增长的重要因素。经济活动走向正轨，失业率也大幅下降到4.1%。 2020年下降6.1%，2021年又实现6.4%的增长，可以说是非常不容易，这也说明香港经济的韧性非常强，基础牢固。  不过，2021年内地各省市GDP增速很多都超过了8%，大幅超过香港。因此，香港2.37万亿的数据，下降到了全国第21名，被广西超越，广西为2.47万亿。  另外，从城市排名来看，香港仍然可以排到全国第六。位于上海、北京、深圳、广州、重庆之后。但只比苏州多了1000亿，很有可能在2022年被反超，滑落至第七。",
+        "新华社香港1月28日电（记者 王茜）香港特区政府统计处28日发布统计数字显示，根据预先估计数字，香港2021年本地生产总值同比上升6.4%。特区政府认为，香港经济在2022年将会进一步增长，但增长步伐受各种不确定因素影响。 统计数据显示，按本地生产总值各个主要组成部分分析，2021年私人消费开支同比上升5.7%；政府消费开支同比上升4.6%；本地固定资本形成总额同比上升10.1%；货品出口总额及货品进口也分别同比上升19.0%及17.5%。 特区政府发言人表示，2021年本地生产总值显著增长6.4%，扭转过去两年的跌势，但仍比2018年的水平低约2%。",
+        "Jan 28, 2022 ... 新华社香港1月28日电（记者王茜）香港特区政府统计处28日发布统计数字显示，根据预先估计数字，香港2021年本地生产总值同比上升6.4%。",
+        "用微信扫码二维码 分享至好友和朋友圈 作为“东方明珠”的香港，回归已经近25年，但经济发展似乎并不理想，陆续被内地省市超越。在2020年因为疫情影响，经济更是直接下滑了6.1%，比1998年亚洲金融危机和2009年次贷危机下滑的还要多。 不过，2021年获得了不错的恢复。香港统计处公布的数据显示，2021年香港完成名义GDP达到了28616.2亿港元，同比增长6.4%。按照人民币和港元的汇率来换算，那就是23740亿元人民币（3680亿美元左右）。  过去的一年，香港在努力实行经济复苏，出口额大幅增长19%，居民消费也逐渐复苏，获得了5.6%的提升。",
+        "Feb 24, 2022 ... 不过，2021年获得了不错的恢复。香港统计处公布的数据显示，2021年香港完成名义GDP达到了28616.2亿港元，同比增长6.4%。按照人民币和港元的 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_005_2021年香港GDP增长了多少.md"
+      ]
+    },
+    {
+      "id": 7,
+      "rgb_source_id": 6,
+      "question": "2021年北京大兴机场年旅客吞吐量",
+      "expected_output": "2500万人次",
+      "ground_truth": "2500万人次",
+      "contexts": [
+        "北京大兴国际机场2021年旅客吞吐量突破2500万人次  新华社北京1月1日电（记者 罗鑫）记者从北京大兴国际机场获悉，截至2021年12月31日，大兴机场年旅客吞吐量突破2500万人次，全年保障航班约21万架次，圆满完成全面转场、航班换季、疫情防控和复工复产等各项工作目标，生产运行平稳有序。 2021年，大兴机场单日最高航班量达907架次，单日最高旅客量突破14万人次，全年累计运营国内航线200条、联通全国157个航点。",
+        "新华社北京1月1日电（记者罗鑫）记者从北京大兴国际机场获悉，截至2021年12月31日，大兴机场年旅客吞吐量突破2500万人次，全年保障航班约21万架次，圆满完成全面转场、航班换季、疫情防控和复工复产等各项工作目标，生产运行平稳有序。  \t2021年，大兴机场单日最高航班量达907架次，单日最高旅客量突破14万人次，全年累计运营国内航线200条、联通全国157个航点。",
+        "Jan 1, 2022 ... 记者从北京大兴国际机场获悉，截至2021年12月31日，大兴机场年旅客吞吐量突破2500万人次，全年保障航班约21万架次，圆满完成全面转场、航班换季、疫情 ...",
+        "Jan 1, 2022 ... 新华社北京1月1日电（记者罗鑫）记者从北京大兴国际机场获悉，截至2021年12月31日，大兴机场年旅客吞吐量突破2500万人次，全年保障航班约21万架次， ...",
+        "北京大兴国际机场2021年旅客吞吐量突破2500万人次  新华社北京1月1日电（记者 罗鑫）记者从北京大兴国际机场获悉，截至2021年12月31日，大兴机场年旅客吞吐量突破2500万人次，全年保障航班约21万架次，圆满完成全面转场、航班换季、疫情防控和复工复产等各项工作目标，生产运行平稳有序。 2021年，大兴机场单日最高航班量达907架次，单日最高旅客量突破14万人次，全年累计运营国内航线200条、联通全国157个航点。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_006_2021年北京大兴机场年旅客吞吐量.md"
+      ]
+    },
+    {
+      "id": 8,
+      "rgb_source_id": 7,
+      "question": "2022年春节档首日票房冠军",
+      "expected_output": "长津湖之水门桥",
+      "ground_truth": "长津湖之水门桥",
+      "contexts": [
+        "2022年春节档以60.35亿票房收官，2月7日，灯塔研究院和灯塔专业版联合发布《2022春节档电影市场数据洞察报告》（以下简称灯塔报告）。 灯塔报告显示，2月1日大年初一，春节档首日揽下14.5亿票房，与2019年持平，后续走势也与疫情前一样平缓回落。  票房冠军《长津湖之水门桥》斩获25.",
+        "人民网北京2月2日电 (记者郭冠华) 2022年春节档第一天，中国电影迎来“开门红”。国家电影局发布数据显示，2月1日（正月初一）当日票房14.45亿元，人次2574.07万；其中国产影片票房14.44亿元，单日份额为99.99%。  \t单日票房前十名中，《长津湖之水门桥》以6.37亿元位居榜首；《四海》排名第二，斩获2.26亿元；《这个杀手不太冷静》以2.13亿元的票房成绩荣获第三名，《奇迹・笨小孩 》《熊出没・重返地球》《狙击手》《喜羊羊与灰太狼之筐出未来》《小虎墩大英雄》《独家头条》《牧蜂姑娘》紧随其后。",
+        "据猫眼专业版统计，截至2月1日21时33分，春节档首日票房达到14.75亿元，位列中国影史单日票房第二。首日场次达到52.6万，刷新中国电影市场单日场次纪录。其中，《长津湖之水门桥》以8.31亿元(含预售)成绩领跑春节档，成为中国影史剧情题材电影首映日票房冠军。 　　2021年大年初一，在《唐人街探案3》超高热度，和《你好，李焕英》口碑逆袭的双重作用下，以16.92亿元刷新全球单一市场单日票房纪录。相比之下，2022年春节档虽略逊一筹，但也热度不凡。 　　“春节档的这些新片，题材、风格都不一样，很想多看几部。",
+        "Feb 8, 2022 ... 灯塔报告显示，2月1日大年初一，春节档首日揽下14.5亿票房，与2019年持平，后续走势也与疫情前一样平缓回落。 票房冠军《长津湖之水门桥》斩获25.28 ...",
+        "据猫眼专业版统计，截至2月1日21时33分，春节档首日票房达到14.75亿元，位列中国影史单日票房第二。首日场次达到52.6万，刷新中国电影市场单日场次纪录。其中，《长津湖之水门桥》以8.31亿元（含预售）成绩领跑春节档，成为中国影史剧情题材电影首映日票房冠军。 2021年大年初一，在《唐人街探案3》超高热度，和《你好，李焕英》口碑逆袭的双重作用下，以16.92亿元刷新全球单一市场单日票房纪录。相比之下，2022年春节档虽略逊一筹，但也热度不凡。 “春节档的这些新片，题材、风格都不一样，很想多看几部。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_007_2022年春节档首日票房冠军.md"
+      ]
+    },
+    {
+      "id": 9,
+      "rgb_source_id": 8,
+      "question": "2022春运开始时间",
+      "expected_output": "1月17日",
+      "ground_truth": "1月17日",
+      "contexts": [
+        "2022年春运时间： 　　2022年1月17日—2月25日，共40天 　　2022年春运抢票时间： 　　春运第一天的火车票(2022年1月17日农历腊月十五)——2022年1月3日开抢 　　春运第二天的火车票(2022年1月18日农历腊月十六)——2022年1月4日开抢 　　春运第三天的火车票(2022年1月19日农历腊月十七)——2022年1月5日开抢 　　春运第四天的火车票(2022年1月20日农历腊月十八)——2022年1月6日开抢 　　除夕前一天的火车票(2022年1月30日农历腊月廿九)——2022年1月16日开抢 　　除夕当天的火车票(2022年1月31日农历腊月三十)——2022年1月17日开抢",
+        "2022年春运时间： 　　2022年1月17日—2月25日，共40天 　　2022年春运抢票时间： 　　春运第一天的火车票(2022年1月17日农历腊月十五)——2022年1月3日开抢 　　春运第二天的火车票(2022年1月18日农历腊月十六)——2022年1月4日开抢 　　春运第三天的火车票(2022年1月19日农历腊月十七)——2022年1月5日开抢 　　春运第四天的火车票(2022年1月20日农历腊月十八)——2022年1月6日开抢 　　除夕前一天的火车票(2022年1月30日农历腊月廿九)——2022年1月16日开抢 　　除夕当天的火车票(2022年1月31日农历腊月三十)——2022年1月17日开抢",
+        "2022年春运自1月17日开始，2月25日结束，共计40天。按照规定，今日(1月3日)，旅客可通过网络和电话购买春运首日火车票。 　　1月17日可买除夕当日车票 　　根据放假安排，今年春节假期为1月31日至2月6日，共7天。 　　由于今年农历没有大年三十，除夕为腊月二十九，即1月31日。根据火车票15天预售期的安排，1月15日可购买腊月二十七(1月29日)的火车票，1月16日可购买腊月二十八(1月30日)的火车票，1月17日即春运首日可购买除夕(1月31日)当日的火车票。",
+        "【导语】：2022年春运从1月17日开始，2月25日结束，共40天，春运第一天的火车票(1月17日)于2022年1月3日开抢，具体详见正文。",
+        "2023-02-09 00:42 来源：北京本地宝管理频道  【导语】：2022年春运从1月17日开始，2月25日结束，共40天，春运第一天的火车票(1月17日)于2022年1月3日开抢，具体详见正文。",
+        "2022春运首日火车票今起开售 退改签服务有新调整 　　2022年铁路春运自1月17日开始，2月25日结束，共40天，按照火车票提前15天发售的安排，2022年1月3日，铁路部门将开始发售2022年春运火车票。 　　1月15日，旅客可以购买1月29日（腊月二十七）的火车票，1月16日可以购买1月30日（腊月二十八）的火车票，1月17日可以购买1月31日（除夕）当日的火车票。 　　从铁路旅客发送量来看，今年较去年将有明显增长。据国铁集团介绍，2022年春运，全国铁路预计发送旅客2.8亿人次，同比增长28.5%。",
+        "近日，国务院召开新闻发布会明确了2022春运时间，1月17日开始，2月25日结束共40天。 　　据客运部门消息，1月3日就能购买春运第1天的火车票和汽车票了，一年一度抢票大战你准备好了吗？　　不管对手速有无信心先收下这份新鲜出炉的春运时间表吧，建议保存到手机随时查看哦。　　“双节”期间客流量与去年有怎样的变化？交通运输部门会做哪些准备工作？一起看看。　　交通运输部运输服务司司长蔡团结在12月24日的国新办发布会上介绍，据初步预测，2022年全国春运客运量较2021年将有大幅度增长，预计增长1倍以上，甚至超过2020年。",
+        "新华社北京1月3日电 题：2022年春运火车票，开售！ 新华社记者 一年一度的春运即将来临。今年铁路春运自1月17日开始，2月25日结束，共40天，全国铁路预计发送旅客2.8亿人次，同比增长28.5%。按照火车票提前15天发售的安排，1月3日，铁路部门开始发售2022年春运火车票。 在北京，北京西站售票窗口于3日8：00开始与12306官网同步发售春运首日车票，车站提前备足工作人员，满足窗口旅客购票需求，预计成都、广州、武汉等方向的车票会比较紧张。",
+        "新华社北京1月2日电（记者樊曦）记者从中国国家铁路集团有限公司获悉，2022年铁路春运自1月17日开始，2月25日结束，共40天，全国铁路预计发送旅客2.8亿人次，同比增长28.5%。按照火车票提前15天发售的安排，2022年1月3日，铁路部门将开始发售2022年春运火车票。 国铁集团运输部负责人介绍，铁路部门将统筹发展和安全、疫情防控和春运组织、春运和冬奥运输保障，切实做好春运各项工作，不断提升广大旅客的安全感、获得感和幸福感，为冬奥会提供高质量运输服务保障，努力实现“平安春运、有序春运、温馨春运，让旅客体验更美好”的目标。",
+        "Dec 21, 2021 ... 2022年春运从1月17日开始，2月25日结束，共40天，春运第一天的火车票(1 ... 回复【春运】可获2023年春运火车票购票入口(官网/APP)、春运起止时间/火车 ...",
+        "Jan 2, 2022 ... 记者从中国国家铁路集团有限公司获悉，2022年铁路春运自1月17日开始，2月25 ... 客户端）售票服务时间由每日5:00至23:30调整为5:00至次日凌晨1:00（每 ...",
+        "2022年春运”指2022年春节期间大量外出务工人员返乡的一次大规模交通运输，于2022年1月17日开始，2月25日结束，共计40天。根据火车票15天预售期安排，2022年春运首日 ...",
+        "Dec 28, 2021 ... 近日，国务院召开新闻发布会明确了2022春运时间，1月17日开始，2月25日结束共40天。 据客运部门消息，1月3日就能购买春运第1天的火车票和汽车票了，一 ...",
+        "Jan 3, 2022 ... 资料图：上海虹桥站候车大厅内，旅客们在有序候车。 王程伟摄 ... 2022年铁路春运自1月17日开始，2月25日结束，共40天，按照火车票提前15天发售的安排，2022 ...",
+        "Jan 3, 2022 ... 2022年春运自1月17日开始，2月25日结束，共计40天。按照规定，今日(1月3日)，旅客可通过网络和电话购买春运首日火车票。",
+        "Jan 6, 2022 ... 2022年春运将从1月17日开始，2月25日结束，共计40天。2022年是我国踏上 ... 属地疫情防控要求，及时调整寒假放假、开学时间，尽可能错开春运时段。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_008_2022春运开始时间.md"
+      ]
+    },
+    {
+      "id": 10,
+      "rgb_source_id": 9,
+      "question": "2022年春运首日火车票什么时候开售",
+      "expected_output": "1月3日",
+      "ground_truth": "1月3日",
+      "contexts": [
+        "导语 北京铁路部门提醒，北京各火车站严格落实进出站旅客测温制度，做好测温工作。在进站口对乘车旅客进行100%北京“健康宝”健康码查验，绿码通行，红码和黄码劝返。 \r \t　　➤2022年春运火车票什么时间开售?  \r \t　　根据火车票15天预售期安排，春运首日火车票1月3日开售，1月17日可以购买1月31日除夕当日的火车票。2022年除夕为腊月二十九，即1月31日。根据火车票15天预售期安排：\r  \r \t　　1月15日可以购买1月29日(腊月二十七)的火车票;\r  \r \t　　1月16日可以购买1月30日(腊月二十八)的火车票;",
+        "中新经纬1月3日电 (熊家丽)2022年春运自1月17日开始，2月25日结束，共计40天。按照规定，今日(1月3日)，旅客可通过网络和电话购买春运首日火车票。 　　1月17日可买除夕当日车票 　　根据放假安排，今年春节假期为1月31日至2月6日，共7天。 　　由于今年农历没有大年三十，除夕为腊月二十九，即1月31日。根据火车票15天预售期的安排，1月15日可购买腊月二十七(1月29日)的火车票，1月16日可购买腊月二十八(1月30日)的火车票，1月17日即春运首日可购买除夕(1月31日)当日的火车票。",
+        "新华社北京1月3日电 题：2022年春运火车票，开售！ 新华社记者 一年一度的春运即将来临。今年铁路春运自1月17日开始，2月25日结束，共40天，全国铁路预计发送旅客2.8亿人次，同比增长28.5%。按照火车票提前15天发售的安排，1月3日，铁路部门开始发售2022年春运火车票。 在北京，北京西站售票窗口于3日8：00开始与12306官网同步发售春运首日车票，车站提前备足工作人员，满足窗口旅客购票需求，预计成都、广州、武汉等方向的车票会比较紧张。",
+        "2022春运首日火车票今起开售 退改签服务有新调整 2022年铁路春运自1月17日开始，2月25日结束，共40天，按照火车票提前15天发售的安排，2022年1月3日，铁路部门将开始发售2022年春运火车票。 1月15日，旅客可以购买1月29日(腊月二十七)的火车票，1月16日可以购买1月30日(腊月二十八)的火车票，1月17日可以购买1月31日(除夕)当日的火车票。 从铁路旅客发送量来看，今年较去年将有明显增长。据国铁集团介绍，2022年春运，全国铁路预计发送旅客2.8亿人次，同比增长28.5%。",
+        "2022年春运自1月17日开始，2月25日结束，共计40天。按照规定，今日(1月3日)，旅客可通过网络和电话购买春运首日火车票。",
+        "1月3日起，旅客可通过网络和电话购买春运火车票。图为1月3日，旅客在南京火车站出行。 据悉，2022年春运自1月17日开始，2月25日结束，共计40天。 1月3日，旅客在南京火车站出行。",
+        "中国2022年春运首日火车票开售. 时间: 2022-01-03 19:27:09; 来源: 中新社; 编辑: 聂晓. 1月3日起，旅客可通过网络和电话购买春运火车票。据悉，2022年春运自1月17日 ...",
+        "Jan 4, 2022 ... 根据火车票15天预售期安排，春运首日火车票1月3日开售，1月17日可以购买1月31日除夕当日的火车票。2022年除夕为腊月二十九，即1月31日。根据火车票15 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_009_2022年春运首日火车票什么时候开售.md"
+      ]
+    },
+    {
+      "id": 11,
+      "rgb_source_id": 10,
+      "question": "2022年特斯拉交付量",
+      "expected_output": "1313851/131万",
+      "ground_truth": "1313851/131万",
+      "contexts": [
+        "根据官方披露数据，特斯拉在2022年的最后一个季度实现新车交付40.5万辆，产量则达到44万辆。从具体的车型来看，特斯拉在2022年第四季度总共生产了约2万辆Model S和Model X，以及合计约42万辆的Model 3和Model Y；交付层面上，特斯拉实现交付约1.7万辆Model S和Model X，以及约38.8万辆Model 3和Model Y。 放眼全年，特斯拉在2022年总共交付131万辆新车，产量约为136.9万辆，同比增长40%，并成就了其史上首次产销“双破百”。其中，特斯拉Model 3和Model Y两款车型在2022全年合计交付了124.7万辆，依旧是支撑其销量的中流砥柱。 在业内看来，特斯拉2022年的生产端数据更具价值。",
+        "特斯拉第四季度产量为439701辆，同比增长44%，交付量为405278辆，同比增长31%。其中，ModelS和ModelX车型产量为20613辆，同比增长57%；交付量为17147辆，同比增长46%。Model3和ModelY车型产量为419088辆，同比增长43%；交付量为388131辆，同比增长31%。  从全年来看，特斯拉的产量和交付量超越了百万大关，2022年产量达到136万辆，交付量达131万辆，分别增长了47%和40%，但这一数据离马斯克想要的50%仍有距离。同时，特斯拉的交付量增幅也出现明显下落，2021年全年，特斯拉全球交付量超过93万辆，同比增长约87.4%  但在马斯克看来，能实现上述目标并不容易。",
+        "对于特斯拉的2022年，外界评价两极分化。 认为其成功者，多半源于销量数字带来的直观冲击。数据显示，在高通胀侵袭消费购买力、美联储激进加息和疫情袭扰的背景下，特斯拉2022年第四季度的交付量仍创下历史新高，达到40.53万辆。2022年全年，特斯拉总交付量超131万辆，实现40%的同比增长。 也有人认为其不够成功，理由则源于销量数字背后的市场趋势变化。就在几个月前，买家还要等上几个月才能买到一辆特斯拉，但如今仅需几天就可以开上新车，同时买家或许还能享受到史无前例的优惠幅度，而这被都视为特斯拉市场需求疲软的迹象之一。",
+        "中国网汽车1月3日讯，特斯拉发布了2022年全球生产及交付报告。特斯拉以131万的电动车交付量，超越第二名比亚迪91万辆纯电销量，稳坐行业第一。业内普遍认为，这份报告不仅体现了特斯拉扎扎实实的销量成绩，更是预示了汽车行业2023年乃至未来的走向——“燃油车时代终结已成定局”。 　　先来看看数据。2022年，特斯拉全球总交付量131万辆，相比2021年增长40%；生产137万辆，同比增长约47%，其中第四季度生产了439,701辆，交付405,278辆，创下新的交付记录。",
+        "原标题：收获史上最强劲订单！特斯拉公布成绩单，创纪录的一年！马斯克这样说… 　　作为全球新能源汽车的龙头，特斯拉又交出了创下多项纪录的2022年第四季度及全年成绩单。 　　数据显示，特斯拉第四季度营收243.18亿美元，同比增长37%；净利润37.07亿美元；归属于普通股股东的净利润为36.87亿美元，相比增长59%。2022年全年，特斯拉交付了超过131万辆的电动车。  　　特斯拉官方微博发文表示，2022年第四季度又是一个打破纪录的季度，2022年也是创造纪录的一年。",
+        "原标题：收获史上最强劲订单！特斯拉公布成绩单，创纪录的一年！马斯克这样说… 作为全球新能源汽车的龙头，特斯拉又交出了创下多项纪录的2022年第四季度及全年成绩单。 数据显示，特斯拉第四季度营收243.18亿美元，同比增长37%；净利润37.07亿美元；归属于普通股股东的净利润为36.87亿美元，相比增长59%。2022年全年，特斯拉交付了超过131万辆的电动车。  特斯拉官方微博发文表示，2022年第四季度又是一个打破纪录的季度，2022年也是创造纪录的一年。“最后一个季度中，我们实现了有史以来单季度最高营业收入、最高营业利润和最高净利润。",
+        "Jan 3, 2023 ... 中国网汽车1月3日讯，特斯拉发布了2022年全球生产及交付报告。特斯拉以131万的电动车交付量，超越第二名比亚迪91万辆纯电销量，稳坐行业第一。",
+        "Jan 3, 2023 ... 据特斯拉公布的数据显示，2022年全年，特斯拉全球总交付量为131万辆，相比2021年增长40%，低于此前平均年增长率50%的目标；全球共计生产137万辆新车，同比 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_010_2022年特斯拉交付量.md"
+      ]
+    },
+    {
+      "id": 12,
+      "rgb_source_id": 11,
+      "question": "2023年世界人工智能大会在哪举办",
+      "expected_output": "上海",
+      "ground_truth": "上海",
+      "contexts": [
+        "记者从6月29日举行的上海市政府新闻发布会上了解到，2023世界人工智能大会将于7月6日至8日在上海世博中心及世博展览馆举办，并在浦东张江、徐汇西岸设分会场，同步在闵行等产业集聚区开展同期活动。",
+        "记者从6月29日举行的上海市政府新闻发布会上了解到，2023世界人工智能大会将于7月6日至8日在上海世博中心及世博展览馆举办，并在浦东张江、徐汇西岸设分会场，同步在闵行等产业集聚区开展同期活动。",
+        "2023年7月6日-8日，世界人工智能大会（简称“WAIC”）将在中国上海举办。本届世界人工智能大会以“智联世界·生成未来”为主题，经国务院批准，由国家发展和改革委员会、工业和信息化部、科学技术部、国家互联网信息办公室、中国科学院、中国工程院、中国科学技术协会和上海市人民政府共同主办。 世界人工智能大会自2018年创办以来，已经成功举办五届。亿欧自首届举办以来，就作为官方战略合作伙伴，全程深度参与世界人工智能大会。",
+        "来源：中国网 2023年7月6日-8日，世界人工智能大会（简称“WAIC”）将在中国上海举办。本届世界人工智能大会以“智联世界·生成未来”为主题，经国务院批准，由国家发展和改革委员会、工业和信息化部、科学技术部、国家互联网信息办公室、中国科学院、中国工程院、中国科学技术协会和上海市人民政府共同主办。  世界人工智能大会自2018年创办以来，已经成功举办五届。亿欧自首届举办以来，就作为官方战略合作伙伴，全程深度参与世界人工智能大会。",
+        "7月6日-8日，2023世界人工智能大会举办，本届大会的主题是“智联世界 生成未来”，会议活动总体架构按照“1+1+2+10+N”设置，即1场开幕式、1场闭幕式、科技创新和产业发展2场全体会议、10场主题论坛，以及N场生态论坛。 今年是上海连续第六年举办世界人工智能大会，充分发挥大会“科技风向标、应用展示台、产业加速器、治理议事厅”重要作用，汇聚融通全球人工智能领域思想智慧、前沿技术、产业动向和人文生态，助推人工智能健康创新发展。其中，多家上海国企在大会上展示交流创新成果。",
+        "上海市经济信息化委主任吴金城介绍，围绕技术、产业、人文，本届大会将重点关注大模型、智能芯片、科学智能、机器人、类脑智能、元宇宙、自动驾驶、数据论坛、法治与安全、区块链等十大前沿风向，会同北大、清华、复旦、上海交大、浙大、同济、上科大等知名高校，展开深度探讨交流。目前，国内外领军学者、知名企业家、国际组织代表等1400余位重量级嘉宾确认参会。",
+        "上海市经济信息化委主任吴金城介绍，围绕技术、产业、人文，本届大会将重点关注大模型、智能芯片、科学智能、机器人、类脑智能、元宇宙、自动驾驶、数据论坛、法治与安全、区块链等十大前沿风向，会同北大、清华、复旦、上海交大、浙大、同济、上科大等知名高校，展开深度探讨交流。目前，国内外领军学者、知名企业家、国际组织代表等1400余位重量级嘉宾确认参会。",
+        "上汽集团   作为2023世界人工智能大会的精英合作伙伴，上汽集团智己汽车携首款真正意义上的智能化软件整车产品“全程AI舱”，登陆上海世博展览馆H1馆智己汽车展台，让AI智能渗透到每一个驾驶场景，最大程度释放驾驶焦虑，解决实际驾驶痛点，让驾驶变得更轻松、更安全、更有趣，用智能化技术更好赋能人类驾驶。同期，智己汽车旗下爆款车型-智己LS7还担任了本届大会的接驳用车。 面向自动驾驶的未来趋势，智己汽车以智能化颠覆出行体验的IM AD智能驾驶技术，正持续不断迭代进化。",
+        "Jun 30, 2023 ... 2023年世界人工智能大会7月6日将在上海举办-\"上海已连续第六年举办世界人工智能大会，本届大会的主题是“智联世界生成未来”，由上海市政府和国家 ...",
+        "Jun 9, 2023 ... 2023年7月6日-8日，世界人工智能大会（简称“WAIC”）将在中国上海举办。本届世界人工智能大会以“智联世界·生成未来”为主题，经国务院批准，由国家发展 ...",
+        "Jun 30, 2023 ... 记者从6月29日举行的上海市政府新闻发布会上了解到，2023世界人工智能大会将于7月6日至8日在上海世博中心及世博展览馆举办，并在浦东张江、徐汇西岸设 ...",
+        "Jun 9, 2023 ... 2023年7月6日-8日，世界人工智能大会（简称“WAIC”）将在中国上海举办。本届世界人工智能大会以“智联世界·生成未来”为主题，经国务院批准，由国家发展 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_011_2023年世界人工智能大会在哪举办.md"
+      ]
+    },
+    {
+      "id": 13,
+      "rgb_source_id": 12,
+      "question": "印度第三艘“歼敌者”级核潜艇下水的时间",
+      "expected_output": "2021年11月23日",
+      "ground_truth": "2021年11月23日",
+      "contexts": [
+        "英国《简氏防务周刊》网站2021年12月29日发表题为《印度第三艘“歼敌者”级核潜艇悄然下水》的报道，全文摘编如下： 　　美国普兰尼特公司捕获的卫星图像显示，代号S4的印度第三艘“歼敌者”级核动力弹道导弹潜艇2021年11月23日在位于印度维萨卡帕特南的造船中心下水。 　　这艘潜艇后来被重新安置到码头以北靠近舾装码头的区域，正对着该级别潜艇的另一艘。印度媒体尚未报道该潜艇下水的消息，可能与第二艘“歼敌者”级潜艇服役时间因新冠疫情而延迟有关。",
+        "参考消息网1月3日报道 英国《简氏防务周刊》网站2021年12月29日发表题为《印度第三艘“歼敌者”级核潜艇悄然下水》的报道，全文摘编如下： 美国普兰尼特公司捕获的卫星图像显示，代号S4的印度第三艘“歼敌者”级核动力弹道导弹潜艇2021年11月23日在位于印度维萨卡帕特南的造船中心下水。 这艘潜艇后来被重新安置到码头以北靠近舾装码头的区域，正对着该级别潜艇的另一艘。印度媒体尚未报道该潜艇下水的消息，可能与第二艘“歼敌者”级潜艇服役时间因新冠疫情而延迟有关。",
+        "参考消息网1月3日报道 英国《简氏防务周刊》网站2021年12月29日发表题为《印度第三艘“歼敌者”级核潜艇悄然下水》的报道，全文摘编如下： 美国普兰尼特公司捕获的卫星图像显示，代号S4的印度第三艘“歼敌者”级核动力弹道导弹潜艇2021年11月23日在位于印度维萨卡帕特南的造船中心下水。 这艘潜艇后来被重新安置到码头以北靠近舾装码头的区域，正对着该级别潜艇的另一艘。印度媒体尚未报道该潜艇下水的消息，可能与第二艘“歼敌者”级潜艇服役时间因新冠疫情而延迟有关。",
+        "用微信扫描二维码分享至好友和朋友圈 美国普兰尼特公司捕获的卫星图像显示，代号S4的印度第三艘“歼敌者”级核动力弹道导弹潜艇2021年11月23日在位于印度维萨卡帕特南的造船中心下水。 这艘潜艇后来被重新安置到码头以北靠近舾装码头的区域，正对着该级别潜艇的另一艘。印度媒体尚未报道该潜艇下水的消息，可能与第二艘“歼敌者”级潜艇服役时间因新冠疫情而延迟有关。  印度第三艘“歼敌者”核潜艇下水 或配更多导弹 从卫星图像上看，7000吨级的S4和该系列前两艘潜艇相比，尺寸要大得多。",
+        "据英国《简氏防务周刊》2021年12月29日报道，代号S4的印度第三艘“歼敌者”级核动力弹道导弹潜艇2021年11月23日在位于印度维萨卡帕特南的造船中心下水。     与下水仪式曾轰动全印度的前两艘核潜艇相比，这艘吨位更大、威慑力更强的核潜艇，下水仪式却极为低调，并没有对外公布艇名，以至于英媒报道起的标题是《印度第三艘“歼敌者”级核潜艇悄然下水》。     报道称，该潜艇下水后，被重新安置到码头以北靠近舾装码头的区域，正对着该级别潜艇的另一艘。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_012_印度第三艘_歼敌者_级核潜艇下水的时间.md"
+      ]
+    },
+    {
+      "id": 14,
+      "rgb_source_id": 13,
+      "question": "美国2021年GDP增长多少",
+      "expected_output": "5.7%",
+      "ground_truth": "5.7%",
+      "contexts": [
+        "5%，进入负增长，基数较低，所以在2020年低基数影响下，2021年美国GDP实现了较高的增长率。 同时，美国GDP数据也公布了，根据统计，2021年美国GDP总量首次突破23万亿美元大关，达到23.03万亿美元，依然是全球第一大经济体，要知道2020年美国GDP为20.89万亿美元，GDP增量超过2万亿美元。  但是，如果按照正常计算，美国GDP增长率应该是10.24%，为什么GDP增长率却是5.7%？事实上，10.24%属于名义增速，其中包括了通胀水平等因素，抛开这些因素之后就会得出GDP实际增长率，也就是5.7%。",
+        "尽管受到新冠疫情的困扰，但美国经济持续增长，2021年第四季度国内生产总值（GDP）达到6.9%的年增长率，超过经济学家增长5.5%的预期，这一增长速度是37年来最强劲的。与此同时，股市、房市大幅度增长，通货膨胀率也快速上涨，失业率则处于历史低位。 美国商务部所属经济统计局（BEA）数据显示，2021年全年GDP增长率为5.7%，GDP总额达到22.99万亿美元。此外，个人消费支出增长了7.9%（个人消费占GDP三分之二的分量）、国内私人资本投资增加了9.5%，成为GDP增长的重要动力。",
+        "用微信扫码二维码 分享至好友和朋友圈 在我国GDP数据公布后不久，美国也公布了2021年的相关数据。1月27日，美国GDP增速公布，2021年美国GDP同比增长5.7%，这一数据创下了上世纪80年代以来的新高，在众多发达国家中堪称一枝独秀，而且是在GDP规模较大的前提下实现的。  美国GDP增长5.7%，一方面是因为2020年以来的量化宽松，各大央行纷纷“放水”，尤其是美国，这也导致美国国债规模持续拉升，迈向30万亿美元大关，大量的资金刺激股市、投资及消费的增长，拉动GDP。 另一方面，2020年美国GDP下跌3.",
+        "4万亿元人民币，按年平均汇率折算，达17.7万亿美元，仅次于美国，继续稳居世界第二。1月27日，美国也公布了2021年的GDP初步核算数据，GDP增速为5.7%，为1984年以来的最高，在发达经济体中属于高位；GDP总量达23.0万亿美元，超过疫情前的最高水平。 　　对比中国与美国近几十年的发展，可以看到两国的GDP差距在不断缩小。 　　作为长期的世界“霸主”，美国一直保持着对全球其他国家在经济体量上的领先地位，二战以后鲜有国家的GDP“接近”美国。冷战时期，据估算，苏联在1975年曾一度达到美国GDP的40%。",
+        "Jan 31, 2022 ... 在我国GDP数据公布后不久，美国也公布了2021年的相关数据。1月27日，美国GDP增速公布，2021年美国GDP同比增长5.7%，这一数据创下了上世纪80年代以来的 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_013_美国2021年GDP增长多少.md"
+      ]
+    },
+    {
+      "id": 15,
+      "rgb_source_id": 14,
+      "question": "2021年中国城镇新增就业了多少人",
+      "expected_output": "1269万人",
+      "ground_truth": "1269万人",
+      "contexts": [
+        "Jan 16, 2022 ... 1月17日，国家统计局发布2021年中国经济数据。数据显示，就业形势总体稳定，城镇调查失业率降低。全年城镇新增就业1269万人，比上年增加83万人。",
+        "1月17日，国家统计局发布2021年中国经济数据。数据显示，就业形势总体稳定，城镇调查失业率降低。全年城镇新增就业1269万人，比上年增加83万人。全年城镇调查失业率平均值为5.1%，比上年平均值下降0.5个百分点。全国企业就业人员周平均工作时间为47.8小时。",
+        "基本养老保险覆盖超10亿人，基本医疗保险覆盖超13亿人。城镇新增就业1269万人，完成全年目标任务的115%。中国粮食生产再获丰收，总产量68285万吨，比上年增长2.0%，创历史新高。 2021年，中国高质量发展取得新成效，国民经济和社会发展计划中生态环境领域8项约束性指标顺利完成，全年单位GDP能耗比上年下降2.7%，新能源汽车产量比上年增长145.6%。中国创新能力进一步增强，载人航天、火星探测、资源勘探、能源工程等领域实现新突破。 当前，世界经济复苏面临诸多制约因素，全球发展进程遭受严重冲击。",
+        "Mar 30, 2022 ... 2021年，中国国内生产总值达17.7万亿美元，稳居世界第二，预计占世界经济比重超过18%，对世界 ... 城镇新增就业1269万人，完成全年目标任务的115%。",
+        "2021年全年城镇新增就业1269万人，545万城镇失业人员实现再就业，困难人员就业183万人。2021年末，城镇登记失业人员1040万人，城镇登记失业率为3.96%，全国城镇调查失业率为5.1%。2021年全年，全国共帮助4.4万户零就业家庭实现每户至少一人就业。 主办单位：国务院办公厅　运行维护单位：中国政府网运行中心  版权所有：中国政府网　中文域名：中国政府网.政务  网站标识码bm01000001　京ICP备05070218号　京公网安备11010202000001号  中国政府网微博、微信 主办单位：国务院办公厅　运行维护单位：中国政府网运行中心 版权所有：中国政府网　中文域名：中国政府网.政务"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_014_2021年中国城镇新增就业了多少人.md"
+      ]
+    },
+    {
+      "id": 16,
+      "rgb_source_id": 15,
+      "question": "黑石集团预测2022年美联储将加息几次",
+      "expected_output": "4次/四次",
+      "ground_truth": "4次/四次",
+      "contexts": [
+        "アプリをダウンロード  越来越多机构对3月加息达成「共识」，摩根大通、德意志银行和花旗等在内的多家华尔街大行，均已加入到了支持美联储在3月加息的阵营之中。 其次，12月加息的声音也不断出现。除了高盛，摩根大通首席美国经济学家也在周五非农发布后表示，「我们现在预计首次加息将出现在3月，然后每季度加一次，全年加息四次。」黑石集团此前也在“2022年的十大黑天鹅”中预测，2022年美联储将加息四次。 目前市场对加息速度和力度的预测主要看美联储关注的就业情况和通胀情况，而疫情是影响因素之一。",
+        "アプリをダウンロード  越来越多机构对3月加息达成「共识」，摩根大通、德意志银行和花旗等在内的多家华尔街大行，均已加入到了支持美联储在3月加息的阵营之中。 其次，12月加息的声音也不断出现。除了高盛，摩根大通首席美国经济学家也在周五非农发布后表示，「我们现在预计首次加息将出现在3月，然后每季度加一次，全年加息四次。」黑石集团此前也在“2022年的十大黑天鹅”中预测，2022年美联储将加息四次。 目前市场对加息速度和力度的预测主要看美联储关注的就业情况和通胀情况，而疫情是影响因素之一。",
+        "扫码打开虎嗅APP 本文来自微信公众号：华尔街见闻（ID：wallstreetcn），作者：王眉，原文标题：《2022年飞出这些“黑天鹅”？黑石预测来了》，题图来自：视觉中国  1月3日，黑石集团（Blackstone）私人财富部门副总裁拜伦·维恩（Byron Wien）与首席投资策略师Joe Zidle列出了2022年的十大黑天鹅。  黑石集团预测，2022年美股回调20%、油价破百、美联储加息四次……  这是拜伦第37次就未来一年的经济、金融市场和政治领域可能出现的黑天鹅发表自己的看法。",
+        "原标题：黑石预测：2022年将飞出这十大“黑天鹅” 本文来自微信公众号：华尔街见闻（ID：wallstreetcn），作者：王眉，原文标题：《2022年飞出这些“黑天鹅”？黑石预测来了》，题图来自：视觉中国 1月3日，黑石集团（Blackstone）私人财富部门副总裁拜伦·维恩（Byron Wien）与首席投资策略师Joe Zidle列出了2022年的十大黑天鹅。 黑石集团预测，2022年美股回调20%、油价破百、美联储加息四次…… 这是拜伦第37次就未来一年的经济、金融市场和政治领域可能出现的黑天鹅发表自己的看法。",
+        "用微信扫码二维码 分享至好友和朋友圈 美国私募基金黑石集团（Blackstone） 周一（3 日） 揭露2022 年「十大惊奇预测」，其中包括：美股今年将因加息而陷入震荡，先暴跌将近20％，不过到了年末将收在平盘。 黑石私人财富部门副董事长韦恩（Bryon Wien） 和首席投资策略师Joe Zidle 说，企业获利预期保持强劲，但无法抵挡转趋鹰派的美联储、和美国10 年期国债收益率将攀升到2.75％ 的影响。  两人预估，美联储将在2022 年升息四次。",
+        "Jan 10, 2022 ... 黑石集团此前也在“2022年的十大黑天鹅”中预测，2022年美联储将加息四次。 目前市场对加息速度和力度的预测主要看美联储关注的就业情况和通胀情况，而 ...",
+        "Jan 6, 2022 ... 黑石集团预测，2022年美股回调20%、油价破百、美联储加息四次…… 这是拜伦第37次就未来一年的经济、金融市场和政治领域可能出现的黑天鹅发表自己的看法 ...",
+        "黑石集团此前也在“2022年的十大黑天鹅”中预测，2022年美联储将加息四次。 目前市场对加息速度和力度的预测主要看美联储关注的就业情况和通胀情况，而疫情是影响因素之 ...",
+        "Jan 6, 2022 ... 黑石集团预测，2022年美股回调20%、油价破百、美联储加息四次…… 这是拜伦第37次就未来一年的经济、金融市场和政治领域可能出现的黑天鹅发表自己的看法 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_015_黑石集团预测2022年美联储将加息几次.md"
+      ]
+    },
+    {
+      "id": 17,
+      "rgb_source_id": 16,
+      "question": "2021年中国电影市场总票房是多少？",
+      "expected_output": "472.58亿元",
+      "ground_truth": "472.58亿元",
+      "contexts": [
+        "2021年，中国电影总票房达到472.58亿元，恢复至疫情前的74%，全年总票房和银幕总数继续保持全球第一。其中，年度票房前三名为《长津湖》《你好，李焕英》《唐人街探案3》，三者总票房突破150亿元。去年也诞生了历史最高春节档（78.4亿元）和历史第二高国庆档（43.9亿元）的成绩，两大档期合计在全年大盘的票房占比已逐年提升至四分之一的水平。   2021年电影市场档期效应是否进一步增加？未来如何促进电影市场进一步健康发展？",
+        "Jan 10, 2022 ... 经历了2020年的蛰伏，2021年的中国电影市场是复苏也是重生。电影市场方面，国家电影局2022年1月1日发布数据显示，2021年我国电影总票房达472.58亿元， ...",
+        "Jan 4, 2022 ... 市场篇：472.58亿票房，82248块银幕据M大数据统计，2021年中国电影市场年度总票房为472.58亿元，全年生产电影740部，城市院线观影总人次11.67亿， ...",
+        "经历了2020年的蛰伏，2021年的中国电影市场是复苏也是重生。电影市场方面，国家电影局2022年1月1日发布数据显示，2021年我国电影总票房达472.58亿元，其中国产电影票房为399.27亿元，占总票房的84.49%。全年新增银幕6667块，银幕总数达到82248块，全年总票房和银幕总数继续保持全球第一，电影市场活力显现。电影内容方面，2021年度电影类型丰富，其中主旋律影片强势霸屏，呈现出体量大、票房高、话题热的电影群像，表现最为亮眼。此外，文艺片、喜剧片等口碑佳作频出，成为大银幕靓丽的一笔色彩。",
+        "1月1日，据国家电影局发布数据，2021年我国电影总票房达到472.58亿元，其中国产电影票房为399.27亿元，占总票房的84.49%；城市院线观影人次11.67亿。全年新增银幕6667块，银幕总数达到82248块。中国电影产业快速复苏发展，全年总票房和银幕总数继续保持全球第一。 2021年共生产电影故事片565部，影片总产量为740部。全年票房前10名影片中有8部国产影片。 回顾全年，《长津湖》《我和我的父辈》《你好，李焕英》《悬崖之上》等一大批国产影片的出色市场表现，春节档、暑期档、国庆档、元旦档、清明节档、五一档等重要档期的强劲势头。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_016_2021年中国电影市场总票房是多少.md"
+      ]
+    },
+    {
+      "id": 18,
+      "rgb_source_id": 17,
+      "question": "《李茂扮太子》是什么类型的电影",
+      "expected_output": "喜剧",
+      "ground_truth": "喜剧",
+      "contexts": [
+        "该片李茂假扮太子，太子变成李茂，和《狸猫换太子》有异曲同工之妙。除了两位当事人，其他人都被蒙在鼓里，都不知道李茂是假太子。太子与家珍一起在桶里戏水、家珍想和李茂生个他们自己的孩子、岳父认太子为女婿李茂…这些桥段从头到尾引得观众频频笑场。 但无厘头的喜剧存在一些缺点，让人看完不吐不快。第一，该片为了搞笑而搞笑，人物的行为经不起逻辑的推敲，古代人讲现代rap，人物的智商令人堪忧，笑点有些尴尬。太子千方百计出宫，不过是想听戏，但听戏又很多地方可以听。",
+        "整个故事也正是从这里开始变得有趣了：李茂意外发现自己竟与当朝太子相貌相同，一个想进太子府获得晋升，一个想出太子府获得自由，二人交换身份，却不知正一步步卷入阴谋之中……  喜剧电影，说到底好笑才是关键。 一个普通小百姓和一个要啥有啥的太子，因为撞脸互换身份，很多笑梗自然而然就出来了。 两个人在浴池意外相遇，戴着面具的太子左右端详着李茂的脸：“你这张脸，还挺会长啊”。 李茂吓得哆哆嗦嗦：“小的长相卑微、寒酸、不堪入目。",
+        "也因为自身叠加类型的优势，更容易吸引普通观众入场。但是直到《李茂扮太子》的票房失利，古装喜剧是否还能撑得住已经变得非常微妙。 从《李茂扮太子》幕后制作来看，电影的故事依旧是“小人物温情喜剧”的路数，只不过时空转化到了古代，本质上和开心麻花此前的现实主义喜剧没有太大差别。而从笑料来说，电影还是依附于演员的“包袱”，但相比成熟的喜剧创作，《李茂扮太子》的主创曾公开表示很多“包袱”都是在现场二度创作而成。",
+        "近年来，贺岁档票房一年比一年高，爆款都是喜剧、爱情、奇幻、悬疑、动画、动作等各种元素的大杂烩。但此次《李茂扮太子》主打传统单一类型的喜剧难能可贵，传统喜剧电影让人联想起经典电视剧《武林外传》，也复古了港味贺岁片的味道。该片还集结了中国喜剧的半壁江山：马丽、常远、艾伦、魏翔、王成思、杜晓宇、陈冰、冯秦川、李海银等等演员，让人感觉开心麻花出品的用心。 李茂是身份卑微的小捕快，他和老婆杨家珍恩爱且过得甜蜜。",
+        "李茂扮太子？狸猫换太子？电影谐音梗！ 文/王珉 作者简介：王珉，中国电影评论学会会员，全国部分报刊和新媒体的影评专栏作家，厦门广电集团记者，厦门电影家协会会员，厦门影视剧本学会会员。 导语 《李茂扮太子》主打传统单一类型的喜剧难能可贵，这样一部传统喜剧电影，属于“女强男弱”的设定。另外，互换身份和性别反转，充满戏剧，也让人频频笑场。但这样的古装喜剧，却是综艺烂梗大合集剧场版，为了搞笑而搞笑，人物行为经不起逻辑推敲，人物刻画也潦草敷衍。",
+        "由高可执导，马丽、常远、艾伦、魏翔、王成思等一批喜剧演员主演的电影《李茂换太子》于今日发布预告，定档12月31日跨年档。这也是演员常远继去年自编自导的作品《温暖的抱抱》后，再次冲击跨年档。 电影《李茂换太子》讲述了一个互换身份的故事。富家女杨家珍与小捕快李茂成",
+        "登录  还没账号？立即注册  点击头像快速登录  由高可执导并编剧的开年爆笑喜剧电影《李茂扮太子》今日曝光终极预告，正式宣布开启预售。预告中，常远饰演的捕快李茂，怀揣着“改戏楼、请太子、当县令”这一听起来不可思议的美梦，机缘巧合下与太子互换人生。原以为是天降好运，殊不知从一开始就踏入了尚书的惊天阴谋......",
+        "有时候也避无可避，杨家珍对敌时被摔到一旁，李茂和太子同时冲过去，异口同声：“你没事吧。”家珍也不禁犯迷糊，直呼“没事，就是看你重影了”，分分钟把喜剧值拉满。 近几年，古代喜剧片在市面上非常少见，上一部同类型院线还是2018年的《捉妖记2》，真是久违了。 古代喜剧往往是架空历史的，这样能给作品更多的发挥空间，但同时，把握不好也很容易让内容变得悬浮，这点上目前来看，《李茂扮太子》做得还不错，笑点、台词接地气，更容易让人有代入感。 比如李茂与宋小宝饰演的包工头之间那场对手戏。",
+        "因此，李茂心里也有了欲望：想要拥有更多，可以给自己争回点脸面。  另一边的太子，恰恰相反。生在皇家，含着金钥匙的他从小什么都有，可唯一没有的是自由，这也是他心里最渴望的东西。 从某方面来说，李茂和太子互相羡慕、渴望着对方的生活，就像围城，城里的人想出去，城外的人想进来。 而因为“撞脸”，他们实现了交换人生，有机会去感受他们羡慕的对方的生活。 “互换身份”是喜剧片中的经典设定，天然自带黑色幽默属性，屡试不爽。",
+        "文/小星 每年贺岁档都是一场大混战，各种类型片集中上映。今年，战火依旧猛烈。 不过话说回来，经历一整年的辛劳，每逢贺岁档，相信不少人都和我一样，还是最期待喜剧，想整点高兴的，暂别烦恼，笑笑闹闹地跨入新年。 今年，《李茂扮太子》作为贺岁档唯一的国产纯喜剧，本身就有绝对优势。 那它能不能在贺岁片争夺战中，脱颖而出呢？   久违的古装喜剧，底子够硬 从目前已释出的物料看，《李茂扮太子》给我的一个感觉是：新奇。",
+        "尽管，“伪开心麻花系”喜剧不能代表开心麻花的水准，但是高度相似的主演阵容和母题大体类似的主题，都让开心麻花数次“背锅”。《李茂扮太子》的主演阵容里有马丽、常远、艾伦等麻花“熟脸”，也有魏翔、王成思这样的麻花“配角”，所以被观众天然的划分为“麻花喜剧”。 但实际上这部电影和开心麻花没有丝毫联系，在出品方和联合出品方当中都找不到开心麻花的踪迹。",
+        "原以为是天降好运，殊不知从一开始就踏入了尚书的惊天阴谋……电影由马丽、常远、艾伦、魏翔、王成思、杜晓宇、陈冰、冯秦川、李海银、黄才伦、张一鸣、宋小宝、于洋、克拉拉、张子栋、刘冠麟主演。  在昨日官宣的预售海报中，马丽、常远、艾伦等喜剧大咖腾云而起，新年启航向快乐进发。市场上已经很久没有出现过纯粹的喜剧类型影片，《李茂扮太子》作为2022年第一部电影，以轻松解压的方式，为大家带来新年的第一声大笑。",
+        "在这个元旦档，跟着李茂体验一把奇妙人生互换，又感悟一次人间烟火的满足感。 这张票，值得。 愿李茂把开年的幸运带给你我。  爆笑喜剧《李茂换太子》定档  十一长假还没来，今年圣诞+元旦的跨年档就已经安排上了，喜剧电影《李茂换太子》正式定档12月31日，并发布定档预告。 讲述富家女杨家珍与小捕快李茂成婚，虽夫妻恩爱，但始终得不到家珍父母的认可。影片讲述小捕快李茂意外发现自己与当朝太子长相相同，二人因各自利益进行身",
+        "Jan 6, 2022 ... 在上映前，《李茂扮太子》还是有着不小的期待。原因在于主打“喜剧”类型，让其在整个档期里有着一定的优势。在整个市场低迷表现下。“喜剧终归来说是香 ...",
+        "Dec 20, 2021 ... 市场上已经很久没有出现过纯粹的喜剧类型影片，《李茂扮太子》作为2022年第一部电影，以轻松解压的方式，为大家带来新年的第一声大笑。“开年哈哈笑， ...",
+        "《李茂扮太子》是由高可、杨晓明执导，马丽、常远、艾伦、魏翔、王成思、杜晓宇、陈冰、冯秦川、李海银、克拉拉、刘冠麟等主演的喜剧电影，于2022年1月1日在中国大陆 ...",
+        "Feb 2, 2022 ... 近年来，贺岁档票房一年比一年高，爆款都是喜剧、爱情、奇幻、悬疑、动画、动作等各种元素的大杂烩。但此次《李茂扮太子》主打传统单一类型的喜剧难能可贵 ...",
+        "在昨日官宣的预售海报中，马丽、常远、艾伦等喜剧大咖腾云而起，新年启航向快乐进发。市场上已经很久没有出现过纯粹的喜剧类型影片，《李茂扮太子》作为2022年第一部电影， ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_017_李茂扮太子_是什么类型的电影.md"
+      ]
+    },
+    {
+      "id": 19,
+      "rgb_source_id": 18,
+      "question": "2021赛季中超冠军",
+      "expected_output": "山东泰山",
+      "ground_truth": "山东泰山",
+      "contexts": [
+        "第10轮-第19轮，山东泰山豪取10连胜，提前三轮锁定冠军，历史上第5次获得中国顶级联赛冠军，也是各项赛事队史第13冠。\r  \r \t冠军山东泰山、亚军上海海港、季军广州队同时获得下赛季亚冠正赛资格，升班马长春亚泰最终收获第四名，斩获亚冠附加赛资格，国安、深圳、广州城、河北分列5-8位。\r  \r \t保级组方面，大连人、青岛最终排名倒数前两位，进入升降级附加赛两回合的较量，其中大连人vs成都蓉城，青岛队vs浙江，两组对决的胜者将征战下赛季中超联赛。",
+        "2021赛季中国足球协会超级联赛是自2004年中超联赛创立以来，由中国足球协会主办的第18届中国足球 ... 山东泰山足球俱乐部总积分51分夺得2021赛季中国足球超级联赛冠军。",
+        "May 18, 2023 ... 山东泰山队2021中超冠军，也有可能被剥夺. 随着孙准浩因受贿被拘留的消息实锤，这意味着孙准浩几乎板上钉钉参与假球了. 那么孙准浩这两个赛季在山东 ...",
+        "Jan 5, 2022 ... 2021赛季中超冠军：山东泰山. 亚冠正赛资格：山东泰山、上海海港、广州队. 亚冠附加赛资格：长春亚泰. 升降级附加赛：大连人、青岛队.",
+        "中超联赛专区 \r \t随着争冠组最后一轮4场比赛在1月4日战罢，2021中超联赛也落下大幕。已提前锁定冠军的山东泰山第二阶段保持不败，上海海港和广州队在已锁定亚冠资格的情况下展开对决，更多地展示出是未来的希望。长春亚泰作为升班马能够跻身亚冠资格赛，让人刮目相看。\r      2021赛季中超冠军：山东泰山   亚冠正赛资格：山东泰山、上海海港、广州队   亚冠附加赛资格：长春亚泰   升降级附加赛：大连人、青岛队  \r \t山东22轮取得15胜6平1负，积51分领先亚军海港6分。",
+        "当初申思、祁宏、江津、李明是上海中远队的，但被剥夺冠军的则是上海申花队 如果上面的这些猜测是真的，依照上次的标准，2022赛季武汉三镇队的冠军奖杯，估计大概率得飞了；而2021赛季山东泰山队的冠军奖杯，估计也有可能飞了！",
+        "山东泰山队2021中超冠军，也有可能被剥夺 随着孙准浩因受贿被拘留的消息实锤，这意味着孙准浩几乎板上钉钉参与假球了 那么孙准浩这两个赛季在山东泰山队，到底是收了哪一方的钱，貌似成了左右2021和2022赛季中超冠军的关键所在 孙准浩踢假球是跟谁踢的，受益方是谁？现在看受益方大概率不会是山东泰山俱乐部，很大可能是山东泰山队的争冠对手，或者是保级球队，亦或者是幕后庄家 从理论上讲，孙准浩受贿无非来源于五个方向： ①金敬道方向。",
+        "由内容质量、互动评论、分享传播等多维度分值决定，勋章级别越高(                                                  )，代表其在平台内的综合表现越好。                      原标题：武汉三镇队2022中超冠军和山东泰山队2021中超冠军，被剥夺的可能性有多大？ 悬念迭起！武汉三镇队2022中超冠军，有可能被剥夺！"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_018_2021赛季中超冠军.md"
+      ]
+    },
+    {
+      "id": 20,
+      "rgb_source_id": 19,
+      "question": "2022年1月5日全国新增确诊病例数？",
+      "expected_output": "189",
+      "ground_truth": "189",
+      "contexts": [
+        "1月5日0—24时，31个省（自治区、直辖市）和新疆生产建设兵团报告新增确诊病例189例。其中境外输入病例57例（上海20例，广东10例，浙江7例，福建6例，天津4例，广西2例，四川2例，云南2例，吉林1例，江苏1例，山东1例，河南1例），含6例由无症状感染者转为确诊病例（浙江3例，四川2例，河南1例）；本土病例132例（河南64例，其中许昌市50例、郑州市5例、洛阳市4例、周口市3例、商丘市1例、固始县1例；陕西63例，均在西安市；浙江5例，均在宁波市），含30例由无症状感染者转为确诊病例（均在河南）。无新增死亡病例。新增疑似病例2例，均为境外输入病例（均在上海）",
+        "据国家卫健委网站消息,截至1月5日24时新型冠状病毒肺炎疫情最新情况公布。 1月5日0—24时,31个省(自治区、直辖市)和新疆生产建设兵团报告新增确诊病例189例。",
+        "1月5日0—24时，31个省（自治区、直辖市）和新疆生产建设兵团报告新增确诊病例189例。",
+        "2022-01-06来源:国家卫生健康委 2022年1月5日0—24时,31个省(自治区、直辖市)和新疆生产建设兵团报告新增确诊病例189例。",
+        "Jan 6, 2022 ... 1月5日0—24时，31个省（自治区、直辖市）和新疆生产建设兵团报告新增确诊病例189例。其中境外输入病例57例（上海20例，广东10例，浙江7例，福建6例， ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_019_2022年1月5日全国新增确诊病例数.md"
+      ]
+    },
+    {
+      "id": 21,
+      "rgb_source_id": 20,
+      "question": "我国2021年人口出生率",
+      "expected_output": "7.52‰",
+      "ground_truth": "7.52‰",
+      "contexts": [
+        "2021年末，全国人口为141260万人，比2020年末增加48万人；全年出生人口1062万人，比2020年减少140万人；死亡人口1014万人，比2020年增加16万人。人口出生率为7.52‰，比2020年下降1.00个千分点；人口死亡率为7.18‰，微升0.11个千分点。 　　2021年人口自然增长率为0.34‰，比2020年下降1.11个千分点。人口增长持续放缓是由于出生人口继续减少，这主要受两方面因素影响。一是育龄妇女人数持续减少。2021年15—49岁育龄妇女比2020年减少约500万人，其中21—35岁育龄妇女减少约300万人。二是生育水平继续下降。",
+        "在疫情、育龄妇女减少等多因素的影响下，我国出生人口数量和出生率继续走低。 1月17日，在国务院新闻办举行的2021年国民经济运行情况新闻发布会上，国家统计局局长宁吉喆表示，2021年年末全国人口（包括31个省、自治区、直辖市和现役军人的人口，不包括居住在31个省、自治区、直辖市的港澳台居民和外籍人员）141260万人，比上年末增加48万人。全年出生人口1062万人，人口出生率为7.52‰；死亡人口1014万人，人口死亡率为7.18‰；人口自然增长率为0.34‰。 1062万的出生人口，创下了近年来新低，比2016年下降了43.6%。",
+        "图像来源，Getty Images 中国国家统计局本周一（1月17日）公布，2021年中国出生人口1062万人，人口出生率进一步降至7.52‰。 减去死亡人口数后，中国总人口仅比上年末增加48万人，人口自然增长率低至0.34‰。 过去几年，中国关于“老龄化”、“少子化”的讨论甚嚣尘上，“人口焦虑”不断累积。但刚刚公布的去年人口数据，还是让不少专家表示出乎意料。 有分析指，如何应对人口“零增长”甚至“负增长”时代的快速提前到来，已经成为中国无法回避的难题。 图像来源，Getty Images 虽然中国人口尚未出现负增长，但净增人口近几年断崖式下跌。 2020年中国出生人口为多少？",
+        "Discover Thomson Reuters By Reuters Staff 1 Min Read 路透北京1月17日 - 中国国家统计局周一公布，2021年末大陆31个省区市总人口为14.126亿人，比上年末增加48万人；全年出生人口1,062万人，人口出生率进一步降至7.52‰。 “中国统计年鉴2021”显示，2020年中国全国人口出生率为8.52‰，为首次跌破10‰。 统计局新闻稿 here并显示，2021年末，从年龄构成看，16-59岁的劳动年龄人口8.8222亿人，占全国人口的比重为62.5%；60岁及以上人口占全国人口的18.9%。 2021年末城镇人口占全国人口比重（城镇化率）为64.72%，比上年末提高0.83个百分点。 去年的中国第七次全国人口普查数据显示，2020年中国总人口为14.",
+        "Apr 1, 2022 ... 根据国家统计局数据，2021年末，全国人口141260万人，比上年末增加48万人。全年出生人口1062万人，出生率为7.52‰；自然增长率为0.34‰。 全国而言，去年 ...",
+        "Jan 16, 2022 ... 中国国家统计局周一公布，2021年末大陆31个省区市总人口为14.126亿人，比上年末增加48万人；全年出生人口1062万人，人口出生率进一步降至7.52‰。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_020_我国2021年人口出生率.md"
+      ]
+    },
+    {
+      "id": 22,
+      "rgb_source_id": 21,
+      "question": "塔里木油田2021年的油气产量是多少？",
+      "expected_output": "3182万吨",
+      "ground_truth": "3182万吨",
+      "contexts": [
+        "2021年，塔里木油田天然气日产量突破1亿立方米，石油液体日产量冲上2万吨，油气产量达到3182万吨的历史新高，连续5年实现超百万吨增长，实现了“十四五”高质量开局。 　　同时，塔里木油田保民生、保公用、保重点，2021年向西气东输供气247.8亿立方米，向南疆五地州供气超50亿立方米。 （信息来源：中国石油）",
+        "其中，完成国内原油产量3000万吨，实现高水平、高质量、高效益稳产；生产天然气50.2亿立方米，连续11年稳定增长。塔里木油田2021年油气产量当量达到3182万吨历史新高，连续5年实现超百万吨增长。去年6月，塔里木油田在富满地区发现10亿吨级超深大油气区，成为近10年塔里木盆地石油勘探最大的发现。 　　2021年中国石化油气当量产量约479.67百万桶油当量，其中胜利油田勘探开发成绩尤为亮眼。",
+        "Mar 14, 2022 ... 特别是在去冬今春冬供期间，塔里木油田天然气日产量连攀新高，保持在1亿 ... 亿立方米大气区。2021年，油气产量当量达到3182万吨，其中天然气产量319 ...",
+        "Jan 25, 2022 ... 2021年，塔里木油田天然气日产量突破1亿立方米，石油液体日产量冲上2万吨，油气产量达到3182万吨的历史新高，连续5年实现超百万吨增长，实现了“十四 ...",
+        "Oct 26, 2022 ... 2021年，油田油气产量达到3182万吨油当量。图为塔里木油田一处井区。 谭辉摄（影像中国）. 数据来源： ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_021_塔里木油田2021年的油气产量是多少.md"
+      ]
+    },
+    {
+      "id": 23,
+      "rgb_source_id": 22,
+      "question": "2022年冬奥会开幕式总导演是谁",
+      "expected_output": "张艺谋",
+      "ground_truth": "张艺谋",
+      "contexts": [
+        "2023-08-07 16:24 来源：北京本地宝管理频道   2023-08-07 13:23 来源：北京本地宝管理频道   2023-08-07 16:44 来源：海淀体育  【导语】：2022年1月7日晚，央视《新闻联播》消息，张艺谋担任2022年冬奥会开闭幕式总导演。 　　2022北京冬奥会开幕式总导演是谁? 　　——张艺谋 　　【张艺谋简介】 　　中国电影“第五代导演”代表人物，早期执导的《红高粱》、《大红灯笼高高挂》、《秋菊打官司》等电影斩获多个国内外奖项。",
+        "【导语】：2022年1月7日晚，央视《新闻联播》消息，张艺谋担任2022年冬奥会开闭幕式总导演。 　　2022北京冬奥会开幕式总导演是谁? 　　——张艺谋 　　【张艺谋简介】 　　中国电影“第五代导演”代表人物，早期执导的《红高粱》、《大红灯笼高高挂》、《秋菊打官司》等电影斩获多个国内外奖项。 　　张艺谋的奥运履历： 　　张艺谋曾是2008年北京奥运会开闭幕式总导演，2014年担任北京申办2022年冬奥会主宣传片总导演，担任2018年平昌冬奥会闭幕式“北京8分钟”节目总导演。",
+        "开幕式细节严格保密，这点和以往任何一届奥运会开幕式一样。谜底到开幕式时才会揭晓。 因考虑到寒冷天气和疫情原因，开幕式预计将持续100分钟左右。 将有3000名演员参与开幕式演出，其中95%为青少年。 中国女子钢架雪车运动员赵丹和男子速度滑冰运动员、2018年平昌冬奥会铜牌得主高亭宇将担任中国代表团旗手。 三次获得奥斯卡提名的中国著名导演张艺谋将出任北京冬奥会开幕式总导演。他也曾担任过2008年北京奥运会的开幕式和闭幕式总导演。",
+        "原标题：[共赴冬奥之约]北京冬奥会开幕式总导演张艺谋：实现多个“前所未有” “点火”创意最大胆  　　央视网消息：北京2022年冬奥会开幕式总导演张艺谋在接受记者采访时表示，这次冬奥会开幕式将在核心环节和规定动作上大胆创意，实现多个“前所未有”，尤其是点火仪式，更是创意的重中之重。 责任编辑：张玉  举报邮箱：jubao@vip.sina.",
+        "张艺谋的奥运履历： 　　张艺谋曾是2008年北京奥运会开闭幕式总导演，2014年担任北京申办2022年冬奥会主宣传片总导演，担任2018年平昌冬奥会闭幕式“北京8分钟”节目总导演。 　　2022北京冬奥会开幕式节目设计： 　　开幕式的节目设计突出体现人类命运共同体和中国推动三亿人参与冰雪运动，以及全世界人民共享冬奥盛会的理念和文化。而由于开幕式当天正好是中国传统二十四节气——立春，这一重要元素在节目中也将有充分体现。 Copyright © 2006-\r         2023 All rights reserved. 本地宝 |粤ICP备17055554号 违法和不良信息举报电话：",
+        "距离2022北京冬奥会开幕还有不到一个月的时间。张艺谋担任北京2022年冬奥会和冬残奥会的开闭幕式的总导演。在“简约、安全、精彩”的办赛要求下，这次冬奥会的开幕式会有什么样的呈现？从2008年到2022年，很多人都参与过两次奥运会，所以今天的节目里既有新面孔，也有老朋友，他们身份虽不相同，但都有着浓浓的奥运情结。今天我们将跟随一位“双奥记者”的镜头，走进鸟巢，走近开幕式的团队。  在成功举办了2008年夏季奥运会之后，随着申冬奥的成功，北京成为了双奥之城。",
+        "央视网消息（焦点访谈）：距离2022北京冬奥会开幕还有不到一个月的时间。张艺谋担任这次北京2022年冬奥会和冬残奥会的开闭幕式的总导演。在“简约、安全、精彩”的办赛要求下，这次冬奥会的开幕式会有什么样的呈现？从2008年到2022年，很多人都参与过两次奥运会，所以今天的节目里既有新面孔，也有老朋友，他们身份虽不相同，但都有着浓浓的奥运情结。今天我们将跟随一位“双奥记者”的镜头，走进鸟巢，走近开幕式的团队。  \t　　在成功举办了2008年夏季奥运会之后，随着申冬奥的成功，北京成为了“双奥之城”。",
+        "2022年冬奥会和冬残奥会北京市运行保障指挥部开闭幕式工作组组长、北京市政协副主席、党组副书记王宁说：“冬奥会开幕式是从2021年10月份开始进入到训练和联排阶段，到今天已经进行了几次联排，再过几天就要进入到彩排阶段。艺术家和演员都花费了很大精力，每个细节都认真进行打磨。” 王宁是北京冬奥会开闭幕式工作组的组长，2008年他担任北京奥运会开闭幕式运营中心主任，是一位名副其实的“双奥人”。和他再度合作的张艺谋，继担任北京2008年奥运会开幕式的总导演之后，再次担任北京2022年冬奥会开幕式的总导演。",
+        "2022年冬奥会和冬残奥会北京市运行保障指挥部开闭幕式工作组组长、北京市政协副主席、党组副书记王宁说：“冬奥会开幕式是从2021年10月份开始进入到训练和联排阶段，到今天已经进行了几次联排，再过几天就要进入到彩排阶段。艺术家和演员都花费了很大精力，每个细节都认真进行打磨。”  \t　　王宁是北京冬奥会开闭幕式工作组的组长，2008年他担任北京奥运会开闭幕式运营中心主任，是一位名副其实的“双奥人”。和他再度合作的张艺谋，继担任北京2008年奥运会开幕式的总导演之后，再次担任北京2022年冬奥会开幕式的总导演。",
+        "王宁说：“这次冬奥会要展现几个主题，第一是要展现中国对于世界和平的追求和向往；第二是要展现奥运会的理念和精神，更快、更高、更强和更团结；第三是要展现冬奥会的口号‘一起向未来’的目标和心情。这次冬奥会有这次冬奥会的特点，展现了自然之美、人文之美和运动之美。”  结合国际奥委会的建议，冬奥会的开幕式一般选择在露天场馆举行。考虑到气温、防疫等因素，这次冬奥会的开幕式从时长和结构上都做了相应调整。 张艺谋说：“时长要比夏奥会短，夏奥会三个半将近四个小时，冬天天气比较寒冷，观众都在室外。",
+        "而他也将成为“双奥导演”。    \t　　北京2022年冬奥会和冬残奥会开闭幕式总导演张艺谋说：“只有祖国的强大实力，才能在这么短的时间内接了这两个奥运会，历史上从来没有过。我很幸运被又一次任命为总导演，很兴奋，觉得又一次可以为国出力，又一次可以做这样具有挑战性的工作。我自己很喜欢这种挑战性的工作，但是除了兴奋之外，觉得责任很大，压力很大。”  \t　　从2008年到2022年，13年后的今天，世界处于百年未有之大变局，中国也正处于实现中华民族伟大复兴的关键时期。",
+        "“开幕式上，小雪花凝聚成一朵大雪花；闭幕式上，大雪花幻化为人们心中的圣火。”冬奥会开闭幕式总导演张艺谋感慨道，一朵雪花传递人类共同的情感，“一起向未来”的口号得以完美诠释。 “从参赛国家和地区的引导牌、演员服装，到和平鸽表演、主题歌演唱，再到主火炬点燃和熄灭，代表各个国家和地区的不同的雪花汇聚五环旗下，这不仅是中国式浪漫，更是‘世界大同、天下一家’携手弘扬奥林匹克精神的真实写照。”张艺谋说。",
+        "而他也将成为“双奥导演”。  北京2022年冬奥会和冬残奥会开闭幕式总导演张艺谋说：“只有祖国的强大，有实力，才能在这么短的时间内接了这两个奥运会，历史上从来没有过。我很幸运被又一次任命为总导演，很兴奋，觉得又一次可以为国出力，又一次可以做这样具有挑战性的工作。我自己很喜欢这种挑战性的工作，但是除了兴奋之外，觉得责任很大，压力很大。”  从2008年到2022年，13年后的今天，世界处于百年未有之大变局，中国也正处于实现中华民族伟大复兴的关键时期。",
+        "总导演张艺谋接受新华社采访时表示，鉴于冬天天气寒冷和疫情防控因素，开幕式时长不到100分钟，而 ... 《构建一朵雪花》是2022年北京冬奥会开幕式上唯一一个舞蹈表演。",
+        "Feb 4, 2022 ... 央视网消息：北京2022年冬奥会开幕式总导演张艺谋在接受记者采访时表示，这次冬奥会开幕式将在核心环节和规定动作上大胆创意，实现多个“前所未有”，尤其是 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_022_2022年冬奥会开幕式总导演是谁.md"
+      ]
+    },
+    {
+      "id": 24,
+      "rgb_source_id": 23,
+      "question": "中国第三艘航母名字",
+      "expected_output": "福建",
+      "ground_truth": "福建",
+      "contexts": [
+        "一名军迷认为航母的命名应该是纪念近代以来中国的几次海上战争。第一艘命名为“辽宁舰”是纪念甲午旅大战争，那么第二艘自然是纪念甲午威海卫战争。当时有很多人猜对了，既然是威海卫，那自然是“山东舰”了。  那么，到如今的第三艘航母，命名线索基本被摆在明面上了，任何稍微懂点历史的人都能猜出来第三艘航母将命名为“福建舰”，来纪念和铭记中法马尾海战。以上提及的战争是中国近代史上最著名的三大海战。",
+        "第一艘命名前，大家都胡猜 第二艘命名前，有人能蒙对 那么第三艘，基本是摆在明面了，任何稍微懂点历史的也该猜出了。 第一艘叫“辽宁”（铭记甲午旅大战争） 第二艘叫“山东”（铭记甲午威海卫战争） 第三艘只能叫“福建”（铭记中法马尾海战） 以上是中国近代史上的三大海战。 第四艘可能叫“广东”（铭记鸦片战争） 第五艘可能叫“江苏”（铭记南京条约） 在哪里跌倒，就要在哪里站起来。 山东舰，祭奠甲午海战，铭记中华半岛地缘安全全面沦陷，百年岛链锁华伊始。",
+        "用微信扫码二维码 分享至好友和朋友圈 根据他的说法，第四艘航母应该叫“广东舰”，第五艘叫“江苏舰”。2022年6月17日上午，我国自主建造的第3艘航空母舰建造完毕，在中国船舶集团有限公司江南造船厂举行命名仪式。  11时，在全体人员的见证下，航空母舰伴随着隆隆军威移出船坞。随后经中央军委批准，我国第3艘航空母舰被命名为“中国人民解放军福建舰”， 舷号为“18”。就在中国人都为此自豪高兴的同时，也有人不清楚为什么第三艘航空母舰起名为“福建舰”？舰艇的命名有啥讲究？",
+        "船体模块于2020年5月从制造设施移至中转区，並于2020年7月移至乾船塢。到2020年9月上旬，几乎所有的龙骨和船体模块已移至船坞中。基于卫星和航空摄影的测量表明，该舰的水线长度约为300米，最大水线宽度约为40米，排水量超过85,000吨[5]。  2022年6月17日上午，中國第三艘航空母艦下水命名儀式在中國船舶集團有限公司江南造船厂舉行[23]。中共中央政治局委员、中央军委副主席许其亮出席了仪式[24]。经中央军委批准命名为“中国人民解放军海军福建舰”，舷号为18[23]。",
+        "船体模块于2020年5月从制造设施移至中转区，并于2020年7月移至干船坞。到2020年9月上旬，几乎所有的龙骨和船体模块已移至船坞中。基于卫星和航空摄影的测量表明，该舰的水线长度约为300米，最大水线宽度约为40米，排水量超过85,000吨[5]。  2022年6月17日上午，中国第三艘航空母舰下水命名仪式在中国船舶集团有限公司江南造船厂举行[23]。中共中央政治局委员、中央军委副主席许其亮出席了仪式[24]。经中央军委批准命名为“中国人民解放军海军福建舰”，舷号为18[23]。",
+        "11时许，下水命名仪式开始，全场唱中华人民共和国国歌，升五星红旗；仪式上，向接舰部队主官授予命名证书，军地领导共同为中国第三艘航空母舰下水剪彩；随后掷瓶礼，航空母舰停靠码头；下水命名仪式在中国人民解放军军歌声中结束[23]。该舰下水后，即按计划开展系泊试验[23][25]，此后福建舰还将按计划开展航行试验。[23]  2023年3月13日，央视公开画面显示福建号水线下排烟口被熏黑，专家认为福建号“已经进行了辅助动力的测试，系泊试验进展顺利，福建舰海试的日子指日可待”。[26]",
+        "11時許，下水命名儀式開始，全場唱中華人民共和國國歌，升五星紅旗；儀式上，向接艦部隊主官授予命名證書，軍地領導共同為中國第三艘航空母艦下水剪綵；隨後擲瓶禮，航空母艦停靠碼頭；下水命名儀式在中國人民解放軍軍歌聲中結束[23]。该舰下水后，即按计划开展系泊试验[23][25]，此后福建舰还将按计划开展航行试验。[23]  2023年3月13日，央视公开画面显示福建号水线下排烟口被熏黑，专家认为福建号“已经进行了辅助动力的测试，系泊试验进展顺利，福建舰海试的日子指日可待”。",
+        "★航母的建造绝非一件容易的事，谁拥有航母谁就拥有了海上的话语权，福建舰的下水代表着我国的军  我国完全自主设计建造的首艘弹射型航空母舰下水命名  6月17日上午11时许，我国第三艘航空母舰下水命名仪式在上海江南造船厂举行。经中.央军.委批准，将第三艘航空母舰命名为“中.国人民解.放军海军福建舰”，舷号为“18”。.  福建舰是我国完全自主设计建造的首艘弹射型航空母舰，采用平直通长飞行甲板，配置电磁弹射和  清平乐·闻中国航母入列贺词",
+        "中国航母—龙之舰养成记  它号称海上巨无霸，它的出现改变了海战平面作战的模式，百年过后为何各国还在争相发展它，它有何过人之处？百年之后的中国才发展它，我们还能否赶上世界的主流？它是航空母舰，让我们一起走进中国航母。  我国第三艘航空母舰下水 命名“福建舰”  图为下水命名仪式现场。新华社记者 李刚 摄  又一国产航母问世  ★2022-06-17日，我国第三艘航母下水命名仪式在中国船舶集团有限公司江南造船厂举行。仪式上，向接舰部队主官授予命名证书，军地领导共同为我国第三艘航空母舰下水剪彩。",
+        "经中央军委批准，我国第三艘航空母舰命名为“中国人民解放军海军福建舰”，舷号为“18”。",
+        "中国第三艘航母“福建舰”下水. 福建舰采用平直通长飞行甲板，配置电磁弹射和阻拦装置，满载排水量8万余吨。 重要进展; 福建舰来了; 为何用电磁弹射？"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_023_中国第三艘航母名字.md"
+      ]
+    },
+    {
+      "id": 25,
+      "rgb_source_id": 24,
+      "question": "河南2021年的粮食总产量是多少？",
+      "expected_output": "1308.84亿斤/6544.2万吨",
+      "ground_truth": "1308.84亿斤/6544.2万吨",
+      "contexts": [
+        "12月10日，记者获悉，河南正式公布2021年全年粮食总产量。国家统计局河南调查总队日前发布数据，经对全省夏、秋粮产量抽样调查样本实割实测和播种面积遥感监测并报国家统计局核准：2021年，河南粮食总产量为1308.84亿斤，比上年减少56.32亿斤，减产4.1%。其中，夏粮总产量为760.64亿斤，比上年增产9.89亿斤，增长1.3%；秋粮总产量为548.20亿斤，比上年减少66.21亿斤，减产10.8%。 　　据了解，今年粮食播种面积稳中有增。2021年，各地认真落实粮食安全责任制，按照党政同责要求，千方百计完成粮食面积目标任务。",
+        "新华社郑州12月11日电（记者 孙清清）国家统计局河南调查总队发布数据，经对全省夏、秋粮产量抽样调查样本实割实测和播种面积遥感监测并报国家统计局核准：2021年，河南粮食总产量为1308.84亿斤，比上年减少56.32亿斤，但在全国仍位居第二位。其中，夏粮总产量为760.64亿斤，比上年增产9.89亿斤；秋粮总产量为548.20亿斤，比上年减少66.21亿斤。 数据显示，2021年，河南粮食播种面积为16158.46万亩,比上年增加50.27万亩，而全省粮食总产量减少主要因秋粮减产所致。",
+        "Jul 26, 2022 ... 沿着习近平总书记指引的方向，河南抓住促进中部地区崛起战略机遇， ... 数据显示，2021年河南粮食总产量为1308.84亿斤，连续多年稳定在1300亿斤以上。",
+        "12月10日，记者获悉，河南正式公布2021年全年粮食总产量。国家统计局河南调查总队日前发布数据，经对全省夏、秋粮产量抽样调查样本实割实测和播种面积遥感监测并报国家统计局核准：2021年，河南粮食总产量为1308.84亿斤，比上年减少56.32亿斤，减产4.1%。其中，夏粮总产量为760.64亿斤，比上年增产9.89亿斤，增长1.3%；秋粮总产量为548.20亿斤，比上年减少66.21亿斤，减产10.8%。 　　据了解，今年粮食播种面积稳中有增。2021年，各地认真落实粮食安全责任制，按照党政同责要求，千方百计完成粮食面积目标任务。",
+        "2021年，河南粮食种植面积达16158.46万亩，粮食作物产量1308.84亿斤，与2012年相比，产量增加129.16亿斤。 藏粮于地，藏粮于技。在周口市商水县的高标准农田高效节水灌溉示范区里，高科技让田间管理更高效。除了常见的成片连方、沟渠相连，这里还配套了统一联网的智能灌溉、水肥一体化、病虫害监测等科技设施，在智能中枢的协调指挥下，各设施既能独立高效运作，又能协同配合，为农民提供实时数据。 “过去都是雇人浇地，一人一天最多浇10亩。现在电脑控制，动动手指设定好程序，一天就能浇完所有地。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_024_河南2021年的粮食总产量是多少.md"
+      ]
+    },
+    {
+      "id": 26,
+      "rgb_source_id": 25,
+      "question": "苹果M1芯片首席设计师去了哪家公司",
+      "expected_output": "英特尔",
+      "ground_truth": "英特尔",
+      "contexts": [
+        "全球PC芯片巨头英特尔竟挖走苹果M1芯片首席设计师，到底想干什么？  近日，苹果Mac(前)系统架构总监宣布，将离开苹果赴任英特尔，担任英特尔院士(Intel Fellow)和设计工程部门的技术总监(CTO)，主要负责所有英特尔客户端系统单晶片(SoC)架构设计。 不仅仅是出现了挖人的动作，英特尔还在1月7日当周发布第12代酷睿移动处理器，一连推出了28款型号的12代酷睿芯片。英特尔还将其中的酷睿i9-12900HK称为“世界最快的移动处理器”。 有业内分析师表示，在过去的两年间，苹果芯片团队陆续有一些工程师出走，后续影响尚未可知。",
+        "扫码打开虎嗅APP 本文来自微信公众号：AI前线（ID：ai-front），作者：刘燕，原文标题：《苹果“换芯”之路再起波折，M1芯片功臣被英特尔挖走了》，题图来自：视觉中国  苹果M1芯片首席设计师被老东家英特尔挖走了。  苹果 M1 芯片功臣何许人也？  1 月 6 日，苹果 M1 芯片设计总监 Jeff Wilcox 在领英上宣布，他将离开苹果，前往英特尔担任新职位。他将担任英特尔研究员和设计工程组的首席技术官的领导职位，专注于客户端 SoC 架构。Jeff Wilson 说，他计划与英特尔一起打造开创性的 SoC。  Jeff Wilcox 曾是苹果桌面和笔记本电脑产品开发的关键角色。",
+        "1 月 7 日消息，根据钜亨网报道，随着苹果 Mac 计算机自英特尔转向自家芯片的 2 年过渡期即将结束，英特尔挖角苹果 M1 首席芯片设计师。 苹果 Mac (前) 系统架构总监 Jeff Wilcox 周四 (6 日) 在其 LinkedIn 页面上宣布他将离开苹果赴英特尔就职，担任英特尔院士 (Intel Fellow) 和设计工程部门的技术总监 (CTO)，主要负责所有英特尔客户端系统单晶片 (SoC) 架构设计。  Wilcox 在过去 8 年担任苹果 Mac 系统架构总监，负责监督 Mac 系统架构、讯号完整性和电源完整性，领导苹果转向 Apple Silicon 的过渡期。",
+        "机器之心报道 编辑：杜伟、泽南 从苹果离职后，Jeff Wilcox 成为了英特尔 Fellow，以及设计工程事业群的 CTO。 苹果的 M1 芯片实现了超越英特尔酷睿的能耗比之后，英特尔把首席设计师挖了回来。 2020 年 11 月，苹果发布了首款专为 Mac 打造的芯片 M1；去年 10 月，苹果又接连推出了 M1 Pro 和 M1 Max，首次将片上系统（SoC）架构引入 Pro 系统，在内存带宽、功效、容量等方面实现新的突破。 在这一系列过程中，Mac 系统架构团队负责人 Jeff Wilcox 功不可没。 图源：appleinsider  他在苹果全权负责 Mac 系统的所有架构设计、信号完整性和电源完整性。",
+        "扫描二维码随时随地手机看文章  \t1月7日消息，苹果M1芯片设计总监杰夫·威尔科克斯(Jeff  Wilcox)本周宣布，他已离开苹果，前往英特尔担任新职务。故事的开头，还得从2005年英特尔和苹果的芯片合作说起。当时，还是全球芯片霸主的英特尔，在苹果的力邀下，成为其芯片供应商，一合作就是15年(截至2020年11月)。听起来是个和睦相处的故事，但是事实却是，英特尔超级不争气，一直没按既定的时间表开发出7nm芯片，到现在制程还停留在10nm，也因此换来了合作商(苹果)的无限嫌弃。",
+        "看来苹果在开始新的一年就要啜泣了，因为杰夫威尔考克斯（Jeff Wilcox）宣布已辞去Mac系统架构总监一职，并加入到英特尔（Intel）。 这也是苹果在面临离职潮后，再次有关键员工离职加入竞争对手公司，而威尔考克斯的离开也使他们失去“明星芯片”设计师和Apple Silicon团队的领导人之一。 可能许多人都不懂威尔考克斯，但对于熟悉苹果细节的人而言，他曾带领该公司的Mac 从 x86 过渡到使用 Apple M1 芯片；他也是开发Apple T2安全芯片的团队的一员。",
+        "几周前，威尔考克斯宣布将会离职，并说道： “在经历了令人惊叹的八年后，我决定离开苹果公司，去追求另一个机会。这是一次令人难以置信的旅程，我为期间所取得的所有成就感到自豪。最终通过 M1、M1 Pro 和 M1 Max SOC系统实现了Apple Silicon过渡。” “我会非常想念所有在苹果遇见的同事和朋友，并期待着将在今年年初开始的下一个旅程。” 威尔考克斯透露，他实际上是回到了英特尔。在加入苹果前，他曾于2010年至2013年在那里担任首席架构师。据LinkedIn显示，他将回到英特尔担任研究员、设计工程集团首席技术官、客户端SoC架构的新职位。",
+        "Wilcox 在其 LinkedIn 写道：「在历经精彩的 8 年之后，我决定离开苹果并寻求另一个机会… 在苹果这些年取得的所有成果，我感到无比自豪，最棒的是透过 M1、M1 Pro 和 M1 Max SoC 与系统推出，迈向 Apple Silicon 过渡。我将会非常想念所有苹果同事与朋友们。」 实际上，这不是 Wilcox 首次赴英特尔工作，他曾在 2010 年到 2013 年担任英特尔 PC 芯片组的工程师。 Wilcox 周四表示：「他很荣幸能再次与出色的团队合作，协助建立开创性的 SoC。」 目前苹果下任 Mac 系统架构总监仍是未知，也不知道苹果是否慰留 Wilcox。",
+        "2010年到2013年间，他曾出任英特尔PC芯片组的工程师。 而重返该英特尔之后，将致力于推出新的处理器。Wilcox日前在自己的LinkedIn主页上写道：“经历了一段令人惊叹的8年后，我终于决定离开苹果，去寻找另一个机会。” “这是一段不可思议的旅程，我对在那里的时间里所取得的成就感到无比自豪，最终完成在M1、M1 Pro和M1 Max SOC以及系统的苹果芯片过渡。我会非常想念我所有的苹果同事和朋友”Wilcox表示，自己已经开始了作为英特尔研究员的新职位，即首席技术官，负责设计集团客户SoC架构。",
+        "从M1芯片开始，他带领Mac团队实现了向苹果自研芯片的过渡，并开发了T2协同处理器的SoC和系统架构。 不过，在2022年1月，Wilcox在社交媒体上发布消息说：“在令人惊叹的八年之后，我决定离开苹果并寻求另一个机会。这是一次令人难以置信的旅程，我为我在那里取得的所有成就感到无比自豪，最终实现了Apple Silicon向M1、M1 Pro和M1 Max SoC和系统的过渡。我会非常想念我所有的苹果公司同事和朋友，但我期待着下一个旅程。”目前，Wilcox已经在英特尔就职，担任英特尔院士和设计工程组CTO，将专注于客户端SoC架构设计。",
+        "中金公司表示，回顾2021年前三季度，全球产能紧缺致芯片价格提升，国内方面伴随着国产化率提升，主要设计/代工/封测公司前三季度均维持了较高的收入及盈利增速。 随着苹果Mac计算机芯片由英特尔转向苹果自家芯片的2年过渡期即将结束，苹果M1芯片首席设计师已告别苹果，回归英特尔，并负责所有英特尔客户端系统系统（SoC）的架构设计。 在过去的8年间，出任苹果Mac系统架构总监，JeffWilcox负责领导Mac系统架构、讯号完整性和电源完整性，在苹果转向使用自家芯片AppleSilicon的过渡期中担任重要角色。 事实上，这并不是首次加入英特尔。",
+        "从 M1 芯片开始，他带领 Mac 团队实现了向苹果自研芯片的过渡，并开发了 T2 协同处理器的 SoC 和系统架构。 然而，两周前，Jeff Wilcox 在 linkedin 宣布自己将从苹果离职，寻找新的机会。他表示，「在苹果度过不可思议的八年之后，我决定离开。」 就在一天前，Jeff Wilcox 终于公布了自己的新东家。 据他在 LinkedIn 上介绍，他已经在英特尔就职，担任英特尔院士（Intel Fellow）、设计工程事业群（Design Engineering Group）CTO，并负责客户端 SoC 架构设计。他表示，「我非常高兴能与英特尔出色的团队再次合作，并共同创建突破性的 SoC。伟大的事业就在前方。」 Jeff Wilcox 已于本月初在英特尔工作。",
+        "就在2021年10月，苹果还在其新品发布会上公开了自研芯片升级版——M1Max，搭载的是台积电5nm工艺，570亿晶体管，70%CPU性能提升，4倍GPU性能提升。不少业内人士都直呼，苹果自研芯片的决定是对的，M1Max芯片简直全方位吊打“前任”英特尔。   \t英特尔自然是不甘落后的。这不，苹果的2年过渡期限转瞬即逝，“不用再看苹果脸色”的英特尔也大小动作不断，似乎要为了从前的屈辱报上一仇。就在本周四(1月6日)，苹果前任M1芯片架构总监Jeff  Wilcox在社交平台官宣了离开苹果，投奔英特尔的消息，将帮英特尔设计客户端系统单晶片(SoC)架构。",
+        "Jan 7, 2022 ... 苹果M1芯片首席设计师被老东家英特尔挖走了。 ... 自CEO Pat Gelsinger 执掌英特尔以来，这家公司已从AMD、英伟达和苹果等竞争对手那里招聘了多名 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_025_苹果M1芯片首席设计师去了哪家公司.md"
+      ]
+    },
+    {
+      "id": 27,
+      "rgb_source_id": 26,
+      "question": "长安汽车2021年销量同比增长多少？",
+      "expected_output": "14.8%",
+      "ground_truth": "14.8%",
+      "contexts": [
+        "1万辆，同比增长14.8%，市占率同比提升0.8个百分点，重回汽车集团第四；实现营业收入1051.42亿元，同比增长24.33%，增幅创3年新高。   据长安汽车公布的年度报告显示，公司2021年实现营业收入1051.42亿元，同比增长24.33%；实现归属于上市公司股东的净利润35.52亿元，同比增长6.87%；基本每股收益0.47元。公司拟向全体股东每10股派发现金红利2.33元(含税)，以资本公积金每10股转增3股。  销量方面，2021年，长安汽车实现销量230.1万辆，同比增长14.8%，市占率同比提升0.8个百分点，重回汽车集团第四；长安系中国品牌汽车销售175.5万辆，同比增长16.",
+        "长安汽车在公告中表示，报告期内公司净利润的改善，得益于自主板块的销量提升，使得利润实现同比大幅增长。同时，合资板块的盈利能力也总体向好。 根据长安汽车披露的销量数据，2021年全年实现销量230.1万辆，同比增长14.8%，市占率同比提升0.8个百分点，重回汽车集团第四。其中，长安系中国品牌汽车销售175.5万辆，同比增长16.7%，居行业第二；中国品牌狭义乘用车企业销量排名行业第二，与行业第一的差距较2020年缩小63.7%。 报告期内，长安汽车销售毛利率达到16.64%，较上年同期提升1.9个百分点。",
+        "2022-01-11 18:43:00  长安汽车集团2021销量出炉：230万辆，同比增长14.8%  1月10日，长安汽车公布2021年全年销量。从总量上来看，长安汽车集团累计销量230万辆，同比增长14.8%，超额完成全年销量目标（215万辆）。其中中国品牌汽车销量达到175万辆，同比增长16.7%。自主品牌乘用车销量120.42万辆，同比增长23.08%。  从车型来看，CS75和CS55系列依然是长安汽车的销量担当。CS75年度累计销量28万辆，同比增长5.6%。CS55系列年度累计14万辆，同比增长27.9%。值得一提的是，长安第二代CS75 PLUS已于近日在线下活动中亮相，有望在2022年2月上市销售。",
+        "晚上好！欢迎来到AutoThinker汽车智库平台 V3.0 北京时间： 登录 / 注册 热点推荐  来源：汽车之家                            作者：杜安迪                            编辑：李世奇                                                            发布时间：2022-01-10 17:41                          \t　　日前，长安汽车公布了2021年的销量成绩，其中，长安汽车集团总销量突破230万辆，同比增长14.8%;长安系中国品牌汽车年度销量突破175万辆，同比增长16.7%，长安系中国品牌乘用车年度销量突破120万辆，同比上涨23.1%。其中，“蓝鲸”家族车型的累计销量表现突破100万辆。",
+        "4月27日晚间，长安汽车(000625)披露2021年年度报告，公司营业收入1051.41亿元，同比增长24.33%；净利润35.52亿元，同比增长6.87%。扣非净利润由亏转盈，达16.53亿元，同比增长150.85%。 长安汽车在公告中表示，报告期内公司净利润的改善，得益于自主板块的销量提升，使得利润实现同比大幅增长。同时，合资板块的盈利能力也总体向好。 销量走高带动现金流净额增长 2021年，长安汽车全年实现销量230.1万辆，同比增长14.8%，市占率同比提升0.8个百分点，重回主流汽车集团销量排名第四。 其中，长安系中国品牌汽车销售175.5万辆，同比增长16.7%。",
+        "Apr 28, 2022 ... 2021年，长安汽车集团实现销量230.1万辆，同比增长14.8%；实现营业收入1051.42亿元，同比增长24.33%。-更多汽车资讯来自网通社。",
+        "Jan 11, 2022 ... 懂车帝提供1月10日，长安汽车公布2021年全年销量。从总量上来看，长安汽车集团累计销量230万辆，同比增长14.8%，超额完成全年销量目标.",
+        "Jan 10, 2022 ... 日前，长安汽车公布了2021年的销量成绩，其中，长安汽车集团总销量突破230万辆，同比增长14.8%;长安系中国品牌汽车年度销量突破175万辆，同比 ...",
+        "Apr 28, 2022 ... 同时，合资板块的盈利能力也总体向好。 根据长安汽车披露的销量数据，2021年全年实现销量230.1万辆，同比增长14.8%，市占率同比提升0.8 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_026_长安汽车2021年销量同比增长多少.md"
+      ]
+    },
+    {
+      "id": 28,
+      "rgb_source_id": 27,
+      "question": "10·29索马里首都汽车炸弹爆炸死亡人数",
+      "expected_output": "119人",
+      "ground_truth": "119人",
+      "contexts": [
+        "索马里首都汽车爆炸事件死亡人数上升至119人 当地时间10月31日，索马里政府官员表示，29日在索马里首都摩加迪沙发生的汽车炸弹爆炸导致的死亡人数已上升至119人，324人受伤，另有10人失踪，此前索马里“青年党”宣称对此次事件负责。 29日爆炸案是自2017年10月17日摩加迪沙爆炸案后，索马里遭遇的伤亡人数最大的一次袭击事件，2017年爆炸案造成至少587人死亡，316人受伤。 索马里“青年党”是与基地组织有关联的极端组织，近年来在索马里及其邻国多次发动恐怖袭击。",
+        "您现在的位置  首页 > 政务公开 > 政府信息公开 > 应急管理 > 突发事件 > 社会安全事件  　　当地时间10月31日，索马里政府官员表示，29日在索马里首都摩加迪沙发生的汽车炸弹爆炸导致的死亡人数已上升至119人，324人受伤，另有10人失踪，此前索马里“青年党”宣称对此次事件负责。 　　29日爆炸案是自2017年10月17日摩加迪沙爆炸案后，索马里遭遇的伤亡人数最大的一次袭击事件，2017年爆炸案造成至少587人死亡，316人受伤。",
+        "Nov 3, 2022 ... 当地时间10月31日，索马里政府官员表示，29日在索马里首都摩加迪沙发生的汽车炸弹爆炸导致的死亡人数已上升至119人，324人受伤，另有10人失踪，此前 ...",
+        "Oct 31, 2022 ... 当地时间10月31日，索马里政府官员表示，29日在索马里首都摩加迪沙发生的汽车炸弹爆炸导致的死亡人数已上升至119人，324人受伤，另有10人失踪，此前 ...",
+        "Nov 1, 2022 ... 当地时间10月31日，索马里政府官员表示，29日在索马里首都摩加迪沙发生的汽车炸弹爆炸导致的死亡人数已上升至119人，324人受伤，另有10人失踪，此前索马里 ..."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_027_10_29索马里首都汽车炸弹爆炸死亡人数.md"
+      ]
+    },
+    {
+      "id": 29,
+      "rgb_source_id": 28,
+      "question": "2021年宝马全球销量？",
+      "expected_output": "2521525辆/252万辆",
+      "ground_truth": "2521525辆/252万辆",
+      "contexts": [
+        "2022-01-28 00:15:21  更多资讯  关注我们 简 讯 宝马集团2021年全球销量为252万辆， 电动车销量大涨70.4%  2021年，宝马集团向全球客户交付了252万辆宝马、MINI和劳斯莱斯汽车，同比增长8.4%。其中，宝马品牌销量创历史新高，达到221万辆，同比增长9.1%，成为全球高端汽车市场的领军品牌。此外，宝马集团纯电动汽车销量同比增长133.2%，达到10.3万辆。",
+        "Jan 28, 2022 ... 2021年，宝马集团向全球客户交付了252万辆宝马、MINI和劳斯莱斯汽车，同比增长8.4%。其中，宝马品牌销量创历史新高，达到221万辆，同比增长9.1%，成为全球 ...",
+        "Jan 13, 2022 ... 2021年，宝马集团向全球客户交付了252万辆宝马、MINI和劳斯莱斯汽车，同比增长8.4%。其中，宝马品牌的销量创历史新高，达到221万辆，同比增长9.1%， ...",
+        "2021年，宝马集团向全球客户交付了252万辆宝马、MINI和劳斯莱斯汽车，同比增长8.4%。其中，宝马品牌的销量创历史新高，达到221万辆，同比增长9.1%，成为全球高端车市场的领军品牌。此外，宝马集团纯电动汽车的销量同比增长133.2%，达到10.3万辆。 （图片来源：宝马） 宝马集团负责客户、品牌和销售的管理委员会成员Pieter Nota表示，“尽管我们面临供应瓶颈和持续的新冠疫情，但是由于强大的运营表现和出色的产品阵容，我们在2021年实现了强劲的销量业绩。",
+        "宝马集团2021年全球销量为252万辆，电动车销量大涨70."
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_028_2021年宝马全球销量.md"
+      ]
+    },
+    {
+      "id": 30,
+      "rgb_source_id": 29,
+      "question": "2021年中国外贸进出口规模是多少美元",
+      "expected_output": "6.05万亿美元",
+      "ground_truth": "6.05万亿美元",
+      "contexts": [
+        "Jan 15, 2022 ... 以美元计，2021年中国进出口规模达6.05万亿美元，在2013年首次达到4万亿美元的8年后，年内跨过5万亿、6万亿美元两大台阶，达到历史新高。全年外贸增量 ...",
+        "在1月14日举行的国新办新闻发布会上，海关总署新闻发言人、统计分析司司长李魁文介绍，2021年，中国外贸进出口实现较快增长，货物贸易进出口总值同比增长21.4%，规模再创新高、质量稳步提升，实现“十四五”外贸良好开局。 进出口规模突破6万亿美元 2021年，中国外贸交出了一份亮眼的成绩单—— 以美元计，2021年中国进出口规模达6.05万亿美元，在2013年首次达到4万亿美元的8年后，年内跨过5万亿、6万亿美元两大台阶，达到历史新高。全年外贸增量达1.4万亿美元。以人民币计，2021年中国货物贸易进出口总值达39.1万亿元人民币，同比增长21.4%。",
+        "新华社北京1月14日电（记者刘红霞）中国外贸再次迈上了新台阶。海关总署14日发布数据显示，2021年，以美元计价，我国货物贸易进出口规模首次突破6万亿美元，创下历史新高。 数据显示，在2013年首次达到4万亿美元后，我国外贸在2021年内连续跨过5万亿、6万亿美元两大台阶，达到6.05万亿美元。这一年的外贸增量达到了1.4万亿美元，相当于2005年全年外贸规模。 以人民币计价，2021年我国进出口总值39.1万亿元，比2020年增长21.4%。其中，出口21.73万亿元，同比增长21.2%；进口17.37万亿元，增长21.5%。 与2019年相比，进出口、出口、进口分别增长23.9%、26.1%、21.2%。",
+        "2021年增加1.4万亿美元 我国外贸额首次突破6万亿美元 2021年，以美元计，我国进出口规模达6.05万亿美元，在2013年首次达4万亿美元的8年后，年内跨过5万亿、6万亿美元两大台阶，达到历史高点。这一年外贸增量达1.4万亿美元。以人民币计，2021年我国货物贸易进出口总值39.1万亿元，同比增长21.4%。国新办1月14日举行新闻发布会，海关总署新闻发言人、统计分析司司长李魁文介绍了2021年全年进出口的有关情况。 对“一带一路”沿线国家进出口增长23.6% 纵梁冲压、车架焊接、防锈烘干……江西南昌，江铃汽车集团的生产线上一派繁忙。",
+        "海关总署新闻发言人李魁文周五在国新办举行的新闻发布会上称。 据其介绍，2021年，中国外贸进出口实现较快增长，年内突破5万亿、6万亿美元两个关口，规模6.05万亿美元再创新高。 在谈及去年拉动外贸的因素时，他表示，首先得益于中国经济发展和疫情防控保持全球领先地位。2021年，中国经济继续保持恢复态势，主要经济指标保持较快增长，国内生产和消费需求为外贸稳增长提供了强有力支撑。据海关统计，去年中国中间产品进口和出口分别增长24.9%和28.6%，消费品进口增长9.9%。 二是全球经济保持复苏态势。",
+        "海关总署新闻发言人、统计分析司司长李魁文表示，2022年外贸面临的不确定不稳定不均衡因素增多，但也要看到，我国经济韧性强、长期向好的基本面不会改变，将继续为稳外贸提供有力支撑。 三大因素支撑外贸快速增长 以美元计价，2021年我国年度进出口规模达到了6.05万亿美元，首次突破6万亿美元关口，达到了历史高点。 “2013年，我国外贸首次达到4万亿美元。时隔8年之后，我国外贸在1年之内连续跨过5万亿美元、6万亿美元两大台阶，仅2021年1.4万亿美元的外贸增量，就相当于2005年全年的规模。”李魁文认为，主要有三方面因素支撑了我国外贸快速增长。",
+        "2月8日，国务院发布《关于同意在鄂尔多斯等27个城市和地区设立跨境电子商务综合试验区的批复》。商务部对外贸易司有关负责人介绍，2021年中国跨境电商进出口规模达到了1.98万亿元，增长15%，中国已成为跨境电商等新业态新模式蓬勃成长的沃土，各类平台和商户充分发挥在线营销、无接触交易、短距离配送等各种优势，有力推动中国外贸逆势突围。 海关总署前不久发布数据显示，2021年，以美元计价，中国货物贸易进出口规模首次突破6万亿美元，达到6.05万亿美元，较2020年增长21.4%；从全球看，中国全年进出口贸易总额占全球总额的21.6%，创历史新高。"
+      ],
+      "challenge_type": "noise_robustness",
+      "difficulty": "medium",
+      "source_docs": [
+        "rgb_pos_029_2021年中国外贸进出口规模是多少美元.md"
+      ]
+    }
+  ]
+}

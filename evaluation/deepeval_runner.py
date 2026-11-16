@@ -11,11 +11,19 @@ import csv
 import json
 import logging
 import os
+import random
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+# 强制行缓冲推流
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except Exception:
+    pass
 
 import httpx
 
@@ -103,17 +111,108 @@ class CustomDeepEvalLLM(DeepEvalBaseLLM if DEEPEVAL_AVAILABLE else object):
 
     async def a_generate(self, prompt: str, schema: Optional[Any] = None, *args, **kwargs) -> Any:
         chat_model = self.load_model()
-        if schema is not None:
+        for attempt in range(3):
             try:
-                structured = chat_model.with_structured_output(schema)
-                return await structured.ainvoke(prompt)
-            except Exception as e:
-                logger.warning(f"⚠️ 异步结构化输出失败，降级为常规文本解析 ({e})")
-        res = await chat_model.ainvoke(prompt)
-        return res.content
+                if schema is not None:
+                    try:
+                        structured = chat_model.with_structured_output(schema)
+                        return await structured.ainvoke(prompt)
+                    except Exception as e:
+                        ex_sub = str(e).lower()
+                        if "429" in ex_sub or "rate" in ex_sub:
+                            raise e
+                        logger.warning(f"⚠️ 异步结构化输出失败，降级为常规文本解析 ({e})")
+                res = await chat_model.ainvoke(prompt)
+                return res.content
+            except Exception as ex:
+                ex_str = str(ex).lower()
+                if ("429" in ex_str or "rate limit" in ex_str or "too many requests" in ex_str) and attempt < 2:
+                    wait_sec = random.uniform(1.5, 3.5) * (attempt + 1)
+                    logger.warning(f"⚠️ 遭遇裁判大模型 429 速率限制，随机退避 {wait_sec:.2f}s 后重试 (第 {attempt+1} 次)...")
+                    await asyncio.sleep(wait_sec)
+                    continue
+                raise ex
 
     def get_model_name(self) -> str:
         return self.model_name
+
+
+class RefusalAssertionMetric:
+    """
+    Evaluates whether the RAG system abstains from answering when facts
+    are absent in the retrieved knowledge base (Huawei RGB Negative Rejection standard).
+    """
+
+    REFUSAL_PATTERNS = [
+        "无法回答", "未提及", "没有提及", "未收录", "资料不足", "资料中无", "未包含",
+        "无相关信息", "抱歉", "未能提供", "未能找到", "无法确认", "未找到相关",
+        "根据已知资料，未", "根据现有资料，未", "无法基于提供", "没有提到",
+        "cannot answer", "not mentioned", "no information", "insufficient", "unable to answer"
+    ]
+
+    def __init__(self, threshold: float = 0.7):
+        self.threshold = threshold
+        self.score: Optional[float] = None
+        self.reason: Optional[str] = None
+
+    async def a_measure(self, test_case: Any) -> float:
+        actual = (test_case.actual_output or "").lower()
+        is_refusal = any(pat.lower() in actual for pat in self.REFUSAL_PATTERNS)
+        if is_refusal:
+            self.score = 1.0
+            self.reason = "系统准确识别资料中无对应事实并明确拒答，有效抵御未登录知识幻觉。"
+        else:
+            self.score = 0.0
+            self.reason = "系统在背景资料缺失的情况下产生妄断推测（幻觉），未能做出正确拒答。"
+        return self.score
+
+    def is_successful(self) -> bool:
+        return self.score is not None and self.score >= self.threshold
+
+
+class CounterfactualAssertionMetric:
+    """
+    Evaluates whether the RAG system resists counterfactual distortion or identifies
+    factual errors injected into the context (Huawei RGB Counterfactual Robustness standard).
+    """
+
+    ERROR_DETECTION_PATTERNS = [
+        "资料有误", "信息有误", "事实错误", "存在错误", "不准确", "伪造", "并非",
+        "factual error", "incorrect in the provided", "document contains an error"
+    ]
+
+    def __init__(self, fake_answer: str = "", threshold: float = 0.7):
+        self.fake_answer = (fake_answer or "").strip()
+        self.threshold = threshold
+        self.score: Optional[float] = None
+        self.reason: Optional[str] = None
+
+    async def a_measure(self, test_case: Any) -> float:
+        actual = (test_case.actual_output or "").lower()
+        expected = (test_case.expected_output or "").lower()
+        fake = self.fake_answer.lower()
+
+        # 1. Check if model explicitly detected error in materials
+        detected_error = any(pat.lower() in actual for pat in self.ERROR_DETECTION_PATTERNS)
+        if detected_error:
+            self.score = 1.0
+            self.reason = "模型成功识别输入资料中的事实错误并指出 (Error Detection)。"
+            return self.score
+
+        # 2. Check if model resists counterfactual fake answer and preserves ground truth
+        if fake and fake in actual:
+            self.score = 0.0
+            self.reason = f"模型被反事实错误资料误导，输出了伪造答案: '{self.fake_answer}'。"
+        elif expected and expected in actual:
+            self.score = 1.0
+            self.reason = "模型未被伪造事实带偏，准确输出了正确事实答案 (Resisted Counterfactual)。"
+        else:
+            self.score = 0.5
+            self.reason = "模型既未指出材料错误，也未完全采信虚假答案，处于中立表述。"
+        return self.score
+
+    def is_successful(self) -> bool:
+        return self.score is not None and self.score >= self.threshold
 
 
 # ----------------------------------------------------------------------
@@ -209,6 +308,9 @@ async def evaluate_single_case_deepeval(
     project_id: str,
     judge_llm: CustomDeepEvalLLM,
     threshold: float = 0.7,
+    challenge_type: Optional[str] = None,
+    assertion_rule: Optional[str] = None,
+    fake_answer: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Evaluates a single test case using DeepEval metrics with granular reasons."""
     safe_contexts = [c for c in contexts if c and c.strip()]
@@ -222,33 +324,42 @@ async def evaluate_single_case_deepeval(
         retrieval_context=safe_contexts,
     )
 
-    metrics_config = [
+    metrics_config: List[Tuple[str, Any]] = [
         ("faithfulness", FaithfulnessMetric(threshold=threshold, model=judge_llm, include_reason=True)),
         ("answer_relevancy", AnswerRelevancyMetric(threshold=threshold, model=judge_llm, include_reason=True)),
         ("contextual_recall", ContextualRecallMetric(threshold=threshold, model=judge_llm, include_reason=True)),
         ("contextual_precision", ContextualPrecisionMetric(threshold=threshold, model=judge_llm, include_reason=True)),
     ]
 
+    # Huawei RGB Benchmark specialized assertions
+    if assertion_rule == "must_refuse" or challenge_type == "negative_rejection":
+        metrics_config.append(("refusal_assertion", RefusalAssertionMetric(threshold=threshold)))
+    elif assertion_rule == "detect_error_or_resist_counterfactual" or challenge_type == "counterfactual_robustness":
+        metrics_config.append(("counterfactual_assertion", CounterfactualAssertionMetric(fake_answer=fake_answer or "", threshold=threshold)))
+
     metric_scores: Dict[str, Optional[float]] = {}
     metric_reasons: Dict[str, str] = {}
     metric_passed: Dict[str, bool] = {}
 
-    for name, metric in metrics_config:
+    async def _measure_one(name, metric):
         try:
-            # Measure metric asynchronously
-            await metric.a_measure(test_case)
+            await asyncio.wait_for(metric.a_measure(test_case), timeout=75.0)
             score = round(float(metric.score), 4) if metric.score is not None else 0.0
             passed = bool(metric.is_successful())
             reason = metric.reason or "No specific reason provided."
-
-            metric_scores[name] = score
-            metric_reasons[name] = reason
-            metric_passed[name] = passed
+            return name, score, passed, reason
+        except asyncio.TimeoutError:
+            logger.warning(f"   ⚠️ 指标 [{name}] 评分超时 (75s 熔断保护生效)")
+            return name, None, False, "Metric evaluation timed out after 75s."
         except Exception as e:
             logger.warning(f"   ⚠️ 指标 [{name}] 计算异常: {e}")
-            metric_scores[name] = None
-            metric_reasons[name] = f"Error during metric evaluation: {str(e)}"
-            metric_passed[name] = False
+            return name, None, False, f"Error during metric evaluation: {str(e)}"
+
+    metric_results = await asyncio.gather(*[_measure_one(n, m) for n, m in metrics_config])
+    for name, score, passed, reason in metric_results:
+        metric_scores[name] = score
+        metric_passed[name] = passed
+        metric_reasons[name] = reason
 
     valid_scores = [v for v in metric_scores.values() if v is not None]
     overall_score = round(sum(valid_scores) / len(valid_scores), 4) if valid_scores else 0.0
@@ -288,6 +399,8 @@ def save_deepeval_reports(results: List[Dict[str, Any]], results_dir: Path) -> T
         "answer_relevancy",
         "contextual_recall",
         "contextual_precision",
+        "refusal_assertion",
+        "counterfactual_assertion",
         "overall_score",
         "all_passed",
         "contexts_count",
@@ -304,6 +417,8 @@ def save_deepeval_reports(results: List[Dict[str, Any]], results_dir: Path) -> T
                 "answer_relevancy": scores.get("answer_relevancy", "N/A"),
                 "contextual_recall": scores.get("contextual_recall", "N/A"),
                 "contextual_precision": scores.get("contextual_precision", "N/A"),
+                "refusal_assertion": scores.get("refusal_assertion", "N/A"),
+                "counterfactual_assertion": scores.get("counterfactual_assertion", "N/A"),
                 "overall_score": r.get("overall_score", 0.0),
                 "all_passed": "PASS" if r.get("all_passed") else "FAIL",
                 "contexts_count": r.get("contexts_count", 0),
@@ -395,20 +510,21 @@ async def run_deepeval_suite(
     print(f"   • 裁判模型:    {model_name} ({base_url or 'OpenAI Default'})")
 
     # Step 3: Run Evaluation Pipeline
-    print(f"\n📊 [Step 3/3] 开始全量 DeepEval 断言评测 (共 {len(test_cases)} 题)...")
+    print(f"\n📊 [Step 3/3] 开始全量 DeepEval 断言评测 (共 {len(test_cases)} 题，协程并发度: {concurrency})...", flush=True)
     semaphore = asyncio.Semaphore(concurrency)
-    results = []
+    completed_cases = 0
 
     async with httpx.AsyncClient(timeout=120.0) as client:
-        for idx, case in enumerate(test_cases, start=1):
-            async with semaphore:
-                q = case["question"]
-                gt = case.get("ground_truth", "")
-                p_id = project_id or case.get("project") or "eval_benchmark"
+        async def _eval_case_worker(idx: int, case: Dict[str, Any], total_cases: int) -> Dict[str, Any]:
+            nonlocal completed_cases
+            q = case["question"]
+            gt = case.get("ground_truth", "")
+            p_id = project_id or case.get("project") or "eval_benchmark"
 
-                print(f"\n--------------------------------------------------------------------------------")
-                print(f"👉 [用例 {idx:02d}/{len(test_cases):02d}] 项目: {p_id}")
-                print(f"   ❓ 问题: \"{q}\"")
+            async with semaphore:
+                print(f"\n--------------------------------------------------------------------------------", flush=True)
+                print(f"👉 [用例 {idx:02d}/{total_cases:02d}] 项目: {p_id}", flush=True)
+                print(f"   ❓ 问题: \"{q}\"", flush=True)
 
                 try:
                     t0 = time.time()
@@ -430,11 +546,15 @@ async def run_deepeval_suite(
                     ans = rag_res["answer"]
                     ctxs = rag_res["contexts"]
 
-                    print(f"   ⚡ RAG 响应完成 (耗时 {latency}s, 提取到 {len(ctxs)} 个切片)")
-                    print(f"   💬 回答摘要: {ans[:100]}..." if len(ans) > 100 else f"   💬 回答: {ans}")
+                    print(f"   ⚡ RAG 响应完成 (耗时 {latency}s, 提取到 {len(ctxs)} 个切片)", flush=True)
+                    print(f"   💬 回答摘要: {ans[:100]}..." if len(ans) > 100 else f"   💬 回答: {ans}", flush=True)
 
-                    # Measure via DeepEval
-                    print(f"   ⚖️  DeepEval 裁判打分与深度诊断分析中...")
+                    # Measure via DeepEval (指标并发)
+                    print(f"   ⚖️  DeepEval 裁判打分与深度诊断分析中...", flush=True)
+                    c_type = case.get("challenge_type")
+                    a_rule = case.get("assertion_rule")
+                    fake_ans = case.get("counterfactual_fake_answer")
+
                     res = await evaluate_single_case_deepeval(
                         idx=idx,
                         question=q,
@@ -444,30 +564,32 @@ async def run_deepeval_suite(
                         project_id=p_id,
                         judge_llm=judge_llm,
                         threshold=threshold,
+                        challenge_type=c_type,
+                        assertion_rule=a_rule,
+                        fake_answer=fake_ans,
                     )
-                    results.append(res)
 
                     # Print Granular Metrics and Reasons
                     scores = res["scores"]
                     reasons = res["reasons"]
                     passed = res["passed"]
 
-                    print(f"   📈 指标与诊断分析:")
-                    for m_name in ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision"]:
+                    print(f"   📈 指标与诊断分析:", flush=True)
+                    for m_name in scores.keys():
                         s = scores.get(m_name)
                         status_str = "✅ PASS" if passed.get(m_name) else "❌ FAIL"
                         score_str = f"{s:.4f}" if s is not None else "N/A"
-                        print(f"      • {m_name:<20}: {score_str} [{status_str}]")
+                        print(f"      • {m_name:<25}: {score_str} [{status_str}]", flush=True)
                         r = reasons.get(m_name)
                         if r and r != "No specific reason provided.":
-                            print(f"        └─ 🔍 理由: {r}")
+                            print(f"        └─ 🔍 理由: {r}", flush=True)
 
                     status_badge = "✅ ALL PASS" if res["all_passed"] else "⚠️ SOME FAILED"
-                    print(f"   🏁 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge}")
+                    print(f"   🏁 [用例 {idx:02d}] 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge}", flush=True)
 
                 except Exception as e:
-                    print(f"   ❌ 用例 {idx} 执行异常: {e}")
-                    results.append({
+                    print(f"   ❌ 用例 {idx} 执行异常: {e}", flush=True)
+                    res = {
                         "test_number": idx,
                         "question": q,
                         "project": p_id,
@@ -477,7 +599,18 @@ async def run_deepeval_suite(
                         "overall_score": 0.0,
                         "all_passed": False,
                         "error": str(e),
-                    })
+                    }
+
+                completed_cases += 1
+                prog = min(90, int((completed_cases / total_cases) * 90))
+                print(f"[PROGRESS: {prog}%]", flush=True)
+                return res
+
+        gathered_results = await asyncio.gather(
+            *[_eval_case_worker(idx, case, len(test_cases)) for idx, case in enumerate(test_cases, start=1)]
+        )
+        results = list(gathered_results)
+        results.sort(key=lambda r: r.get("test_number", 0))
 
     # Summary Report
     results_dir = Path(__file__).parent / "results"
@@ -604,8 +737,8 @@ def main():
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=1,
-        help="Number of concurrent evaluation queries",
+        default=2,
+        help="Number of concurrent evaluation queries (default: 2)",
     )
     parser.add_argument(
         "--threshold",
@@ -664,12 +797,14 @@ def main():
     top_ks = [int(k.strip()) for k in args.matrix_top_k.split(",") if k.strip()] if args.matrix_top_k else [args.top_k]
 
     if len(modes) > 1 or len(top_ks) > 1:
-        print("=" * 80)
-        print("⚔️  启动 LightRAG 多参数矩阵打擂横向对比评测 (Matrix Evaluation)")
-        print(f"   • 评测模式组合: {modes}")
-        print(f"   • Top-K 候选组合: {top_ks}")
-        print(f"   • 总打擂轮次:   {len(modes) * len(top_ks)} 轮")
-        print("=" * 80)
+        print("=" * 80, flush=True)
+        print("⚔️  启动 LightRAG 多参数矩阵打擂横向对比评测 (Matrix Evaluation)", flush=True)
+        print(f"   • 评测模式组合: {modes}", flush=True)
+        print(f"   • Top-K 候选组合: {top_ks}", flush=True)
+        print(f"   • 总打擂轮次:   {len(modes) * len(top_ks)} 轮", flush=True)
+        if args.limit:
+            print(f"   • 🚀 极速打擂验证模式: 仅抽样前 {args.limit} 题 (快速出分)", flush=True)
+        print("=" * 80, flush=True)
 
         for m in modes:
             for k in top_ks:

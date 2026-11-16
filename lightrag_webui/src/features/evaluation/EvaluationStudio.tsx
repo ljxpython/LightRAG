@@ -23,7 +23,8 @@ import {
   ArrowUpRightIcon,
   Settings2Icon,
   Edit3Icon,
-  AlertCircleIcon
+  AlertCircleIcon,
+  CopyIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -98,8 +99,23 @@ interface AsyncTaskStatus {
   status: 'pending' | 'running' | 'completed' | 'failed'
   progress: number
   message: string
+  logs?: string[]
+  result_url?: string
+  runs?: string[]
   result?: any
   error?: string
+}
+
+interface ReadinessReport {
+  status: 'ready' | 'partial' | 'missing' | 'unknown'
+  dataset_name: string
+  project_id: string
+  coverage_rate: number
+  total_required: number
+  matched_docs: string[]
+  missing_docs: string[]
+  total_project_docs: number
+  message: string
 }
 
 /** 提取考题的支撑切片数组，清洗空串并去除无效值 */
@@ -133,6 +149,11 @@ export default function EvaluationStudio() {
   const [datasetDetail, setDatasetDetail] = useState<DatasetDetail | null>(null)
   const [loadingDatasets, setLoadingDatasets] = useState(false)
   const [loadingDetail, setLoadingDetail] = useState(false)
+  const [deletingDataset, setDeletingDataset] = useState(false)
+
+  // 原材料就绪度检测状态 (Readiness Guard)
+  const [readiness, setReadiness] = useState<ReadinessReport | null>(null)
+  const [checkingReadiness, setCheckingReadiness] = useState(false)
 
   // 考题在线编辑与脏状态
   const [cases, setCases] = useState<TestCase[]>([])
@@ -144,12 +165,14 @@ export default function EvaluationStudio() {
   const [inspectCase, setInspectCase] = useState<TestCase | null>(null)
   const [editingContextText, setEditingContextText] = useState<string>('')
   const [isEditingContext, setIsEditingContext] = useState<boolean>(false)
+  const [focusSlice, setFocusSlice] = useState<{ index: number; text: string; caseId?: string | number } | null>(null)
 
   // 模态框 1：自动合成考题
   const [synthOpen, setSynthOpen] = useState(false)
   const [synthName, setSynthName] = useState('')
   const [synthCount, setSynthCount] = useState<number>(5)
   const [synthCrudDiff, setSynthCrudDiff] = useState(true)
+  const [synthTargetMode, setSynthTargetMode] = useState<'overwrite' | 'create'>('overwrite')
   const [synthTaskId, setSynthTaskId] = useState<string | null>(null)
   const [synthTaskStatus, setSynthTaskStatus] = useState<AsyncTaskStatus | null>(null)
 
@@ -160,6 +183,7 @@ export default function EvaluationStudio() {
   const [evalEngine, setEvalEngine] = useState<string>('deepeval')
   const [matrixTaskId, setMatrixTaskId] = useState<string | null>(null)
   const [matrixTaskStatus, setMatrixTaskStatus] = useState<AsyncTaskStatus | null>(null)
+  const [matrixLimitMode, setMatrixLimitMode] = useState<'quick' | 'full'>('quick')
 
   // iframe 刷新控制
   const [iframeKey, setIframeKey] = useState(0)
@@ -182,6 +206,36 @@ export default function EvaluationStudio() {
     if (currentProjectId === 'eval_benchmark') return '评测基准'
     return currentProjectId.length > 16 ? `${currentProjectId.slice(0, 8)}...` : currentProjectId
   }, [workspaceList, currentProjectId])
+
+  // 题库智能血缘分组（专属题库 / 平台通用基准 / 其他项目）
+  const { projectDatasets, benchmarkDatasets, otherDatasets } = useMemo(() => {
+    const proj: DatasetSummary[] = []
+    const bench: DatasetSummary[] = []
+    const other: DatasetSummary[] = []
+
+    datasets.forEach((d) => {
+      const isBenchmark =
+        d.name.toLowerCase().includes('benchmark') ||
+        d.name === 'business_qa.json' ||
+        d.project_id === 'eval_benchmark' ||
+        d.project_id === '11111111-1111-4111-8111-111111111111'
+
+      const isCurrentProject =
+        Boolean(currentProjectId) &&
+        (d.project_id === currentProjectId ||
+          (currentProjectId.length >= 8 && d.name.includes(currentProjectId.slice(0, 8))))
+
+      if (isCurrentProject) {
+        proj.push(d)
+      } else if (isBenchmark) {
+        bench.push(d)
+      } else {
+        other.push(d)
+      }
+    })
+
+    return { projectDatasets: proj, benchmarkDatasets: bench, otherDatasets: other }
+  }, [datasets, currentProjectId])
 
   // 轮询 Ref
   const synthPollTimer = useRef<number | null>(null)
@@ -248,6 +302,66 @@ export default function EvaluationStudio() {
     }
   }
 
+  // -------------------------------------------------------------------------
+  // 2.1 原材料就绪度检测 (Readiness Guard)
+  // -------------------------------------------------------------------------
+  const fetchReadiness = async (datasetName: string, projId?: string) => {
+    if (!datasetName) {
+      setReadiness(null)
+      return
+    }
+    try {
+      setCheckingReadiness(true)
+      const targetProj = projId || currentProjectId || ''
+      const url = `/ops/evaluation/datasets/${encodeURIComponent(datasetName)}/readiness?project_id=${encodeURIComponent(targetProj)}`
+      const res = await fetch(url)
+      if (res.ok) {
+        const data: ReadinessReport = await res.json()
+        setReadiness(data)
+      } else {
+        setReadiness(null)
+      }
+    } catch (err) {
+      console.error('Failed to fetch evaluation readiness:', err)
+      setReadiness(null)
+    } finally {
+      setCheckingReadiness(false)
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 2.2 题库安全删除与归档 (Lifecycle Trash)
+  // -------------------------------------------------------------------------
+  const handleDeleteDataset = async () => {
+    if (!selectedDatasetName) return
+    if (selectedDatasetName === 'business_qa.json' || selectedDatasetName === 'sample_lightrag.json') {
+      toast.error('基准题库为系统级资产，受保护禁止删除！')
+      return
+    }
+    const confirmed = window.confirm(
+      `⚠️ 确定要将题库 "${selectedDatasetName}" 移入回收站归档吗？\n该操作会将其安全移入 .trash 目录，不影响历史评测记录。`
+    )
+    if (!confirmed) return
+
+    try {
+      setDeletingDataset(true)
+      const res = await fetch(`/ops/evaluation/datasets/${encodeURIComponent(selectedDatasetName)}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        toast.success(`题库 "${selectedDatasetName}" 已成功移入回收站！`)
+        await fetchDatasets()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(`删除失败: ${err.detail || '未知错误'}`)
+      }
+    } catch (err) {
+      toast.error(`删除题库请求失败: ${err}`)
+    } finally {
+      setDeletingDataset(false)
+    }
+  }
+
   useEffect(() => {
     fetchDatasets()
   }, [currentProjectId])
@@ -255,8 +369,11 @@ export default function EvaluationStudio() {
   useEffect(() => {
     if (selectedDatasetName) {
       fetchDatasetDetail(selectedDatasetName)
+      fetchReadiness(selectedDatasetName, currentProjectId)
+    } else {
+      setReadiness(null)
     }
-  }, [selectedDatasetName])
+  }, [selectedDatasetName, currentProjectId])
 
   // -------------------------------------------------------------------------
   // 3. 在线编辑考题逻辑
@@ -328,9 +445,11 @@ export default function EvaluationStudio() {
   // -------------------------------------------------------------------------
   const handleTriggerSynthesize = async (e: React.FormEvent) => {
     e.preventDefault()
-    const targetName = (
-      synthName.trim() || `synth_${currentProjectId}_${Date.now().toString().slice(-4)}`
-    ).replace(/[^a-zA-Z0-9_-]/g, '_')
+    const rawTargetName =
+      synthTargetMode === 'overwrite' && selectedDatasetName
+        ? selectedDatasetName
+        : (synthName.trim() || `synth_${currentProjectId}_${Date.now().toString().slice(-4)}`)
+    const targetName = rawTargetName.endsWith('.json') ? rawTargetName : `${rawTargetName}.json`
 
     try {
       setSynthTaskStatus({
@@ -345,9 +464,11 @@ export default function EvaluationStudio() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          dataset_name: targetName,
-          test_cases_count: Number(synthCount),
-          differential: Boolean(synthCrudDiff)
+          project_id: currentProjectId,
+          output_name: targetName,
+          size: Number(synthCount),
+          incremental: Boolean(synthCrudDiff),
+          base_dataset: selectedDatasetName || undefined
         })
       })
 
@@ -417,10 +538,13 @@ export default function EvaluationStudio() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          dataset_name: selectedDatasetName,
-          modes: selectedModes,
+          project_id: currentProjectId,
+          dataset: selectedDatasetName,
+          matrix_mode: selectedModes,
           top_k: Number(topK),
-          eval_engine: evalEngine
+          limit: matrixLimitMode === 'quick' ? 5 : null,
+          eval_engine: evalEngine,
+          mlflow: true
         })
       })
 
@@ -603,9 +727,19 @@ export default function EvaluationStudio() {
           <Button
             size="sm"
             onClick={() => {
-              setSynthName(
-                `synth_${currentProjectId}_${new Date().toISOString().slice(5, 10).replace('-', '')}`
-              )
+              if (
+                selectedDatasetName &&
+                (projectDatasets.some((d) => d.name === selectedDatasetName) ||
+                  selectedDatasetName.startsWith('lineage_') ||
+                  selectedDatasetName.startsWith('synth_'))
+              ) {
+                setSynthTargetMode('overwrite')
+                setSynthName(selectedDatasetName)
+              } else {
+                setSynthTargetMode('create')
+                const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
+                setSynthName(`${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`)
+              }
               setSynthOpen(true)
             }}
             className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5 text-xs shadow-xs"
@@ -618,12 +752,26 @@ export default function EvaluationStudio() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setMatrixOpen(true)}
+            onClick={() => {
+              if (readiness?.status === 'missing') {
+                toast.error(
+                  `当前知识库完全缺失该题库所需的原材料文档！强行打擂将全部失分。\n请在右上角切换到【评测基准】知识库再运行打擂。`
+                )
+                return
+              }
+              setMatrixOpen(true)
+            }}
             disabled={!datasetDetail || cases.length === 0}
-            className="h-8 border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10 gap-1.5 text-xs"
+            className={cn(
+              'h-8 gap-1.5 text-xs transition-colors',
+              readiness?.status === 'missing'
+                ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
+                : 'border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
+            )}
+            tooltip={readiness?.status === 'missing' ? '原材料缺失不可打擂，点击查看提示' : undefined}
           >
             <SwordsIcon className="size-3.5" />
-            <span>矩阵参数打擂</span>
+            <span>{readiness?.status === 'missing' ? '原料缺失(禁止打擂)' : '矩阵参数打擂'}</span>
           </Button>
 
           {/* 新窗口直达 MLflow 外部链接 */}
@@ -758,11 +906,35 @@ export default function EvaluationStudio() {
                   {datasets.length === 0 ? (
                     <option value="">暂无评测题库</option>
                   ) : (
-                    datasets.map((d) => (
-                      <option key={d.name} value={d.name}>
-                        {d.name} ({d.cases_count} 题)
-                      </option>
-                    ))
+                    <>
+                      {projectDatasets.length > 0 && (
+                        <optgroup label="【本项目专属题库】">
+                          {projectDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              🎯 {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {benchmarkDatasets.length > 0 && (
+                        <optgroup label="【平台通用基准】">
+                          {benchmarkDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              🏛️ {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {otherDatasets.length > 0 && (
+                        <optgroup label="【其他知识库题库】">
+                          {otherDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              📁 {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </>
                   )}
                 </select>
 
@@ -776,6 +948,21 @@ export default function EvaluationStudio() {
                 >
                   <RefreshCwIcon className={cn('size-3', loadingDatasets && 'animate-spin')} />
                 </Button>
+
+                {selectedDatasetName &&
+                  selectedDatasetName !== 'business_qa.json' &&
+                  selectedDatasetName !== 'sample_lightrag.json' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDeleteDataset}
+                      disabled={deletingDataset}
+                      className="size-7 p-0 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 transition-colors"
+                      tooltip="删除该题库(移入回收站)"
+                    >
+                      <Trash2Icon className="size-3.5" />
+                    </Button>
+                  )}
               </div>
 
               <div className="h-4 w-px bg-border/60 hidden sm:block" />
@@ -818,6 +1005,42 @@ export default function EvaluationStudio() {
                 >
                   <span>{lineageStatus.badge}</span>
                 </span>
+
+                {/* 原材料就绪度指示徽章 (Readiness Guard) */}
+                {checkingReadiness ? (
+                  <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] bg-muted text-muted-foreground animate-pulse">
+                    <Loader2Icon className="size-2.5 animate-spin" />
+                    <span>检测原料就绪度...</span>
+                  </span>
+                ) : readiness ? (
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium transition-colors cursor-help',
+                      readiness.status === 'ready' &&
+                        'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30',
+                      readiness.status === 'partial' &&
+                        'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30',
+                      readiness.status === 'missing' &&
+                        'bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30 font-semibold'
+                    )}
+                    title={
+                      readiness.status === 'missing'
+                        ? `【严重警告】当前库完全缺失该题库所需的原材料文档！(${readiness.missing_docs.join(', ')})，强行打擂将全部失分。`
+                        : readiness.status === 'partial'
+                          ? `【部分就绪】具备 ${readiness.matched_docs.length}/${readiness.total_required} 篇文档，缺失: ${readiness.missing_docs.join(', ')}`
+                          : `【契约就绪】当前知识库包含题库所需的全部 ${readiness.total_required} 篇原材料文档，可随时启动矩阵打擂！`
+                    }
+                  >
+                    {readiness.status === 'ready' && <CheckCircle2Icon className="size-3" />}
+                    {readiness.status === 'partial' && <AlertCircleIcon className="size-3" />}
+                    {readiness.status === 'missing' && <AlertTriangleIcon className="size-3" />}
+                    <span>
+                      {readiness.status === 'ready' && `🟢 契约就绪 (${Math.round(readiness.coverage_rate * 100)}%)`}
+                      {readiness.status === 'partial' && `🟡 部分原料 (${readiness.matched_docs.length}/${readiness.total_required})`}
+                      {readiness.status === 'missing' && `🔴 原料缺失 (0/${readiness.total_required})`}
+                    </span>
+                  </span>
+                ) : null}
               </div>
             </div>
 
@@ -864,6 +1087,21 @@ export default function EvaluationStudio() {
               </Button>
             </div>
           </div>
+
+          {/* 原料缺失置顶告警横幅 (Readiness Missing Warning) */}
+          {readiness && readiness.status === 'missing' && (
+            <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs shrink-0 animate-in fade-in duration-200">
+              <div className="flex items-center gap-2.5">
+                <AlertTriangleIcon className="size-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                <div>
+                  <span className="font-semibold">【契约拦截】当前知识库完全缺失该评测集所需的全部原材料文档！</span>
+                  <span className="text-[11px] opacity-90 block mt-0.5">
+                    所需原材料文档（{readiness.missing_docs.join(', ') || '未声明'}）不在当前知识库中。已主动拦截矩阵打擂，请在右上角切换到「评测基准 (eval_benchmark)」知识库后再进行评测！
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 3. 汇总数据表格 (Full-width Data Table) */}
           <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-border/60 bg-card/60 shadow-xs relative">
@@ -1150,17 +1388,29 @@ export default function EvaluationStudio() {
                       </div>
                     </div>
                   ) : ctxs.length > 0 ? (
-                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                       {ctxs.map((ctxText, idx) => (
                         <div
                           key={idx}
-                          className="p-2.5 rounded-md bg-muted/30 font-mono text-[11px] text-foreground/90 leading-relaxed border border-border/40 whitespace-pre-wrap select-text"
+                          onClick={() => setFocusSlice({ index: idx + 1, text: ctxText, caseId: inspectCase?.id })}
+                          className="group/slice p-2.5 rounded-md bg-muted/30 hover:bg-muted/60 font-mono text-[11px] text-foreground/90 leading-relaxed border border-border/40 hover:border-indigo-500/70 transition-all cursor-pointer select-text shadow-2xs"
+                          title="点击卡片放大检视该切片完整全文"
                         >
                           <div className="text-[10px] font-semibold text-indigo-500 mb-1 flex items-center justify-between">
-                            <span>切片 #{idx + 1}</span>
-                            <span className="text-muted-foreground font-normal">{ctxText.length} 字符</span>
+                            <span className="flex items-center gap-1.5">
+                              <span className="px-1.5 py-0.2 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
+                                切片 #{idx + 1}
+                              </span>
+                              <span className="text-muted-foreground font-normal">{ctxText.length} 字符</span>
+                            </span>
+                            <span className="text-muted-foreground group-hover/slice:text-indigo-600 dark:group-hover/slice:text-indigo-400 flex items-center gap-1 transition-colors font-medium">
+                              <Maximize2Icon className="size-2.5" />
+                              <span>点击看全文</span>
+                            </span>
                           </div>
-                          {ctxText}
+                          <div className="whitespace-pre-wrap break-words">
+                            {ctxText}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1183,6 +1433,71 @@ export default function EvaluationStudio() {
           <DialogFooter className="pt-2">
             <Button size="sm" onClick={() => setInspectCase(null)}>
               关闭检视
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------------------------------------------------------- */}
+      {/* 模态框 0.5：🔍 切片证据完整透视大视窗 (Slice Focus Dialog) */}
+      {/* ------------------------------------------------------------------- */}
+      <Dialog open={Boolean(focusSlice)} onOpenChange={(open) => !open && setFocusSlice(null)}>
+        <DialogContent className="sm:max-w-[720px] max-h-[85vh] flex flex-col">
+          <DialogHeader className="shrink-0 border-b border-border/60 pb-3">
+            <DialogTitle className="flex items-center justify-between pr-6">
+              <span className="flex items-center gap-2">
+                <FileTextIcon className="size-4.5 text-indigo-500" />
+                <span>切片完整内容透视 (切片 #{focusSlice?.index})</span>
+              </span>
+              <span className="text-xs font-normal text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded border border-border/50">
+                共 {focusSlice?.text.length || 0} 字符
+              </span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground pt-1">
+              展示底层知识切片的 100% 完整原文，支持全文自由阅读、复制与比对。
+            </DialogDescription>
+          </DialogHeader>
+
+          {focusSlice && (
+            <div className="flex-1 overflow-y-auto py-3 space-y-3 pr-1">
+              {/* 原文卡片 */}
+              <div className="p-4 rounded-lg bg-muted/40 border border-border/80 font-mono text-xs leading-relaxed text-foreground select-text whitespace-pre-wrap break-words">
+                {focusSlice.text}
+              </div>
+
+              {/* 省略号出处说明 */}
+              {(focusSlice.text.endsWith('...') || focusSlice.text.endsWith('…') || focusSlice.text.includes('...')) && (
+                <div className="p-3 rounded-md bg-sky-500/5 border border-sky-500/20 text-sky-800 dark:text-sky-300 text-xs flex items-start gap-2">
+                  <InfoIcon className="size-4 shrink-0 mt-0.5 text-sky-500" />
+                  <div className="space-y-0.5 text-[11px] leading-relaxed">
+                    <p className="font-semibold">关于切片末尾省略号 (…) 的出处说明：</p>
+                    <p className="text-muted-foreground">
+                      该切片来源于华为诺亚方舟 RGB 开源基准原始语料。原数据集在抓取网页新闻时即为搜索引擎快照摘要（Snippet），文本末尾原生带有省略号。上方展示即为此切片在题库中的 <b>100% 完整原始内容</b>，无任何前端截断。
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="pt-2 shrink-0 border-t border-border/40 flex items-center justify-between sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs"
+              onClick={() => {
+                if (focusSlice?.text) {
+                  navigator.clipboard.writeText(focusSlice.text)
+                  toast.success('已复制切片完整文本至剪贴板！')
+                }
+              }}
+            >
+              <CopyIcon className="size-3.5" />
+              <span>复制切片全文</span>
+            </Button>
+            <Button size="sm" onClick={() => setFocusSlice(null)}>
+              关闭
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1221,6 +1536,73 @@ export default function EvaluationStudio() {
             </div>
           ) : (
             <form onSubmit={handleTriggerSynthesize} className="space-y-4 py-2">
+              {/* 题库维护策略：覆盖更新当前专属题库 vs 创建新版本 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">
+                  题库维护策略 (防泛滥治理)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div
+                    onClick={() => {
+                      setSynthTargetMode('overwrite')
+                      if (selectedDatasetName) setSynthName(selectedDatasetName)
+                    }}
+                    className={cn(
+                      'p-2 rounded-lg border text-left cursor-pointer transition-all',
+                      synthTargetMode === 'overwrite'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                        🔄 覆盖更新当前题库
+                      </span>
+                      <input
+                        type="radio"
+                        name="synthTargetMode"
+                        checked={synthTargetMode === 'overwrite'}
+                        readOnly
+                        className="size-3 accent-indigo-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                      保持单一专属题库，差量迭代
+                    </p>
+                  </div>
+
+                  <div
+                    onClick={() => {
+                      setSynthTargetMode('create')
+                      const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
+                      setSynthName(
+                        `${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`
+                      )
+                    }}
+                    className={cn(
+                      'p-2 rounded-lg border text-left cursor-pointer transition-all',
+                      synthTargetMode === 'create'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold">✨ 创建新题库版本</span>
+                      <input
+                        type="radio"
+                        name="synthTargetMode"
+                        checked={synthTargetMode === 'create'}
+                        readOnly
+                        className="size-3 accent-indigo-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      保留历史，新建独立版本
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">
                   题库命名 (Dataset Name) *
@@ -1322,20 +1704,37 @@ export default function EvaluationStudio() {
           </DialogHeader>
 
           {matrixTaskStatus && matrixTaskStatus.status === 'running' ? (
-            <div className="py-6 space-y-4 text-center">
-              <div className="size-12 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto">
-                <Loader2Icon className="size-6 animate-spin" />
+            <div className="py-4 space-y-3.5 text-center">
+              <div className="size-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto">
+                <Loader2Icon className="size-5 animate-spin" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">矩阵打擂正在并发评估中...</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {matrixLimitMode === 'quick' ? '🚀 极速打擂评测并发执行中...' : '📊 全量矩阵打擂并发评估中...'}
+                </p>
                 <p className="text-xs text-muted-foreground font-mono">
                   {matrixTaskStatus.message}
                 </p>
               </div>
-              <Progress value={matrixTaskStatus.progress || 40} className="h-1.5" />
-              <p className="text-[10px] text-muted-foreground">
-                正在执行 DeepEval G-Eval、Faithfulness 及 Relevancy 判定...
-              </p>
+              <div className="space-y-1 px-1">
+                <div className="flex justify-between text-[11px] text-muted-foreground">
+                  <span>实时流式推流进度</span>
+                  <span className="font-mono font-semibold text-indigo-500">{matrixTaskStatus.progress || 10}%</span>
+                </div>
+                <Progress value={matrixTaskStatus.progress || 10} className="h-1.5" />
+              </div>
+
+              {/* 实时控制台推流终端窗格 (Console Log Drawer) */}
+              {matrixTaskStatus.logs && matrixTaskStatus.logs.length > 0 && (
+                <div className="text-left bg-slate-950 text-slate-200 p-2.5 rounded-lg font-mono text-[10px] h-36 overflow-y-auto space-y-1 border border-slate-800 shadow-inner">
+                  {matrixTaskStatus.logs.slice(-25).map((line, idx) => (
+                    <div key={idx} className="leading-tight break-all">
+                      <span className="text-emerald-400 select-none mr-1.5">›</span>
+                      <span>{line}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : matrixTaskStatus && matrixTaskStatus.status === 'completed' ? (
             <div className="py-4 space-y-4">
@@ -1345,27 +1744,49 @@ export default function EvaluationStudio() {
                 <p className="text-xs text-muted-foreground">
                   评测指标、详细打分及问答轨迹已完整同步至 MLflow 实验平台。
                 </p>
+                {matrixTaskStatus.runs && matrixTaskStatus.runs.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1 text-[10px] font-mono text-muted-foreground">
+                    <span>参评 Runs:</span>
+                    {matrixTaskStatus.runs.map((r) => (
+                      <span key={r} className="px-1.5 py-0.5 rounded bg-muted border border-border/80">
+                        {r.slice(0, 8)}...
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-wrap justify-center gap-2 pt-2">
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setMatrixOpen(false)
-                    setActiveSubTab('mlflow')
-                  }}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
-                >
-                  <BarChart3Icon className="size-3.5 mr-1" />
-                  <span>切换至嵌入评测大屏</span>
-                </Button>
+                {matrixTaskStatus.result_url ? (
+                  <a
+                    href={matrixTaskStatus.result_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-indigo-500 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm"
+                  >
+                    <span>🔥 查看本次打擂对比大屏 (Compare Runs)</span>
+                    <ExternalLinkIcon className="size-3.5" />
+                  </a>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setMatrixOpen(false)
+                      setActiveSubTab('mlflow')
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
+                  >
+                    <BarChart3Icon className="size-3.5 mr-1" />
+                    <span>切换至嵌入评测大屏</span>
+                  </Button>
+                )}
                 <a
                   href={mlflowUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/80 bg-background hover:bg-muted text-foreground text-xs font-semibold"
                 >
-                  <span>新窗口打开 MLflow</span>
+                  <span>打开 MLflow 实验主页</span>
                   <ExternalLinkIcon className="size-3.5" />
                 </a>
               </div>
@@ -1376,6 +1797,85 @@ export default function EvaluationStudio() {
                 <label className="text-xs font-semibold text-foreground">当前参评题库</label>
                 <div className="w-full px-3 py-1.5 text-xs font-mono rounded-md bg-muted text-foreground border border-input">
                   {selectedDatasetName} ({cases.length} 道考题)
+                </div>
+              </div>
+
+              {/* 原材料就绪度契约校验与告警 (Readiness Status Alert) */}
+              {readiness && readiness.status === 'missing' && (
+                <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertTriangleIcon className="size-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
+                  <div className="space-y-1">
+                    <div className="font-semibold">【契约拦截】当前知识库完全缺失该评测集的原材料文档</div>
+                    <div className="text-[11px] opacity-90 leading-relaxed">
+                      当前激活库「{currentProjectName}」未包含此评测集所需的任何文档（缺失：{readiness.missing_docs.join(', ') || '全部'}）。
+                      由于召回切片为空，强行打擂将全部失分。请在主界面右上角切换到「评测基准 (eval_benchmark)」知识库。
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {readiness && readiness.status === 'partial' && (
+                <div className="p-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs flex items-start gap-2">
+                  <AlertCircleIcon className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                  <div className="text-[11px] leading-relaxed">
+                    <strong>部分原料就绪：</strong>当前库包含 {readiness.matched_docs.length}/{readiness.total_required} 篇文档，缺失 {readiness.missing_docs.length} 篇（{readiness.missing_docs.join(', ')}），打擂可能部分失分。
+                  </div>
+                </div>
+              )}
+
+              {/* 打擂抽样模式选择 */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">
+                  打擂评测模式 (抽样控制)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div
+                    onClick={() => setMatrixLimitMode('quick')}
+                    className={cn(
+                      'p-2.5 rounded-lg border text-left cursor-pointer transition-all',
+                      matrixLimitMode === 'quick'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">🚀 极速打擂验证</span>
+                      <input
+                        type="radio"
+                        name="limitMode"
+                        checked={matrixLimitMode === 'quick'}
+                        readOnly
+                        className="size-3 accent-indigo-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      抽样前 5 题，约 30 秒出分，日常验证首选
+                    </p>
+                  </div>
+
+                  <div
+                    onClick={() => setMatrixLimitMode('full')}
+                    className={cn(
+                      'p-2.5 rounded-lg border text-left cursor-pointer transition-all',
+                      matrixLimitMode === 'full'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold">📊 全量深度打擂</span>
+                      <input
+                        type="radio"
+                        name="limitMode"
+                        checked={matrixLimitMode === 'full'}
+                        readOnly
+                        className="size-3 accent-indigo-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      全部考题基线，深度验证与留痕归档
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1456,10 +1956,19 @@ export default function EvaluationStudio() {
                 <Button
                   type="submit"
                   size="sm"
-                  disabled={selectedModes.length === 0}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  disabled={selectedModes.length === 0 || readiness?.status === 'missing'}
+                  className={cn(
+                    'text-white transition-all',
+                    readiness?.status === 'missing'
+                      ? 'bg-muted text-muted-foreground border border-border cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                  )}
                 >
-                  启动矩阵打擂流水线
+                  {readiness?.status === 'missing'
+                    ? '❌ 原料缺失无法打擂 (请切换基准库)'
+                    : matrixLimitMode === 'quick'
+                      ? '🚀 启动极速打擂 (抽样 5 题)'
+                      : '📊 启动全量深度打擂'}
                 </Button>
               </DialogFooter>
             </form>

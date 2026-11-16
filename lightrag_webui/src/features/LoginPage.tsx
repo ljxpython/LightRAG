@@ -30,15 +30,10 @@ import {
   splitConsentLabel,
   type LoginConsentTick
 } from '@/features/loginConsent'
+import { User, Lock, Eye, EyeOff, Network, Sparkles, Layers, ShieldCheck } from 'lucide-react'
+import EnterpriseLogo from '@/components/layout/EnterpriseLogo'
 
 interface LoginPageProps {
-  /**
-   * Whether an auth-disabled deployment may activate the guest token right
-   * here. The admin entry keeps the historical auto-login; the WORKSPACE
-   * entry passes false — its guest activation happens ONLY through the
-   * welcome page's explicit action (PRD §6.3), so a direct or bookmarked
-   * #/login visit redirects there instead of silently activating a token.
-   */
   autoActivateGuest?: boolean
 }
 
@@ -49,37 +44,26 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [authStatusTitle, setAuthStatusTitle] = useState<string | null>(null)
-  // The tick is stored WITH the document it was given for; a language switch
-  // replaces that document, and consent must not survive the swap.
   const [consentTick, setConsentTick] = useState<LoginConsentTick>({
     document: null,
     agreed: false
   })
   const [agreementsOpen, setAgreementsOpen] = useState(false)
-  // Latch the URL that failed, not a boolean: a language switch may supply
-  // a different logo URL that should get its own load attempt.
   const [failedLogoUrl, setFailedLogoUrl] = useState<string | null>(null)
-  const authCheckRef = useRef(false); // Prevent duplicate calls in Vite dev mode
+  const authCheckRef = useRef(false)
 
-  // Fired in PARALLEL with the /auth-status probe below (both are effects of
-  // this same mount), so the consent gate costs no serial round trip.
   const content = useCustomizedContent(authStatusTitle)
   const consentAgreed = isAgreedTo(consentTick, content.agreementsMarkdown)
   const consentState = {
-    // NOT content.loading: on a language switch the store keeps the previous
-    // locale's snapshot on screen, and its verdict does not carry.
     pending: content.consentPending,
     consentRequired: content.consentRequired,
     agreed: consentAgreed
   }
   const showConsent = shouldShowLoginConsent(consentState)
   const consentBlocked = isLoginBlockedByConsent(consentState)
-  // How the checkbox NAMES the documents. The bundle owns it (a deployment
-  // may not call its document "Privacy Policy and Model Service Agreement"
-  // at all), and the WebUI translation is only the fallback for a bundle
-  // that declares no name.
   const consentDocuments = resolveConsentDocuments(
     content.consentDocuments,
     t('login.consentDocuments')
@@ -90,27 +74,21 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
   )
 
   useEffect(() => {
-    console.log('LoginPage mounted')
-  }, []);
+    document.title = '登录 - OmniRAG Enterprise Studio'
+  }, [])
 
-  // Check if authentication is configured, skip login if not
   useEffect(() => {
-
     const checkAuthConfig = async () => {
-      // Prevent duplicate calls in Vite dev mode
-      if (authCheckRef.current) {
-        return;
-      }
-      authCheckRef.current = true;
+      if (authCheckRef.current) return
+      authCheckRef.current = true
 
       try {
-        // If already authenticated, redirect to home
         if (isAuthenticated) {
           navigate('/')
           return
         }
 
-        // Check for SSO ticket in URL search or hash search
+        // Automatic SSO Ticket Exchange
         const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '')
         const urlParams = new URLSearchParams(searchStr)
         const ssoTicket = urlParams.get('sso_ticket') || urlParams.get('ticket')
@@ -127,7 +105,6 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                 exchangeRes.webui_title || null,
                 exchangeRes.webui_description || null
               )
-              // Clean ticket from URL bar
               const cleanUrl = window.location.pathname + window.location.hash.split('?')[0]
               window.history.replaceState({}, document.title, cleanUrl)
               toast.success(t('login.successMessage', '登录成功'))
@@ -140,72 +117,43 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
           }
         }
 
-        // Check auth status
         const status = await getAuthStatus()
         setAuthStatusTitle(status.webui_title || null)
 
-        // Set session flag for version check to avoid duplicate checks in App component
         if (status.core_version || status.api_version) {
-          markVersionCheckedFromLogin();
+          markVersionCheckedFromLogin()
         }
 
         if (!status.auth_configured && status.access_token) {
           if (!autoActivateGuest) {
-            // Workspace entry: guest activation belongs to the welcome page's
-            // explicit action — never to a (possibly bookmarked) login visit.
             navigate('/welcome', { replace: true })
             return
           }
-          // If auth is not configured, use the guest token and redirect.
-          // Guest activation is an identity transition: a different stored
-          // identity means the previous user's histories must not be shown.
-          //
-          // NOT gated by the consent checkbox, deliberately. The gate binds
-          // an agreement to a user, and an auth-disabled deployment has no
-          // user to bind it to -- every visitor is the same anonymous guest,
-          // so a tick here would record nothing and prove nothing. It is a
-          // development and demo posture, not a production one; a deployment
-          // that needs the agreement accepted configures AUTH_ACCOUNTS and
-          // gets the gate on the credentialed form below. The same reasoning
-          // covers the workspace entry's guest activation in
-          // WorkspaceWelcome.handlePrimaryAction. Documented in
-          // docs/ui_templates_example/README.md.
-          activateLoginIdentityFromToken(status.access_token)
-          login(status.access_token, true, status.core_version, status.api_version, status.webui_title || null, status.webui_description || null)
-          if (status.message) {
-            toast.info(status.message)
-          }
+          const isGuestMode = status.auth_mode === 'disabled'
+          login(status.access_token, isGuestMode, status.core_version, status.api_version, status.webui_title || null, status.webui_description || null)
           navigate('/')
           return
         }
 
-        // Only set checkingAuth to false if we need to show the login page
-        setCheckingAuth(false);
-
+        setCheckingAuth(false)
       } catch (error) {
         console.error('Failed to check auth configuration:', error)
-        // Also set checkingAuth to false in case of error
-        setCheckingAuth(false);
+        setCheckingAuth(false)
       }
-      // Removed finally block as we're setting checkingAuth earlier
     }
 
-    // Execute immediately
     checkAuthConfig()
+  }, [isAuthenticated, login, navigate, autoActivateGuest, t])
 
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-    }
-  }, [isAuthenticated, login, navigate, autoActivateGuest])
-
-  // Don't render anything while checking auth, or before the customization
-  // response settles. The second wait is what keeps the consent gate honest:
-  // the flag that decides whether signing in requires agreement is not known
-  // until then, so a form rendered earlier would be submittable ungated on a
-  // deployment that requires the agreement. Both requests are in flight
-  // together, so on a reachable server this is the same single wait as before.
   if (checkingAuth || content.loading) {
-    return null
+    return (
+      <div className="flex min-h-dvh w-full items-center justify-center bg-[#070b14] text-slate-300">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <p className="text-xs text-slate-400">正在初始化系统环境…</p>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -214,10 +162,6 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
       toast.error(t('login.errorEmptyFields'))
       return
     }
-    // The disabled button is the visible half of the gate; this is the half
-    // that actually holds. A form submits on Enter regardless of its submit
-    // button's state, so without this check the keyboard path would bypass
-    // the agreement entirely.
     if (consentBlocked) {
       toast.error(t('login.errorConsentRequired'))
       return
@@ -227,41 +171,31 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
       setLoading(true)
       const response = await loginToServer(username, password)
 
-      // Identity-change cleanup, shared with the guest activation paths: a
-      // different user must not see the previous user's conversations in
-      // EITHER entry — the rule applies to both split histories.
-      const identityChanged = activateLoginIdentityFromToken(response.access_token)
-      console.log(
-        identityChanged
-          ? 'Different user logging in, clearing chat history'
-          : 'Same user logging in, preserving chat history'
-      )
-
-      // Check authentication mode
+      activateLoginIdentityFromToken(response.access_token)
       const isGuestMode = response.auth_mode === 'disabled'
       login(response.access_token, isGuestMode, response.core_version, response.api_version, response.webui_title || null, response.webui_description || null)
 
-      // Set session flag for version check
       if (response.core_version || response.api_version) {
-        markVersionCheckedFromLogin();
+        markVersionCheckedFromLogin()
       }
 
       if (isGuestMode) {
-        // Show authentication disabled notification
         toast.info(response.message || t('login.authDisabled', 'Authentication is disabled. Using guest access.'))
       } else {
         toast.success(t('login.successMessage'))
       }
 
-      // Navigate to home page after successful login
       navigate('/')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed...', error)
-      toast.error(t('login.errorInvalidCredentials'))
+      const errorDetail = error?.response?.data?.detail || ''
+      if (error?.response?.status === 503 || errorDetail.includes('unavailable')) {
+        toast.error('主平台身份认证服务暂不可用，请稍后重试')
+      } else {
+        toast.error(t('login.errorInvalidCredentials', '用户名或密码错误'))
+      }
 
-      // Clear any existing auth state
       useAuthStore.getState().logout()
-      // Clear local storage
       localStorage.removeItem('LIGHTRAG-API-TOKEN')
     } finally {
       setLoading(false)
@@ -270,168 +204,257 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
 
   return (
     <div
-      // min-h-dvh, not h-screen: mobile browsers include their collapsing
-      // chrome in 100vh, which can push the form under the toolbar; dvh
-      // tracks the actually visible viewport, and min- lets small screens
-      // scroll instead of clipping.
-      className="flex min-h-dvh w-full flex-col items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-gray-900 dark:to-gray-800"
+      className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-[#070b14] text-slate-100"
       style={{
-        padding:
-          'calc(env(safe-area-inset-top) + 1rem) calc(env(safe-area-inset-right) + 1rem) calc(env(safe-area-inset-bottom) + 1rem) calc(env(safe-area-inset-left) + 1rem)'
+        padding: 'calc(env(safe-area-inset-top) + 1.5rem) calc(env(safe-area-inset-right) + 1.5rem) calc(env(safe-area-inset-bottom) + 1.5rem) calc(env(safe-area-inset-left) + 1.5rem)'
       }}
     >
+      {/* Ambient Radial Glowing Lights */}
       <div
-        className="absolute flex items-center gap-2"
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-32 right-1/4 h-[450px] w-[450px] rounded-full bg-teal-500/10 blur-[130px]"
+      />
+
+      {/* Cyber Dot Grid Pattern Overlay */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]"
+      />
+
+      {/* Top Right Controls */}
+      <div
+        className="absolute z-20 flex items-center gap-2"
         style={{
-          top: 'calc(env(safe-area-inset-top) + 1rem)',
-          right: 'calc(env(safe-area-inset-right) + 1rem)'
+          top: 'calc(env(safe-area-inset-top) + 1.25rem)',
+          right: 'calc(env(safe-area-inset-right) + 1.25rem)'
         }}
       >
-        <AppSettings className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md" />
+        <AppSettings className="rounded-lg border border-white/10 bg-slate-900/60 p-1.5 backdrop-blur-md transition-colors hover:bg-slate-800/80" />
       </div>
-      {/* The card centers in the space ABOVE the footer, so the copyright
-          line sits at the page's bottom edge instead of inside the card. */}
-      <div className="flex w-full flex-1 items-center justify-center">
-        <Card className="w-full max-w-[480px] shadow-lg mx-4">
-          <CardHeader className="flex items-center justify-center space-y-2 pb-8 pt-6">
-            <div className="flex flex-col items-center space-y-4">
-              {content.logoUrl && failedLogoUrl !== content.logoUrl && (
-                <img
-                  src={content.logoUrl}
-                  alt={content.logoAlt}
-                  className="h-12 w-12 object-contain"
-                  onError={() => setFailedLogoUrl(content.logoUrl)}
+
+      {/* Main Dual-Panel Layout Container */}
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 px-4 lg:grid-cols-12 lg:gap-14">
+        {/* Left Side: Brand Narrative & Knowledge Graph Architecture */}
+        <div className="flex flex-col gap-6 lg:col-span-7">
+          {/* Brand Header */}
+          <div className="flex items-center gap-3">
+            <EnterpriseLogo size={38} withText={false} />
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold tracking-tight text-white">
+                {content.brandTitle && content.brandTitle !== 'LightRAG' ? content.brandTitle : 'OmniRAG'}
+              </span>
+              <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-emerald-400">
+                PRO V1.5.8
+              </span>
+            </div>
+          </div>
+
+          {/* Hero Headline */}
+          <div className="space-y-2.5">
+            <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 sm:text-4xl">
+              企业级知识图谱增强检索平台
+            </h1>
+            <p className="max-w-xl text-sm leading-relaxed text-slate-400">
+              融合双层实体图谱拓扑与向量语义空间，突破传统 RAG 检索视野限制，
+              提供高可信、精准溯源、低幻觉的企业专家知识库服务。
+            </p>
+          </div>
+
+          {/* 4 Feature Cards Grid */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {[
+              {
+                icon: Network,
+                title: 'Dual-Level Graph RAG',
+                desc: '低阶实体与高阶拓扑双层协同检索'
+              },
+              {
+                icon: Sparkles,
+                title: 'Docling 多模态可信定位',
+                desc: '高精度版面分析与精准页码溯源'
+              },
+              {
+                icon: Layers,
+                title: 'POSIX CAS 零锁原子发布',
+                desc: '毫秒级快照发布与平滑读租约排空'
+              },
+              {
+                icon: ShieldCheck,
+                title: '三位一体统一凭据',
+                desc: '支持 Agent 平台账号穿透与 60s 票据直通'
+              }
+            ].map((feat) => {
+              const IconComp = feat.icon
+              return (
+                <div
+                  key={feat.title}
+                  className="group flex items-start gap-3 rounded-xl border border-white/5 bg-slate-900/40 p-3.5 backdrop-blur-sm transition-all duration-200 hover:border-emerald-500/30 hover:bg-slate-800/50"
+                >
+                  <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400 group-hover:bg-emerald-500/20">
+                    <IconComp className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold text-slate-200">{feat.title}</h3>
+                    <p className="mt-0.5 text-[11px] text-slate-400">{feat.desc}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* System Cluster Status */}
+          <div className="flex items-center gap-2 pt-1 text-xs text-slate-500">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            <span>OmniRAG 集群正常运行 · 存储引擎: NanoVectorDB · 版本 v1.5.8</span>
+          </div>
+        </div>
+
+        {/* Right Side: Modern Glassmorphism Login Card */}
+        <div className="w-full lg:col-span-5">
+          <Card className="mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-slate-900/70 p-2 shadow-2xl backdrop-blur-2xl">
+            <CardHeader className="space-y-1.5 pb-6 pt-6 text-center">
+              <h2 className="text-xl font-bold tracking-tight text-white">OmniRAG 身份认证</h2>
+              <p className="text-xs text-slate-400">
+                使用 Agent 平台账号或 OmniRAG 专属凭据直通登入
+              </p>
+            </CardHeader>
+            <CardContent className="px-6 pb-6 pt-0">
+              {content.loginMarkdown && (
+                <CustomizedMarkdown
+                  content={content.loginMarkdown}
+                  dir={content.direction}
+                  className="mb-4 text-xs text-slate-300"
                 />
               )}
-              <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">{content.brandTitle}</h1>
-                <p className="text-muted-foreground text-sm">
-                  {t('login.description')}
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="px-8 pb-8">
-            {content.loginMarkdown && (
-              <CustomizedMarkdown
-                content={content.loginMarkdown}
-                dir={content.direction}
-                className="mb-6 text-sm"
-              />
-            )}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex items-center gap-4">
-                <label htmlFor="username-input" className="text-sm font-medium w-16 shrink-0">
-                  {t('login.username')}
-                </label>
-                <Input
-                  id="username-input"
-                  placeholder={t('login.usernamePlaceholder')}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="h-11 min-w-0 flex-1"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label htmlFor="password-input" className="text-sm font-medium w-16 shrink-0">
-                  {t('login.password')}
-                </label>
-                <Input
-                  id="password-input"
-                  type="password"
-                  placeholder={t('login.passwordPlaceholder')}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="h-11 min-w-0 flex-1"
-                />
-              </div>
-              {showConsent && (
-                <div className="flex items-start gap-2" dir={content.direction}>
-                  <Checkbox
-                    id="login-consent"
-                    checked={consentAgreed}
-                    onCheckedChange={(checked) =>
-                      setConsentTick({
-                        document: content.agreementsMarkdown,
-                        agreed: checked === true
-                      })
-                    }
-                    // The visible text is split around the document link, so the
-                    // control's accessible name is spelled out here in full
-                    // rather than assembled from the label fragments.
-                    aria-label={consentLabelText}
-                    className="mt-0.5"
-                  />
-                  <span className="text-muted-foreground text-sm leading-5">
-                    {/* Two labels around the link, never one wrapping it: a
-                        <label> that contained the button would toggle the
-                        checkbox on every click meant to OPEN the document. */}
-                    {consentLabelParts.before && (
-                      <label htmlFor="login-consent" className="cursor-pointer">
-                        {consentLabelParts.before}
-                      </label>
-                    )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Username Input */}
+                <div className="space-y-1.5">
+                  <label htmlFor="username-input" className="text-xs font-medium text-slate-300">
+                    {t('login.username')}
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Input
+                      id="username-input"
+                      placeholder={t('login.usernamePlaceholder', '请输入用户名')}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      className="h-11 rounded-lg border-white/10 bg-slate-950/50 pl-10 text-sm text-white placeholder:text-slate-500 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Input with Show/Hide Toggle */}
+                <div className="space-y-1.5">
+                  <label htmlFor="password-input" className="text-xs font-medium text-slate-300">
+                    {t('login.password')}
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Input
+                      id="password-input"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder={t('login.passwordPlaceholder', '请输入密码')}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="h-11 rounded-lg border-white/10 bg-slate-950/50 pl-10 pr-10 text-sm text-white placeholder:text-slate-500 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                    />
                     <button
                       type="button"
-                      className="text-primary underline underline-offset-2 hover:opacity-80"
-                      onClick={() => setAgreementsOpen(true)}
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                     >
-                      {consentDocuments}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
-                    {consentLabelParts.after && (
-                      <label htmlFor="login-consent" className="cursor-pointer">
-                        {consentLabelParts.after}
-                      </label>
-                    )}
-                  </span>
+                  </div>
                 </div>
-              )}
-              <Button
-                type="submit"
-                className="w-full h-11 text-base font-medium mt-2"
-                disabled={loading || consentBlocked}
-              >
-                {loading ? t('login.loggingIn') : t('login.loginButton')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+
+                {/* Consent Gate */}
+                {showConsent && (
+                  <div className="flex items-start gap-2 pt-1" dir={content.direction}>
+                    <Checkbox
+                      id="login-consent"
+                      checked={consentAgreed}
+                      onCheckedChange={(checked) =>
+                        setConsentTick({
+                          document: content.agreementsMarkdown,
+                          agreed: checked === true
+                        })
+                      }
+                      aria-label={consentLabelText}
+                      className="mt-0.5 border-slate-600 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                    />
+                    <span className="text-xs leading-relaxed text-slate-400">
+                      {consentLabelParts.before && (
+                        <label htmlFor="login-consent" className="cursor-pointer">
+                          {consentLabelParts.before}
+                        </label>
+                      )}
+                      <button
+                        type="button"
+                        className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+                        onClick={() => setAgreementsOpen(true)}
+                      >
+                        {consentDocuments}
+                      </button>
+                      {consentLabelParts.after && (
+                        <label htmlFor="login-consent" className="cursor-pointer">
+                          {consentLabelParts.after}
+                        </label>
+                      )}
+                    </span>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="h-11 w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:from-emerald-600 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-[0.99] disabled:opacity-50"
+                  disabled={loading || consentBlocked}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>{t('login.loggingIn', '正在登录…')}</span>
+                    </div>
+                  ) : (
+                    t('login.loginButton', '登录进入 OmniRAG 知识库')
+                  )}
+                </Button>
+              </form>
+
+              {/* Bottom Security Info */}
+              <div className="mt-5 border-t border-white/5 pt-4 text-center">
+                <p className="text-[11px] text-slate-500">
+                  OmniRAG Enterprise Studio · 统一认证与访问控制保护中
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <CustomizedCopyright
+            copyright={content.copyright}
+            direction={content.direction}
+            className="pt-3 text-center text-xs text-slate-500"
+          />
+        </div>
       </div>
-      <CustomizedCopyright
-        copyright={content.copyright}
-        direction={content.direction}
-        className="pt-4"
-      />
-      {/* Rendered only where the gate exists, so a deployment without an
-          agreement document has no dialog to open. */}
+
+      {/* Consent Dialog */}
       {showConsent && content.agreementsMarkdown && (
         <Dialog open={agreementsOpen} onOpenChange={setAgreementsOpen}>
-          <DialogContent className="max-h-[85vh] max-w-2xl" dir={content.direction}>
-            {/* Visually hidden, NOT omitted: Radix requires a title for the
-                dialog's accessible name, while the visible one belongs to
-                the document itself — printing the link's wording here too
-                would put a second, different title above the file's own.
-
-                That name is the LINK's wording, never something parsed back
-                out of the document: it is what the visitor just ticked, and
-                the deployment maintains it alongside the file it points at.
-                Nothing here reads the Markdown; the dialog renders it. */}
+          <DialogContent className="max-h-[85vh] max-w-2xl bg-slate-900 text-slate-100 border-white/10" dir={content.direction}>
             <DialogHeader className="sr-only">
               <DialogTitle>{consentDocuments}</DialogTitle>
             </DialogHeader>
-            {/* pr-8 clears the close button, which is positioned against the
-                dialog's physical right edge in both writing directions. */}
-            <ScrollArea className="max-h-[70vh] pr-8">
-              {/* No text-sm here: this is a document to READ, not a form
-                  caption, so it keeps the prose tier's own sizing — and the
-                  `document` variant keeps the file's own heading/list/table
-                  rhythm instead of the compact one used for page blurbs. */}
-              <CustomizedMarkdown
-                content={content.agreementsMarkdown}
-                variant="document"
-              />
+            <ScrollArea className="max-h-[70vh] pr-6">
+              <CustomizedMarkdown content={content.agreementsMarkdown} variant="document" />
             </ScrollArea>
           </DialogContent>
         </Dialog>

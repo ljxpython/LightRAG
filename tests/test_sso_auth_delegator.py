@@ -37,7 +37,7 @@ def test_sso_ticket_tampered_signature_rejected():
     secret = "test-secret-key-1234567890"
     ticket = create_sso_ticket(username="zhangsan", secret=secret, ttl=60)
     payload_b64, sig = ticket.split(".", 1)
-    tampered_sig = "a" + sig[1:]
+    tampered_sig = ("b" if sig[0] == "a" else "a") + sig[1:]
     assert verify_sso_ticket(f"{payload_b64}.{tampered_sig}", secret) is None
 
 

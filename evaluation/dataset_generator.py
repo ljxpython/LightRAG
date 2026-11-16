@@ -28,6 +28,13 @@ import argparse
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+# 强制行缓冲推流
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 # Ensure project root in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -50,6 +57,26 @@ logger = logging.getLogger("dataset_generator")
 # ----------------------------------------------------------------------
 # 1. Project Physical Corpus & Lineage Extraction
 # ----------------------------------------------------------------------
+def _is_valid_project_dir(p: Path) -> bool:
+    if not p.is_dir():
+        return False
+    # 1. 检查 active 软链/目录
+    active = p / "active"
+    if active.exists() and (active / "kv_store_full_docs.json").exists():
+        return True
+    # 2. 检查直属 rev_* 目录
+    for d in p.iterdir():
+        if d.is_dir() and d.name.startswith("rev_") and (d / "kv_store_full_docs.json").exists():
+            return True
+    # 3. 检查 revisions/rev_*
+    rev_parent = p / "revisions"
+    if rev_parent.exists() and rev_parent.is_dir():
+        for d in rev_parent.iterdir():
+            if d.is_dir() and d.name.startswith("rev_") and (d / "kv_store_full_docs.json").exists():
+                return True
+    return False
+
+
 def extract_project_corpus(
     project_id: str,
     storage_base: Optional[Path] = None,
@@ -63,20 +90,48 @@ def extract_project_corpus(
     if storage_base is None:
         storage_base = PROJECT_ROOT / "sandbox_storage"
 
-    proj_dir = storage_base / project_id
+    # 智能多级检索候选目录 (支持平铺或多租户层级 sandbox_storage/<tenant>/<project_id>)
+    proj_dir: Optional[Path] = None
+    direct = storage_base / project_id
+    if _is_valid_project_dir(direct):
+        proj_dir = direct
+    else:
+        candidates = []
+        for sub in storage_base.iterdir():
+            if sub.is_dir() and not sub.name.startswith("."):
+                c = sub / project_id
+                if c.exists() and c.is_dir():
+                    candidates.append(c)
+        valid_candidates = [c for c in candidates if _is_valid_project_dir(c)]
+        if valid_candidates:
+            # 优先选择具有有效索引文件且属于 __default 或 default 租户的目录
+            valid_candidates.sort(key=lambda p: 0 if "__default" in str(p) else 1)
+            proj_dir = valid_candidates[0]
+        elif candidates:
+            proj_dir = candidates[0]
+        else:
+            proj_dir = direct
+
     if not proj_dir.exists():
-        logger.error(f"❌ 找不到项目物理存储目录: {proj_dir}")
+        logger.error(f"❌ 找不到项目物理存储目录: {project_id} (已检索 {storage_base} 及其所有租户子目录)")
         return {}, []
 
-    # Locate active revision or highest rev_N
+    logger.info(f"📂 成功命中有效项目物理目录: {proj_dir}")
+
+    # 定位有效版本目录 (优先 active 软链，其次最新 rev_N)
     rev_dir: Optional[Path] = None
     active_link = proj_dir / "active"
-    if active_link.exists() and active_link.is_dir():
+    if active_link.exists():
         rev_dir = active_link.resolve()
     else:
-        revs = [d for d in proj_dir.iterdir() if d.is_dir() and d.name.startswith("rev_")]
-        if revs:
-            rev_dir = sorted(revs, key=lambda d: int(d.name.split("_")[1]) if d.name.split("_")[1].isdigit() else 0)[-1]
+        candidate_revs = [d for d in proj_dir.iterdir() if d.is_dir() and d.name.startswith("rev_")]
+        if not candidate_revs and (proj_dir / "revisions").exists():
+            candidate_revs = [d for d in (proj_dir / "revisions").iterdir() if d.is_dir() and d.name.startswith("rev_")]
+        if candidate_revs:
+            candidate_revs.sort(
+                key=lambda d: int(d.name.split("_")[1]) if len(d.name.split("_")) > 1 and d.name.split("_")[1].isdigit() else 0
+            )
+            rev_dir = candidate_revs[-1]
 
     if rev_dir is None or not rev_dir.exists():
         logger.error(f"❌ 项目 {project_id} 没有任何有效的版本目录 (rev_*)")
@@ -682,9 +737,10 @@ async def main_async():
     print(f"   • 合成引擎:    {args.engine.upper()}")
     print(f"   • 增量演化模式: {'开启 (基于 ' + str(args.base_dataset) + ')' if args.incremental else '关闭 (全量生成)'}")
     print(f"   • 目标输出:    {args.output}")
-    print(f"   • 裁判大模型:  {model}")
-    print(f"   • MLflow 登记: {'开启 (' + args.mlflow_tracking_uri + ')' if args.mlflow_enabled else '关闭'}")
-    print("=" * 80)
+    print(f"   • 裁判大模型:  {model}", flush=True)
+    print(f"   • MLflow 登记: {'开启 (' + args.mlflow_tracking_uri + ')' if args.mlflow_enabled else '关闭'}", flush=True)
+    print("=" * 80, flush=True)
+    print("[PROGRESS: 15%]", flush=True)
 
     # Step 1: Load corpus and chunks
     if args.from_project:
@@ -693,8 +749,10 @@ async def main_async():
         manifest, chunks = load_documents_from_dir(args.docs_dir)
 
     if not chunks:
-        print("❌ 未加载到任何有效切片，程序退出！")
-        return
+        print("❌ 未加载到任何有效切片，程序退出！", flush=True)
+        sys.exit(1)
+
+    print(f"[PROGRESS: 35%]", flush=True)
 
     # Step 2: Incremental or Full Synthesis
     test_cases: List[Dict[str, Any]] = []
@@ -713,11 +771,13 @@ async def main_async():
         test_cases = await synthesizer.generate_cases(chunks, target_size=args.size)
 
     if not test_cases:
-        print("❌ 评测题生成失败或为空！")
-        return
+        print("❌ 评测题生成失败或为空！", flush=True)
+        sys.exit(1)
 
     for tc in test_cases:
         tc["project"] = project_id
+
+    print(f"[PROGRESS: 75%]", flush=True)
 
     # Step 3: Format and save with Lineage Manifest v2
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -734,9 +794,10 @@ async def main_async():
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print("\n" + "=" * 80)
-    print(f"🎉 评测集与血缘契约构建成功！共计 {len(test_cases)} 题已保存至: {args.output}")
-    print("=" * 80)
+    print(f"[PROGRESS: 90%]", flush=True)
+    print("\n" + "=" * 80, flush=True)
+    print(f"🎉 评测集与血缘契约构建成功！共计 {len(test_cases)} 题已保存至: {args.output}", flush=True)
+    print("=" * 80, flush=True)
 
     # Step 4: MLflow sync
     if args.mlflow_enabled:
@@ -748,6 +809,7 @@ async def main_async():
             project_id=project_id,
             tracking_uri=args.mlflow_tracking_uri,
         )
+    print("[PROGRESS: 100%]", flush=True)
 
 
 def main():

@@ -1,0 +1,1364 @@
+{
+  "dataset_id": "rgb_zh_counterfactual",
+  "dataset_name": "华为 RGB 反事实抗扰基准 (ZH)",
+  "benchmark_source": "Huawei Noah RGB Benchmark (AAAI 2024)",
+  "timestamp": "2026-11-16T11:09:50.457367+00:00",
+  "total_cases": 30,
+  "corpus_manifest": {
+    "documents": [
+      {
+        "file_name": "rgb_pos_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_pos_000",
+        "title": "主题报道：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "positive",
+        "sample_id": 0,
+        "sha256": "a979060a6356f67133152455f69f46d543201d2e1cf3bc3715aacc30cba9371c",
+        "char_count": 1287
+      },
+      {
+        "file_name": "rgb_noise_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_noise_000",
+        "title": "背景参考资讯：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "noise",
+        "sample_id": 0,
+        "sha256": "2e4d4c323bbef23e22be115437e6934985ca0b2ae3b8d8883ff0cf38ace97d6f",
+        "char_count": 768
+      },
+      {
+        "file_name": "rgb_pos_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_pos_001",
+        "title": "主题报道：RCEP具体包括哪些国家",
+        "type": "positive",
+        "sample_id": 1,
+        "sha256": "bef6020538afae9e91b6bec15fe73493887aa39b637c24cc0da6e62178bc7b55",
+        "char_count": 1399
+      },
+      {
+        "file_name": "rgb_noise_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_noise_001",
+        "title": "背景参考资讯：RCEP具体包括哪些国家",
+        "type": "noise",
+        "sample_id": 1,
+        "sha256": "6c74ce8023e1d3d60968ec728dcc926f1ac289bb87b1f8b96787f7372b280511",
+        "char_count": 963
+      },
+      {
+        "file_name": "rgb_pos_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_pos_002",
+        "title": "主题报道：第七届香港立法会议员宣誓仪式的时间",
+        "type": "positive",
+        "sample_id": 2,
+        "sha256": "b9ce126b2aa74b4e01903d849bbea76e0712fe70d4454b2f2d4396172b3be755",
+        "char_count": 1536
+      },
+      {
+        "file_name": "rgb_noise_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_noise_002",
+        "title": "背景参考资讯：第七届香港立法会议员宣誓仪式的时间",
+        "type": "noise",
+        "sample_id": 2,
+        "sha256": "989c30f912a8f5c595d4895e15c957e8f358dcd08f1a8b8c4066c365d6978e43",
+        "char_count": 931
+      },
+      {
+        "file_name": "rgb_pos_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_pos_003",
+        "title": "主题报道：首趟RCEP班列的起点？",
+        "type": "positive",
+        "sample_id": 3,
+        "sha256": "82768201566fa01f18aca59408fbf35c00294f26db02a01f504206fde23ecf9d",
+        "char_count": 954
+      },
+      {
+        "file_name": "rgb_noise_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_noise_003",
+        "title": "背景参考资讯：首趟RCEP班列的起点？",
+        "type": "noise",
+        "sample_id": 3,
+        "sha256": "413197677c3edc54994867dfd8c0a18fc0ca9723ba445b71e3ce5dda5549f3dc",
+        "char_count": 1076
+      },
+      {
+        "file_name": "rgb_pos_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_pos_004",
+        "title": "主题报道：香港第七届立法会选举有多少个议席？",
+        "type": "positive",
+        "sample_id": 4,
+        "sha256": "8266dd71ac4a0c83b787fc0089817e0e0aeec92efaf3ceca6385ac43aa943c0b",
+        "char_count": 2852
+      },
+      {
+        "file_name": "rgb_noise_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_noise_004",
+        "title": "背景参考资讯：香港第七届立法会选举有多少个议席？",
+        "type": "noise",
+        "sample_id": 4,
+        "sha256": "ef30c082b5af51a02c3f73752df711548ce450af2c1f25067b663bbe8eb96b6e",
+        "char_count": 983
+      },
+      {
+        "file_name": "rgb_pos_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_pos_005",
+        "title": "主题报道：2021年香港GDP增长了多少？",
+        "type": "positive",
+        "sample_id": 5,
+        "sha256": "c8db6e27dafdc11dc55081dd215c2023c57f31b2565e44323689cbf4a9fd96c8",
+        "char_count": 1136
+      },
+      {
+        "file_name": "rgb_noise_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_noise_005",
+        "title": "背景参考资讯：2021年香港GDP增长了多少？",
+        "type": "noise",
+        "sample_id": 5,
+        "sha256": "9e8b7ae3e2eaa154d4dfc03ce4b33dac1558b04e252eea856007c25c13db3d08",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_pos_006",
+        "title": "主题报道：2021年北京大兴机场年旅客吞吐量",
+        "type": "positive",
+        "sample_id": 6,
+        "sha256": "4ac2732fb58f58bae07e3ddb685785d57e46fa05e5ce4aa666f592a3229709bc",
+        "char_count": 938
+      },
+      {
+        "file_name": "rgb_noise_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_noise_006",
+        "title": "背景参考资讯：2021年北京大兴机场年旅客吞吐量",
+        "type": "noise",
+        "sample_id": 6,
+        "sha256": "79eb098e19ce23782a25a036fc049b505b3d72406010b057ac5504772da06cd6",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_pos_007",
+        "title": "主题报道：2022年春节档首日票房冠军",
+        "type": "positive",
+        "sample_id": 7,
+        "sha256": "63c4142b166c3779775717e25b85a92b38501a374562e87b7e464b9cbd90949b",
+        "char_count": 1142
+      },
+      {
+        "file_name": "rgb_noise_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_noise_007",
+        "title": "背景参考资讯：2022年春节档首日票房冠军",
+        "type": "noise",
+        "sample_id": 7,
+        "sha256": "24d62b3a163e9e19ce4669cc44b0e36b795229559bcf8ef8b9f463c8013af117",
+        "char_count": 908
+      },
+      {
+        "file_name": "rgb_pos_008_2022春运开始时间.md",
+        "doc_id": "rgb_pos_008",
+        "title": "主题报道：2022春运开始时间",
+        "type": "positive",
+        "sample_id": 8,
+        "sha256": "b979a37f8d4c811fbbec72f096ddf9e53e1649a2e74db5a2173631639040d676",
+        "char_count": 3019
+      },
+      {
+        "file_name": "rgb_noise_008_2022春运开始时间.md",
+        "doc_id": "rgb_noise_008",
+        "title": "背景参考资讯：2022春运开始时间",
+        "type": "noise",
+        "sample_id": 8,
+        "sha256": "dd87b84d2c0b923d5495b8d556c8f6e9d32d747c68a3072394db5e934ee3d9b0",
+        "char_count": 881
+      },
+      {
+        "file_name": "rgb_pos_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_pos_009",
+        "title": "主题报道：2022年春运首日火车票什么时候开售",
+        "type": "positive",
+        "sample_id": 9,
+        "sha256": "a5a66aab3e64de0785415a7e78ffdda14ac1141e5e9166d7760e9c8230be330a",
+        "char_count": 1534
+      },
+      {
+        "file_name": "rgb_noise_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_noise_009",
+        "title": "背景参考资讯：2022年春运首日火车票什么时候开售",
+        "type": "noise",
+        "sample_id": 9,
+        "sha256": "c5d5337b54a227c3af843e7aeb0c4120ea852141111b6a4cd5a23ab2f1a17ea8",
+        "char_count": 1171
+      },
+      {
+        "file_name": "rgb_pos_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_pos_010",
+        "title": "主题报道：2022年特斯拉交付量",
+        "type": "positive",
+        "sample_id": 10,
+        "sha256": "1d18c9a5a1f15ee5c7d8021c0ecbd0bd48a3b53f635d43646e9854eab1ad034a",
+        "char_count": 2015
+      },
+      {
+        "file_name": "rgb_noise_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_noise_010",
+        "title": "背景参考资讯：2022年特斯拉交付量",
+        "type": "noise",
+        "sample_id": 10,
+        "sha256": "44ada347363ac23c879e8458c0df8afc102163621ddc0c2affa5a978d849ccf7",
+        "char_count": 1143
+      },
+      {
+        "file_name": "rgb_pos_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_pos_011",
+        "title": "主题报道：2023年世界人工智能大会在哪举办",
+        "type": "positive",
+        "sample_id": 11,
+        "sha256": "ee80b817ab489b0ee76aa6ded6e94ecf7df11087600b587ca1fa376de03938af",
+        "char_count": 2061
+      },
+      {
+        "file_name": "rgb_noise_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_noise_011",
+        "title": "背景参考资讯：2023年世界人工智能大会在哪举办",
+        "type": "noise",
+        "sample_id": 11,
+        "sha256": "2ae963ebbb45b9526acef40b69fcec0408b1b80ac65512f81594e285852b12bb",
+        "char_count": 933
+      },
+      {
+        "file_name": "rgb_pos_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_pos_012",
+        "title": "主题报道：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "positive",
+        "sample_id": 12,
+        "sha256": "01db2dd8279b8b8e328b866593c0e45a9e59a85c2dafea5f89b65042c45a97e0",
+        "char_count": 1281
+      },
+      {
+        "file_name": "rgb_noise_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_noise_012",
+        "title": "背景参考资讯：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "noise",
+        "sample_id": 12,
+        "sha256": "c58a4bb20f55eeb0feba95252affd4351454e6aa4494d6b3bd81034f3ff06c27",
+        "char_count": 741
+      },
+      {
+        "file_name": "rgb_pos_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_pos_013",
+        "title": "主题报道：美国2021年GDP增长多少",
+        "type": "positive",
+        "sample_id": 13,
+        "sha256": "cd0015864107d5e478f4de0d070238ad6e8f09739462050cbb30bfd49e1ed9e3",
+        "char_count": 1263
+      },
+      {
+        "file_name": "rgb_noise_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_noise_013",
+        "title": "背景参考资讯：美国2021年GDP增长多少",
+        "type": "noise",
+        "sample_id": 13,
+        "sha256": "8076879f0633ca83eab21abadbf05fa850fe93c0403932bff533cc7a1c11cccd",
+        "char_count": 1206
+      },
+      {
+        "file_name": "rgb_pos_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_pos_014",
+        "title": "主题报道：2021年中国城镇新增就业了多少人",
+        "type": "positive",
+        "sample_id": 14,
+        "sha256": "bde6b364200978e97d1915249b390aacc65d2350e5080c02a1a7ce32ab04daba",
+        "char_count": 1014
+      },
+      {
+        "file_name": "rgb_noise_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_noise_014",
+        "title": "背景参考资讯：2021年中国城镇新增就业了多少人",
+        "type": "noise",
+        "sample_id": 14,
+        "sha256": "644652ca5e11e1f9a025c0e10add3fafe2f875015fd97534f70bd2602259cecd",
+        "char_count": 1153
+      },
+      {
+        "file_name": "rgb_pos_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_pos_015",
+        "title": "主题报道：黑石集团预测2022年美联储将加息几次",
+        "type": "positive",
+        "sample_id": 15,
+        "sha256": "dbdffb8d05ce630599635e5e46b4af7eaab6f22d0da14e42e4b68705b2d47600",
+        "char_count": 1798
+      },
+      {
+        "file_name": "rgb_noise_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_noise_015",
+        "title": "背景参考资讯：黑石集团预测2022年美联储将加息几次",
+        "type": "noise",
+        "sample_id": 15,
+        "sha256": "e0bb4db908b24d31d376d7f46a355dfbc40df7cad7124de81816592a927f92c0",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_pos_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_pos_016",
+        "title": "主题报道：2021年中国电影市场总票房是多少？",
+        "type": "positive",
+        "sample_id": 16,
+        "sha256": "1b363281eab52af5df87be80b0da362658f933e121740aa7652d1857b7f793ca",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_noise_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_noise_016",
+        "title": "背景参考资讯：2021年中国电影市场总票房是多少？",
+        "type": "noise",
+        "sample_id": 16,
+        "sha256": "f7f99eace7a8f1aa8107966b04b35e8d575c376ba47ac2ddaa470453e12f206c",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_pos_017",
+        "title": "主题报道：《李茂扮太子》是什么类型的电影",
+        "type": "positive",
+        "sample_id": 17,
+        "sha256": "9eb0f4b3d509d89cabcdd3f1398544b816b0ffb132ac3a5ddc7940eba8add2b4",
+        "char_count": 3344
+      },
+      {
+        "file_name": "rgb_noise_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_noise_017",
+        "title": "背景参考资讯：《李茂扮太子》是什么类型的电影",
+        "type": "noise",
+        "sample_id": 17,
+        "sha256": "70b46d07a63e64c1f752af56e2321275e3abe2f1565dd06f4fcebea87f98dc18",
+        "char_count": 876
+      },
+      {
+        "file_name": "rgb_pos_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_pos_018",
+        "title": "主题报道：2021赛季中超冠军",
+        "type": "positive",
+        "sample_id": 18,
+        "sha256": "11f89f53b0fbc0fe4c3b8e01f659dba52e0f45782b1022386240e1f2b467d025",
+        "char_count": 1416
+      },
+      {
+        "file_name": "rgb_noise_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_noise_018",
+        "title": "背景参考资讯：2021赛季中超冠军",
+        "type": "noise",
+        "sample_id": 18,
+        "sha256": "d4d02909531339ad289f8068c6d555cdc289e0c44f4dbde0e49fc2be1eaaaa2f",
+        "char_count": 1176
+      },
+      {
+        "file_name": "rgb_pos_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_pos_019",
+        "title": "主题报道：2022年1月5日全国新增确诊病例数？",
+        "type": "positive",
+        "sample_id": 19,
+        "sha256": "7beb5f7b7006753a451c4cea9d0e6a1a0daa7107c57cdd7b93ec63bd632c835d",
+        "char_count": 720
+      },
+      {
+        "file_name": "rgb_noise_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_noise_019",
+        "title": "背景参考资讯：2022年1月5日全国新增确诊病例数？",
+        "type": "noise",
+        "sample_id": 19,
+        "sha256": "1695a8f3fcbd7ee796c88f3ddfe461bdc8284f15620e042c5d85229d75f2273e",
+        "char_count": 1072
+      },
+      {
+        "file_name": "rgb_pos_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_pos_020",
+        "title": "主题报道：我国2021年人口出生率",
+        "type": "positive",
+        "sample_id": 20,
+        "sha256": "9843b6422ceba75e2b0006fe0a10520eea7d5e17f483bb44d47b73b731cd13b5",
+        "char_count": 1548
+      },
+      {
+        "file_name": "rgb_noise_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_noise_020",
+        "title": "背景参考资讯：我国2021年人口出生率",
+        "type": "noise",
+        "sample_id": 20,
+        "sha256": "9c9fa06fe517f9cd54bdd2eb3eb898f7b86756e8c3674eb86cbf960218ac888e",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_pos_021",
+        "title": "主题报道：塔里木油田2021年的油气产量是多少？",
+        "type": "positive",
+        "sample_id": 21,
+        "sha256": "7444ba95361d251d300425440ba45b7abc3ae829fbd6289fc0a1d8d9cccf11e2",
+        "char_count": 760
+      },
+      {
+        "file_name": "rgb_noise_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_noise_021",
+        "title": "背景参考资讯：塔里木油田2021年的油气产量是多少？",
+        "type": "noise",
+        "sample_id": 21,
+        "sha256": "72acac05757afa1324a325d78148cdbc397440af8ce4ea8d8b2c4637cc81f023",
+        "char_count": 904
+      },
+      {
+        "file_name": "rgb_pos_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_pos_022",
+        "title": "主题报道：2022年冬奥会开幕式总导演是谁",
+        "type": "positive",
+        "sample_id": 22,
+        "sha256": "ef40e2418f74bacc4d5b4a69c83a35537ef0c4a14a8553f5bba632fd7e6169c4",
+        "char_count": 3508
+      },
+      {
+        "file_name": "rgb_noise_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_noise_022",
+        "title": "背景参考资讯：2022年冬奥会开幕式总导演是谁",
+        "type": "noise",
+        "sample_id": 22,
+        "sha256": "da10c58f7b663476c66e4400218dce9774b893c0ee789f6ac4bb2ee4c1c86c33",
+        "char_count": 953
+      },
+      {
+        "file_name": "rgb_pos_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_pos_023",
+        "title": "主题报道：中国第三艘航母名字",
+        "type": "positive",
+        "sample_id": 23,
+        "sha256": "9db8248d1c7ab23889ff7f3c6e72e536caf2c7dc03ff372c27e931f72c95e3fb",
+        "char_count": 2409
+      },
+      {
+        "file_name": "rgb_noise_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_noise_023",
+        "title": "背景参考资讯：中国第三艘航母名字",
+        "type": "noise",
+        "sample_id": 23,
+        "sha256": "a71fb3b1ba6791cfb1ad2e319dabddde0bfe10cd33a2014687d5d22cc2972f9b",
+        "char_count": 887
+      },
+      {
+        "file_name": "rgb_pos_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_pos_024",
+        "title": "主题报道：河南2021年的粮食总产量是多少？",
+        "type": "positive",
+        "sample_id": 24,
+        "sha256": "dca255b0fd21a65d894fe9073910bfd3a48051aa422120bd318082770aae0965",
+        "char_count": 1264
+      },
+      {
+        "file_name": "rgb_noise_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_noise_024",
+        "title": "背景参考资讯：河南2021年的粮食总产量是多少？",
+        "type": "noise",
+        "sample_id": 24,
+        "sha256": "17ddb4c1f5ce421074144aafa5ea5214d791090064c9540eebea1f979265573c",
+        "char_count": 1180
+      },
+      {
+        "file_name": "rgb_pos_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_pos_025",
+        "title": "主题报道：苹果M1芯片首席设计师去了哪家公司",
+        "type": "positive",
+        "sample_id": 25,
+        "sha256": "18f1a492ed718622ec9731054043777ffa171dfdf5ddc22ed147b77b3ceb008e",
+        "char_count": 4031
+      },
+      {
+        "file_name": "rgb_noise_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_noise_025",
+        "title": "背景参考资讯：苹果M1芯片首席设计师去了哪家公司",
+        "type": "noise",
+        "sample_id": 25,
+        "sha256": "114c8c3cad03723175c0847369e5dce29b7e89fe91b65b5904e5cf519a34064b",
+        "char_count": 1334
+      },
+      {
+        "file_name": "rgb_pos_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_pos_026",
+        "title": "主题报道：长安汽车2021年销量同比增长多少？",
+        "type": "positive",
+        "sample_id": 26,
+        "sha256": "226b49e21ce9e51f0e8e5407ae9255cad6a346762515f9c285da0ccdccbb749b",
+        "char_count": 2100
+      },
+      {
+        "file_name": "rgb_noise_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_noise_026",
+        "title": "背景参考资讯：长安汽车2021年销量同比增长多少？",
+        "type": "noise",
+        "sample_id": 26,
+        "sha256": "3e76ba08a41cda950a55479bd381acd4ed4a539ba473284fed7197b07929a974",
+        "char_count": 1022
+      },
+      {
+        "file_name": "rgb_pos_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_pos_027",
+        "title": "主题报道：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "positive",
+        "sample_id": 27,
+        "sha256": "aabc42bcd2499f92a0fbdd9b32410b55ed8bbb90b83b396bfa2b0495db6ce06e",
+        "char_count": 889
+      },
+      {
+        "file_name": "rgb_noise_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_noise_027",
+        "title": "背景参考资讯：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "noise",
+        "sample_id": 27,
+        "sha256": "6db53d67dde513bcc64b068f8d17ad9e21c08a3c9f2a4807b2943c1f5781eb1f",
+        "char_count": 1029
+      },
+      {
+        "file_name": "rgb_pos_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_pos_028",
+        "title": "主题报道：2021年宝马全球销量？",
+        "type": "positive",
+        "sample_id": 28,
+        "sha256": "f5183b555e5d20b14e00493db8741e9eab1da19920280ec951577e8f098a563f",
+        "char_count": 800
+      },
+      {
+        "file_name": "rgb_noise_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_noise_028",
+        "title": "背景参考资讯：2021年宝马全球销量？",
+        "type": "noise",
+        "sample_id": 28,
+        "sha256": "6288306dd1e5bbf236d3cb87fba998209c227975318ea799385e3af4c475312f",
+        "char_count": 1300
+      },
+      {
+        "file_name": "rgb_pos_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_pos_029",
+        "title": "主题报道：2021年中国外贸进出口规模是多少美元",
+        "type": "positive",
+        "sample_id": 29,
+        "sha256": "a2ad7dc47957f0fa569420d8dfc0c286ee6733f78f8a36fcb0829596db88c8e6",
+        "char_count": 1919
+      },
+      {
+        "file_name": "rgb_noise_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_noise_029",
+        "title": "背景参考资讯：2021年中国外贸进出口规模是多少美元",
+        "type": "noise",
+        "sample_id": 29,
+        "sha256": "e24dc9d9a1709f96d9cc063d646b946983811cf4bec39119e21c4c736df3eb0c",
+        "char_count": 1165
+      },
+      {
+        "file_name": "rgb_int_000_第七届香港立法会议员宣誓仪式及首次会议的时间.md",
+        "doc_id": "rgb_int_000",
+        "title": "跨事件综合分析档案：第七届香港立法会议员宣誓仪式及首次会议的时间",
+        "type": "integration",
+        "sample_id": 0,
+        "sha256": "2b727a4374243a199a4c49a7d38dfe55b317c113723b448447850d266d0ca985",
+        "char_count": 3402
+      },
+      {
+        "file_name": "rgb_int_001_2021年香港和澳门的GDP增长率.md",
+        "doc_id": "rgb_int_001",
+        "title": "跨事件综合分析档案：2021年香港和澳门的GDP增长率",
+        "type": "integration",
+        "sample_id": 1,
+        "sha256": "890f43158019cba468379a5601db4697b05fb57ea44607b390134b8747a5c3a7",
+        "char_count": 1379
+      },
+      {
+        "file_name": "rgb_int_002_2022年和2023年春节档首日票房冠军.md",
+        "doc_id": "rgb_int_002",
+        "title": "跨事件综合分析档案：2022年和2023年春节档首日票房冠军",
+        "type": "integration",
+        "sample_id": 2,
+        "sha256": "6c3149417c6d3f0803a3b926fce96db0dc632041e7b375af2208a85382c26503",
+        "char_count": 5249
+      },
+      {
+        "file_name": "rgb_int_003_2022春运的开始和结束时间是什么时候.md",
+        "doc_id": "rgb_int_003",
+        "title": "跨事件综合分析档案：2022春运的开始和结束时间是什么时候？",
+        "type": "integration",
+        "sample_id": 3,
+        "sha256": "b8b9848931054508d326a8823d7e1259c7c3f39a13a2fe258871afab0a46c0a4",
+        "char_count": 1620
+      },
+      {
+        "file_name": "rgb_int_004_2022年和2023年春运首日火车票分别的时间.md",
+        "doc_id": "rgb_int_004",
+        "title": "跨事件综合分析档案：2022年和2023年春运首日火车票分别的时间",
+        "type": "integration",
+        "sample_id": 4,
+        "sha256": "3f6ee1bde6bc48ed771afacda3a0726b587f13b7e666a0eb1ce4bc5b4bd4539c",
+        "char_count": 5521
+      },
+      {
+        "file_name": "rgb_int_005_2022年特斯拉和比亚迪交付量.md",
+        "doc_id": "rgb_int_005",
+        "title": "跨事件综合分析档案：2022年特斯拉和比亚迪交付量",
+        "type": "integration",
+        "sample_id": 5,
+        "sha256": "aa5ddbc1cf01731ccdea01440b1c04338a38e9a7955ee62e3fd84b1d6834b76f",
+        "char_count": 3264
+      },
+      {
+        "file_name": "rgb_int_006_李茂扮太子_是什么类型的电影_它的导演是谁.md",
+        "doc_id": "rgb_int_006",
+        "title": "跨事件综合分析档案：《李茂扮太子》是什么类型的电影？它的导演是谁？",
+        "type": "integration",
+        "sample_id": 6,
+        "sha256": "0d9413157b4e66d3bc34df658af2f4bb6b8ede53b3e72b0a314386e232b77ed0",
+        "char_count": 3543
+      },
+      {
+        "file_name": "rgb_int_007_我国2021年人口的出生率和死亡率是多少.md",
+        "doc_id": "rgb_int_007",
+        "title": "跨事件综合分析档案：我国2021年人口的出生率和死亡率是多少？",
+        "type": "integration",
+        "sample_id": 7,
+        "sha256": "d0fe02d6b25b8ecdf251d3a0a18a45eaaf682e303129cb3678b9b20c875d19d2",
+        "char_count": 1635
+      },
+      {
+        "file_name": "rgb_int_008_塔里木油田2021年和2022年的油气产量分别是.md",
+        "doc_id": "rgb_int_008",
+        "title": "跨事件综合分析档案：塔里木油田2021年和2022年的油气产量分别是多少？",
+        "type": "integration",
+        "sample_id": 8,
+        "sha256": "72ac336ca1fd40824e438b3c0080be04589a577ca77efee19924891798f162bb",
+        "char_count": 666
+      },
+      {
+        "file_name": "rgb_int_009_2021年宝马和奔驰的全球销量分别是多少.md",
+        "doc_id": "rgb_int_009",
+        "title": "跨事件综合分析档案：2021年宝马和奔驰的全球销量分别是多少？",
+        "type": "integration",
+        "sample_id": 9,
+        "sha256": "f562d6199c5d7aa771cc0afecac14a44939206c02add3a6e80872f6b465a1ed2",
+        "char_count": 1099
+      },
+      {
+        "file_name": "rgb_int_010_2021年中国和美国经济分别增长了多少.md",
+        "doc_id": "rgb_int_010",
+        "title": "跨事件综合分析档案：2021年中国和美国经济分别增长了多少？",
+        "type": "integration",
+        "sample_id": 10,
+        "sha256": "e243ef447a40c90e5ab78c5fa288cdb5bf3bccb7f5515a2a506fb0c131572be1",
+        "char_count": 3448
+      },
+      {
+        "file_name": "rgb_int_011_2022年英特尔和英伟达全年营收.md",
+        "doc_id": "rgb_int_011",
+        "title": "跨事件综合分析档案：2022年英特尔和英伟达全年营收",
+        "type": "integration",
+        "sample_id": 11,
+        "sha256": "71c9807a609f6062a61471ede623a2ae92b1226ced8bab291883cea91b217705",
+        "char_count": 2301
+      },
+      {
+        "file_name": "rgb_int_012_踏冰逐梦_的主演和导演是谁.md",
+        "doc_id": "rgb_int_012",
+        "title": "跨事件综合分析档案：《踏冰逐梦》的主演和导演是谁？",
+        "type": "integration",
+        "sample_id": 12,
+        "sha256": "ae95e5c2c0a3a05860c4f2fb31b8e69aba93e871ff99788a3c4c7eddcc6855a2",
+        "char_count": 3029
+      },
+      {
+        "file_name": "rgb_int_013_北京冬奥会美国和中国分别获得多少金牌.md",
+        "doc_id": "rgb_int_013",
+        "title": "跨事件综合分析档案：北京冬奥会美国和中国分别获得多少金牌？",
+        "type": "integration",
+        "sample_id": 13,
+        "sha256": "79c1dc38257a4b2b5f39228e9b6411cb89a3d6bce50c381a5ee416639399a3e4",
+        "char_count": 3235
+      },
+      {
+        "file_name": "rgb_int_014_2022年澳网男单和女单冠军分别是谁.md",
+        "doc_id": "rgb_int_014",
+        "title": "跨事件综合分析档案：2022年澳网男单和女单冠军分别是谁？",
+        "type": "integration",
+        "sample_id": 14,
+        "sha256": "b961527ae12fca20c2656f41f1615b2a3195acc326d9ebe0707357a4891ec90e",
+        "char_count": 7159
+      },
+      {
+        "file_name": "rgb_int_015_北京冬奥会澳大利亚和新西兰运动员数量.md",
+        "doc_id": "rgb_int_015",
+        "title": "跨事件综合分析档案：北京冬奥会澳大利亚和新西兰运动员数量",
+        "type": "integration",
+        "sample_id": 15,
+        "sha256": "d4e8270db38fb3cba3295d53c0b822ec4e61318a4306f08fd50178c771b57fa0",
+        "char_count": 1408
+      },
+      {
+        "file_name": "rgb_int_016_北京冬奥会和冬残奥会的开幕日期分别是什么时候.md",
+        "doc_id": "rgb_int_016",
+        "title": "跨事件综合分析档案：北京冬奥会和冬残奥会的开幕日期分别是什么时候?",
+        "type": "integration",
+        "sample_id": 16,
+        "sha256": "19d16d02520f540032ed29c7d98de0a23793c5132f8fd13371642a6a0d465afe",
+        "char_count": 936
+      },
+      {
+        "file_name": "rgb_int_017_北京冬奥会的第一棒和最后一棒火炬手分别是谁.md",
+        "doc_id": "rgb_int_017",
+        "title": "跨事件综合分析档案：北京冬奥会的第一棒和最后一棒火炬手分别是谁？",
+        "type": "integration",
+        "sample_id": 17,
+        "sha256": "b1f33da8aed1ec1fd92250084325f5b7052b2dfafe80ae3bba7c42e9853a328a",
+        "char_count": 4038
+      },
+      {
+        "file_name": "rgb_int_018_2022和2023年春节档票房冠军分别哪部电影.md",
+        "doc_id": "rgb_int_018",
+        "title": "跨事件综合分析档案：2022和2023年春节档票房冠军分别哪部电影",
+        "type": "integration",
+        "sample_id": 18,
+        "sha256": "dca1a7d4ef696114b40d8fa2021d848510de2f317b3e20b036fc468cb7650c5a",
+        "char_count": 4966
+      },
+      {
+        "file_name": "rgb_int_019_北京冬奥会男子1500米速度滑冰和短道速滑中谁获.md",
+        "doc_id": "rgb_int_019",
+        "title": "跨事件综合分析档案：北京冬奥会男子1500米速度滑冰和短道速滑中谁获得了金牌？",
+        "type": "integration",
+        "sample_id": 19,
+        "sha256": "e69eda9e045ba7eb1dd267809b3e0fdda969d01f58ecd633044edf3a004d1df6",
+        "char_count": 448
+      },
+      {
+        "file_name": "rgb_int_020_北京冬奥会女子和男子500米速度滑冰金牌分别是谁.md",
+        "doc_id": "rgb_int_020",
+        "title": "跨事件综合分析档案：北京冬奥会女子和男子500米速度滑冰金牌分别是谁",
+        "type": "integration",
+        "sample_id": 20,
+        "sha256": "d2c2e7824614479a5e1aa05d4a4ab2b272a97f176c91c6c440bdfee80728a937",
+        "char_count": 909
+      },
+      {
+        "file_name": "rgb_int_021_人世间_的导演和编剧是谁.md",
+        "doc_id": "rgb_int_021",
+        "title": "跨事件综合分析档案：《人世间》的导演和编剧是谁？",
+        "type": "integration",
+        "sample_id": 21,
+        "sha256": "cefb3a015829a7468048eebb92a5ef9df0294c919755f1daf8216d4d949105ed",
+        "char_count": 8015
+      },
+      {
+        "file_name": "rgb_int_022_花样滑冰女子和男子单人滑比赛金牌得主分别是谁.md",
+        "doc_id": "rgb_int_022",
+        "title": "跨事件综合分析档案：花样滑冰女子和男子单人滑比赛金牌得主分别是谁？",
+        "type": "integration",
+        "sample_id": 22,
+        "sha256": "6cbd02e4698ba014097cb4b63b17dd93cd7c3845b032eee6d9328dab025e317e",
+        "char_count": 4112
+      },
+      {
+        "file_name": "rgb_int_023_iPhone_SE_3的芯片是什么_起售价多少.md",
+        "doc_id": "rgb_int_023",
+        "title": "跨事件综合分析档案：iPhone SE 3的芯片是什么，起售价多少",
+        "type": "integration",
+        "sample_id": 23,
+        "sha256": "776c34a7a2564468a9aa26d9f1bc8bd4b250b1f962f529a2a1f9451f6b81bfc1",
+        "char_count": 4340
+      },
+      {
+        "file_name": "rgb_int_024_邓伦逃税多少钱_被罚了多少钱.md",
+        "doc_id": "rgb_int_024",
+        "title": "跨事件综合分析档案：邓伦逃税多少钱，被罚了多少钱",
+        "type": "integration",
+        "sample_id": 24,
+        "sha256": "14b07e07c530b0a639717565a8a88587d848a60e2b3dd49e0ba709716d28277e",
+        "char_count": 2286
+      },
+      {
+        "file_name": "rgb_int_025_MU5735航班坠毁的时间和地点.md",
+        "doc_id": "rgb_int_025",
+        "title": "跨事件综合分析档案：MU5735航班坠毁的时间和地点",
+        "type": "integration",
+        "sample_id": 25,
+        "sha256": "75e64ef0fcdd60cb1b7090f5482c8f6c6482a98d226f455f0b10a68191884252",
+        "char_count": 1113
+      },
+      {
+        "file_name": "rgb_int_026_2022年考研和高考报名人数分别是多少.md",
+        "doc_id": "rgb_int_026",
+        "title": "跨事件综合分析档案：2022年考研和高考报名人数分别是多少？",
+        "type": "integration",
+        "sample_id": 26,
+        "sha256": "078e56e431d66790714689cb1d7fcabdde871b3734457637ccdc389eee834df0",
+        "char_count": 5191
+      },
+      {
+        "file_name": "rgb_int_027_心居_的主演有谁_导演是谁.md",
+        "doc_id": "rgb_int_027",
+        "title": "跨事件综合分析档案：《心居》的主演有谁，导演是谁？",
+        "type": "integration",
+        "sample_id": 27,
+        "sha256": "6ddeca92bbb3b22f8a19cad9196b534f4cf1b308cd7f3c09a5a04b3e82feee9b",
+        "char_count": 5306
+      },
+      {
+        "file_name": "rgb_int_028_卡塔尔世界杯德国队和法国队在哪个组.md",
+        "doc_id": "rgb_int_028",
+        "title": "跨事件综合分析档案：卡塔尔世界杯德国队和法国队在哪个组",
+        "type": "integration",
+        "sample_id": 28,
+        "sha256": "ba896c45bed52b701663a3119f80f88d5bcb47706a506888d30596fb6a65f1a3",
+        "char_count": 6615
+      },
+      {
+        "file_name": "rgb_int_029_上海和北京2021年的GDP分别是多少.md",
+        "doc_id": "rgb_int_029",
+        "title": "跨事件综合分析档案：上海和北京2021年的GDP分别是多少？",
+        "type": "integration",
+        "sample_id": 29,
+        "sha256": "ab2cc3f40cee4feca5fb33c225a1fbf1946cc648af80c07fdcc31b010a871fd4",
+        "char_count": 1601
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "rgb_source_id": 0,
+      "question": "香港第六届立法会选举有多少个议席？",
+      "expected_output": "70",
+      "ground_truth": "70",
+      "counterfactual_fake_answer": "170",
+      "contexts": [
+        "第六届立法会共有70个议席，经2016年9月4日的选举产生。当中，地区直选和功能界别选举分别选出35位议员。根据《基本法》，立法会任期原 ...",
+        "Sep 13, 2016 ... 香港回归后的第六届立法会选举已经结束。 ... 2016年9月5日，香港立法会选举结果揭晓，建制派在总共70个议席中获得41席，占59%，非建制派获得29席， ...",
+        "Sep 4, 2016 ... 香港政权移交以来第六届立法会选举投票结束，全会70个议席花落谁家将有分晓。 绝大多数投票站于香港时间星期天（9月4日）22:30（格林尼治标准 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 2,
+      "rgb_source_id": 1,
+      "question": "2018年中国城镇新增就业了多少人",
+      "expected_output": "1361万",
+      "ground_truth": "1361万",
+      "counterfactual_fake_answer": "161万",
+      "contexts": [
+        "Jan 21, 2019 ... 国家统计局局长宁吉喆21日介绍，2018年，我国城镇新增就业1361万人，比上年多增10万人，完成全年目标的123.7%，连续6年保持在1300万人以上。",
+        "Sep 24, 2019 ... 2018年，中国交出了令世人惊叹的就业成绩单：城镇新增就业人口1361万人；每小时诞生约750户企业，创造超过1500个就业岗位。 今年，我国首次将就业优先 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 3,
+      "rgb_source_id": 2,
+      "question": "2019年军运会在哪中国哪个城市举办",
+      "expected_output": "武汉",
+      "ground_truth": "武汉",
+      "counterfactual_fake_answer": "成都",
+      "contexts": [
+        "这是中华人民共和国首次举办世界军人运动会，共计109个国家9308名军人报名参加，竞赛项目分27个大项、329个小项。 2019年世界军人运动会. 主办城市, 中国湖北省武汉 ...",
+        "Oct 19, 2019 ... 这是中国首次承办国际军体综合性运动会，也是中国2019年承办的最重要的国际体育 ... 武汉军运会也是军运会历史上第一次在一个城市举办所有比赛项目。",
+        "在武汉进行的第七届世界军人运动会羽毛球男子团体比赛中，中国队以5比0战胜韩国队，本届军运会10月18日开幕，网友热议 ... 2019年10月25日09:20 来源： 人民日报海外版.",
+        "Oct 8, 2019 ... 2019年10月18日，第七届世界军人运动会将正式开幕，这是中国今年承办的最 ... 本届军运会首次在一座城市举办所有的比赛，参照大型赛事的标准，武汉为 ...",
+        "Jun 18, 2019 ... 第七届世界军人运动会将于2019年10月18日在中国武汉举行，赛期10天，共设置射击、游泳、田径、篮球等27个大项、329个小项。届时，将有来自100多个国家的近 ...",
+        "Oct 19, 2019 ... 军运会“点亮”大武汉---10月18日，第七届世界军人运动会在湖北武汉开幕， ... 刘加文肖进安）军运史上第一次在一个城市集中举办所有比赛项目，第一次 ...",
+        "Jul 3, 2018 ... 军运会是国际军体主办的全球军人最高规格的大型综合性运动会，每4年举办1 ... 总书记批准，第七届世界军人运动会将于2019年10月18-27日在武汉举办，共 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 4,
+      "rgb_source_id": 3,
+      "question": "2020赛季中超冠军是谁",
+      "expected_output": "江苏苏宁",
+      "ground_truth": "江苏苏宁",
+      "counterfactual_fake_answer": "广州恒大",
+      "contexts": [
+        "Nov 16, 2020 ... 本赛季中超冠军江苏苏宁取得10胜8平2负战绩排名第二。天津泰达只有2胜5平13负，是实际战绩中最差的。 实际战绩与最终排名变化较大的有深圳佳兆业， ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 5,
+      "rgb_source_id": 4,
+      "question": "2015赛季中超冠军是谁",
+      "expected_output": "广州恒大",
+      "ground_truth": "广州恒大",
+      "counterfactual_fake_answer": "江苏苏宁",
+      "contexts": [
+        "Dec 21, 2015 ... 广州恒大今天下午在2015世俱杯季军争夺战中1比2输遭J联赛冠军广岛三箭逆转，无缘创造更好 ... 2015赛季中超联赛冠军奖杯. 2015赛季亚冠联赛冠军奖杯.",
+        "本届联赛将有包括连续四届卫冕冠军广州恒大淘宝在内的16支球队参加。 ... 2015赛季中超的外援注册方案为4＋1，即每队可注册五名外援，其中至少有一人必须是持有亚足联 ...",
+        "3 days ago ... 2015年10月25日15点，2015赛季中超联赛第29轮的一场焦点大战，在广州天河体育场进行，广州恒大淘宝迎战山东鲁能泰山。 全场比赛，中国男篮在篮板方面41-43 ...",
+        "Oct 9, 2018 ... 在队两年多，孔卡率领球队夺得3次中超冠军，而最辉煌的是帮助广州恒大 ... 广州恒大，随队获得2015赛季中超联赛及亚冠冠军、2016赛季中超冠军， 在队 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 6,
+      "rgb_source_id": 5,
+      "question": "中国2019年人口出生率",
+      "expected_output": "10.48‰",
+      "ground_truth": "10.48‰",
+      "counterfactual_fake_answer": "5.48‰",
+      "contexts": [
+        "Jan 16, 2020 ... 中国国家统计局周五公布，2019年全年出生人口1465万人，人口出生率为10.48‰，为1949年有记录以来最低。中国国家统计局局长宁吉喆表示，人口出生率还是 ...",
+        "Jan 17, 2020 ... 数据显示，2019年出生人口1465万人，人口出生率为10.48‰；死亡人口998万人，人口死亡率为7.14‰；人口自然增长率为3.34‰。",
+        "2019年中国大陆总人口140005万人，比上年末增加467万人。全年出生人口1465万人，人口出生率为10.48‰，人口自然增长率为3.34‰。预计2030年总人口数增到14.3亿，人口 ...",
+        "Jan 17, 2020 ... 数据显示，2019年出生人口1465万人，人口出生率为10.48‰；死亡人口998万人，人口死亡率为7.14‰；人口自然增长率为3.34‰。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 7,
+      "rgb_source_id": 6,
+      "question": "中国2018年人口出生率",
+      "expected_output": "10.94‰",
+      "ground_truth": "10.94‰",
+      "counterfactual_fake_answer": "5.94‰",
+      "contexts": [
+        "Jan 21, 2019 ... 宁吉喆当天在国新办新闻发布会上说，2018年我国出生人口1523万人，人口出生率为10.94‰；死亡人口993万人，人口死亡率为7.13‰；人口自然增长率为3.81‰ ...",
+        "May 6, 2019 ... 从国家统计局数据看，2018年中国出生人口1523万人，人口出生率为10.94‰，出生人口较上年减少约200万，为连续第二年下降。同时，2018年人口出生数也创下了 ...",
+        "Jan 21, 2019 ... 全年出生人口1523万人，人口出生率为10.94‰；死亡人口993万人，人口死亡率为7.13‰；人口自然增长率为3.81‰。 从性别结构看，男性人口71351万人，女性人口 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 8,
+      "rgb_source_id": 7,
+      "question": "2020年中国经济增长了多少？",
+      "expected_output": "2.3%",
+      "ground_truth": "2.3%",
+      "counterfactual_fake_answer": "12.3%",
+      "contexts": [
+        "Jan 18, 2021 ... 国家统计局18日发布数据，初步核算，2020年，我国国内生产总值（GDP）1015986亿元，按可比价格计算，比上年增长2.3%。分季度看，一季度同比下降6.8%， ...",
+        "Jan 18, 2021 ... 中国国家统计局周一（1月18日）公布了2020年经济发展数据，其中国内生产总值101.6万亿元人民币，同比增长2.3%。 中国自1978年改革开放以来，年均增长 ...",
+        "GDP2020年国内生产总值1015986亿元比上年增长2.3% · CPI2020年12月份居民消费价格同比上涨0.2% · 就业2020年城镇新增就业1186万人完成全年目标的131.8% · 收入2020年全国居民 ...",
+        "Feb 3, 2021 ... 经济发展主要成就）. 2020年，中国GDP突破100万亿元人民币，同比增长2.3%，成为全球唯一实现正增长的主要经济体。中国驻新加坡使馆发言人结合有关 ...",
+        "Jan 18, 2021 ... 中国经济在2020年增长了2.3%，从当年年初几个月的历史性萎缩中强势复苏，成为唯一一个在新冠疫情肆虐的一年实现增长的世界主要经济体。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 9,
+      "rgb_source_id": 8,
+      "question": "2019年中国经济增长了多少？",
+      "expected_output": "6.1%",
+      "ground_truth": "6.1%",
+      "counterfactual_fake_answer": "10.1%",
+      "contexts": [
+        "2019年国民经济运行总体平稳发展主要预期目标较好实现 · 14亿人口的中国经济，今天交出这样一份答卷！ 2019年我国GDP近百万亿元，增长6.1% | 实现预期目标; 透视2019 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 10,
+      "rgb_source_id": 9,
+      "question": "电影《头号玩家》的导演是谁",
+      "expected_output": "史蒂文·斯皮尔伯格",
+      "ground_truth": "史蒂文·斯皮尔伯格",
+      "counterfactual_fake_answer": "布莱恩·辛格",
+      "contexts": [
+        "一分钟了解《头号玩家》 108万 1'7\". 头号玩家. 编辑概述图册. 编辑文本. 助力编辑. 2018年史蒂文·斯皮尔伯格执导科幻冒险电影. 本词条是多义词，共2个义项 展开 收起.",
+        "Mar 28, 2018 ... 电影《头号玩家》是史蒂文·斯皮尔伯格导演的一部科幻冒险片，影片将于3月30日在内地公映。故事讲述了在未来世界里，越来越多的人迷失在一款超级火爆 ...",
+        "No.149豆瓣电影Top250. 美国/ 动作/ 科幻/ 冒险/ ... 演职员. 史蒂文·斯皮尔伯格 导演 ... 对我这个只玩过斗地主的电脑游戏盲来说，《头号玩家》的内容确是匪夷所思。",
+        "Aug 4, 2017 ... 电影《头号玩家》根据恩斯特·克莱恩同名小说改编，由大牌导演史蒂文·斯皮尔伯格执导，预计将于2018年3月30日北美上映。导演斯皮尔伯格在Comic Con上 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 11,
+      "rgb_source_id": 10,
+      "question": "电影《波西米亚狂想曲》的导演是谁",
+      "expected_output": "布莱恩·辛格",
+      "ground_truth": "布莱恩·辛格",
+      "counterfactual_fake_answer": "史蒂文·斯皮尔伯格",
+      "contexts": [
+        "《波西米亚狂想曲》（英语：Bohemian Rhapsody）是一部2018年音乐传记戏剧电影，其 ... 2017年12月1日，《好莱坞报道》指20世紀福克斯由于导演布莱恩·辛格“疏忽职务”而 ...",
+        "《波西米亚狂想曲》：你没看到自己的可能性吗 129.1万 1'47\" ... 美国2018年布莱恩·辛格执导的电影; 1975年皇后乐队发行单曲; 日本漫画《JOJO的奇妙冒险：石之海》及其 ...",
+        "波西米亚狂想曲豆瓣评分：8.6 简介：本片是对皇后乐队、传奇主唱弗雷迪·莫库里以及他们音乐的致敬盛宴，这是一段充满 ... No.211豆瓣电影Top250 ... 布莱恩·辛格 导演.",
+        "Nov 23, 2019 ... 剧组成员也不可谓不豪华，“《X战警》的导演布莱恩·辛格（主）和《飞鹰艾迪》的导演德克斯特·弗莱彻（副）接棒执导皇后乐队传记片《波西米亚狂想曲》，《 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 12,
+      "rgb_source_id": 11,
+      "question": "《小时代》的作者是谁？",
+      "expected_output": "郭敬明",
+      "ground_truth": "郭敬明",
+      "counterfactual_fake_answer": "韩寒",
+      "contexts": [
+        "本片由原著作者郭敬明担当编剧并执导，杨幂、柯震东、郭采洁、凤小岳、郭碧婷、 ... 今天，充斥耳目的如果都是《小时代》们，或者因为票房有利可图，就无条件地 ...",
+        "此条目介绍的是《小时代》系列电影的第二部。 ... 有限公司和深圳大盛国际传媒有限公司负责发行，并由原著作者郭敬明担当编剧并执导，杨幂、柯震东、郭采洁、凤小岳、 ...",
+        "Jul 4, 2013 ... 根据同名小说《小时代》改编的电影，同时激起了强烈的爱和强烈的恨，让青春文学作家郭敬明又一次站在风口浪尖上。 由小说原作者郭敬明本人执导的这部 ...",
+        "Aug 26, 2020 ... 今天我们大家之所以欢聚在这里，是为我们从小到大的好朋友顾里，庆祝她的生日。 ... 曾经《小时代》的臭名昭著，或多或少与其作者是郭敬明有关。",
+        "Apr 19, 2023 ... 2012年夏天，当时最畅销的小说系列《小时代》，宣布改编为电视剧，并不符合书粉预期的阵容官宣后，被嫌弃了许久。 三个月后，由原著作者郭敬明执导的电影 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 13,
+      "rgb_source_id": 12,
+      "question": "《唐人街探案3》的上映时间？",
+      "expected_output": "2021年2月12日",
+      "ground_truth": "2021年2月12日",
+      "counterfactual_fake_answer": "2011年2月12日",
+      "contexts": [
+        "该片讲述了继“曼谷夺金杀人案”“纽约五行连环杀人案”后，唐仁、秦风被野田昊请到东京，调查一桩离奇的谋杀案的故事。该片于2021年2月12日在中国大陆上映。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 14,
+      "rgb_source_id": 13,
+      "question": "2000年奥运会在哪举办",
+      "expected_output": "澳大利亚、悉尼",
+      "ground_truth": "澳大利亚、悉尼",
+      "counterfactual_fake_answer": "中国、北京",
+      "contexts": [
+        "Jul 11, 2012 ... 开幕时间：2000年9月15日闭幕时间：2000年10月1日举办地：澳大利亚悉尼运动员：10651名运动员（4069名女选手，6582名男选手）"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 15,
+      "rgb_source_id": 14,
+      "question": "东京奥运会开幕日期是什么时候",
+      "expected_output": "2021年7月23日",
+      "ground_truth": "2021年7月23日",
+      "counterfactual_fake_answer": "2021年1月23日",
+      "contexts": [
+        "Mar 30, 2020 ... 新华社东京3月30日电（记者王子江、姬烨）国际奥委会和东京奥组委30日联合宣布，推迟后的东京奥运会举办时间是2021年7月23日至8月8日，东京残奥会举办 ...",
+        "Jun 28, 2023 ... 明年东京残奥会在日本举行的时候，将会是人类团结一心的特别展示，全世界人民展现韧性的 ... 因此，我认为奥运会于2021年7月23日开幕是很理想的。",
+        "Mar 30, 2020 ... 新华社东京3月29日电（记者王子江）东京奥组委消息人士29日透露，推迟后的东京奥运会的开幕时间很有可能是2021年7月23日。 日本共同社援引这位内部 ...",
+        "Jul 23, 2021 ... 2021年7月23日19时（东八区时间），东京奥运会开幕式正式拉开帷幕。 在历届奥运会的开幕式上，这 ... 谁将点燃圣火通常是奥运会开幕式上最大的悬念。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 16,
+      "rgb_source_id": 15,
+      "question": "里约奥运会开幕日期是什么时候",
+      "expected_output": "2016年8月5日",
+      "ground_truth": "2016年8月5日",
+      "counterfactual_fake_answer": "2016年10月5日",
+      "contexts": [
+        "托马斯•巴赫是国际奥林匹克委员会主席。 2016年8月5日,在巴西里约热内卢奥运会的开幕式上，当各国人民为自己国家的运动员走进奥林匹克体育场欢呼时，观众们也会看到 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 17,
+      "rgb_source_id": 16,
+      "question": "2020奥运会在哪举办",
+      "expected_output": "东京",
+      "ground_truth": "东京",
+      "counterfactual_fake_answer": "大阪",
+      "contexts": [
+        "重温2020年在东京举行的夏季奥运会，访问官方内容，其中包括：官方视频、比赛结果、图集、竞赛项目、运动员。",
+        "延期举行后，2020年东京夏季奥林匹克运动会与2022年北京冬季奥林匹克运动会的间隔缩短为半年，这是1994年冬季奥运会与夏季奥运会错开举办以来，间隔最短的一次。本次奥运会 ...",
+        "Mar 25, 2020 ... 东京奥运，史上首届延期举行的奥运会---国际奥委会与东京奥组委24日发布联合声明表示，鉴于当前疫情形势，东京第32届奥运会需要改期至2020年后， ...",
+        "Oct 16, 2018 ... 在日本举办夏季奥运会是继1964年的东京奥运会以来。千叶市作为比赛会场城市，为了奥运会的成功举办，将于国家、奥组委等合作，同时，致力于培养城市 ...",
+        "Oct 9, 2018 ... 既2016年在里约夏季奥运会上首次亮相以来，国际奥委会宣布难民奥林匹克代表团将再次参加2020年在东京举办的奥运会。",
+        "Mar 24, 2020 ... 新冠肺炎疫情在全球持续，国际奥委会及日本政府宣布，东京2020夏季奥运会推迟一年举行。",
+        "奥运会、残奥会运动会不仅是世界最大的体育盛典，也是让举办城市的社会和文化产生重大变革的一大盛事。 东京2020大会是成熟城市东京实现新飞跃的绝好机会。",
+        "第32届夏季奥林匹克运动会（Games of the XXXII Olympiad），即2020年东京奥运会，是由日本奥林匹克委员会举办的国际性运动会，于2021年7月23日开幕、8月8日闭幕。2020 ...",
+        "Dec 11, 2019 ... 在联合国大会12月9日一致通过奥林匹克休战决议之际，东京奥运会组委会主席森喜朗向联合国会员国介绍了日本通过举办奥运会而承载的和平梦想。",
+        "Mar 25, 2020 ... 双方在声明中强调，“东京奥运会必须改在2020年后，但不晚于2021年夏季举行”。奥运圣火将留在日本，无论最终确定何时举办，这届奥运会将保留“东京2020 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 18,
+      "rgb_source_id": 17,
+      "question": "Minecraft是什么类型的游戏？",
+      "expected_output": "沙盒",
+      "ground_truth": "沙盒",
+      "counterfactual_fake_answer": "Moba",
+      "contexts": [
+        "《我的世界》（英语：Minecraft，香港和台湾常用英文）是微软旗下Mojang Studios开发的沙盒游戏。游戏中，玩家能在一个3D世界内与方块进行交互。游戏中的特色功能包括 ...",
+        "Jul 24, 2018 ... Minecraft是沙盒游戏，为了和市面上各种打着沙盒的吃鸡游戏对比，叫“体素游戏”更加合适；. 我的世界故事版，是角色扮演游戏；. 我的世界，可以是任何 ...",
+        "《我的世界》（Minecraft）是一款沙盒类电子游戏，开创者为马库斯·阿列克谢·泊松（Notch）。游戏由Mojang Studios维护，现隶属于微软Xbox游戏工作室。游戏最初于2009 ...",
+        "我的世界即minecraft 。 Minecraft是一个几乎无所不能的沙盒游戏，中文非官方译名为《我的世界》、《当个创世神》、《麦块》（音译名） 。这个游戏让每一个玩家在三维 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 19,
+      "rgb_source_id": 18,
+      "question": "《泰坦尼克号》的编剧是谁",
+      "expected_output": "詹姆斯·卡梅隆",
+      "ground_truth": "詹姆斯·卡梅隆",
+      "counterfactual_fake_answer": "斯蒂夫·康拉德",
+      "contexts": [
+        "《泰坦尼克号》是美国二十世纪福克斯电影公司、派拉蒙影业公司出品爱情片，由詹姆斯·卡梅隆 ... 蔡翊昇、万象凡音演唱歌曲; 1997年电影《泰坦尼克号》发行的原声带专辑.",
+        "《泰坦尼克号》是詹姆斯·卡梅隆导演、编剧、制片、剪辑的1997年美国史诗爱情灾难片，根据同名船只首航便沉没的史实改编，融史实和虚构于一体。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 20,
+      "rgb_source_id": 19,
+      "question": "《当幸福来敲门》的编剧是谁",
+      "expected_output": "斯蒂夫·康拉德",
+      "ground_truth": "斯蒂夫·康拉德",
+      "counterfactual_fake_answer": "詹姆斯·卡梅隆",
+      "contexts": [
+        "斯蒂夫·康拉德 编剧 ... 看到开头就知道结局，不过这并不重要，重要的是过程。。。最感人的不是赢得 ... 年三十清晨，我翻出《当幸福来敲门》这部片子，默默开始看。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 21,
+      "rgb_source_id": 20,
+      "question": "2020-2021赛季欧冠冠军",
+      "expected_output": "切尔西",
+      "ground_truth": "切尔西",
+      "counterfactual_fake_answer": "拜仁慕尼黑",
+      "contexts": [
+        "... 赛季欧洲冠军联赛于2020年8月8日拉开战幕，决赛于2021年5月29日在葡萄牙波尔图的巨龙球场举行。2021年5月29日，切尔西以1-0的比分战胜曼城，夺得该赛季欧冠冠军。",
+        "Nov 4, 2021 ... 英超的曼城队和切尔西队在2020至2021赛季欧冠决赛会师。最终切尔西1比0击败了曼城队夺得了2020至2021赛季欧冠冠军。那么切尔西夺欧冠时的球员阵容是 ...",
+        "2021年5月29日，切尔西以1-0的比分战胜曼城，夺得该赛季欧冠冠军。",
+        "May 30, 2021 ... 切尔西1-0击败曼城夺得2020—2021赛季欧冠冠军 ... 当地时间5月29日21时，2021年欧洲冠军联赛决赛在波尔图巨龙球场举行，对阵双方为两支英超俱乐部切尔西和 ...",
+        "May 30, 2021 ... 原标题：切尔西1-0击败曼城夺得2020—2021赛季欧冠冠军当地时间5月29日21时，2021年欧洲冠军联赛决赛在波尔图巨龙球场举行...",
+        "May 30, 2021 ... 俄罗斯卫星通讯社莫斯科5月30日电伦敦切尔西队足球运动员们在2021年欧洲冠军联赛决赛中击败曼城队，夺得2020—2021赛季欧冠冠军。 2021年5月30日, ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 22,
+      "rgb_source_id": 21,
+      "question": "2019-2020赛季欧冠冠军",
+      "expected_output": "拜仁慕尼黑",
+      "ground_truth": "拜仁慕尼黑",
+      "counterfactual_fake_answer": "利物浦",
+      "contexts": [
+        "Aug 24, 2020 ... 【赛果】#欧冠# 2019-2020赛季欧洲足球冠军联赛决赛：拜仁慕尼黑 1：0力克巴黎圣日耳曼，队史第6️⃣次获得欧冠冠军 。[赞啊][赞啊][赞啊]#德甲# ...",
+        "Aug 24, 2020 ... 原标题：欧冠：拜仁第六次赢得欧冠冠军8月23日，在葡萄牙里斯本举行的2019-2020赛季欧洲足球冠军联赛决赛中，德甲拜仁慕尼黑队以1比0战胜法甲巴黎圣 ...",
+        "Aug 24, 2020 ... 德国拜仁慕尼黑在23日晚的决赛中以1-0击败巴黎圣日耳曼，赢得了2019-2020赛季欧冠联赛的冠军，在卡塔尔2020世俱杯足球赛上获得一席之位。",
+        "Feb 13, 2023 ... 拜仁慕尼黑2020欧冠之路 · 一口气回顾19/20赛季欧冠拜仁夺冠之路,历史第一支全胜夺冠的球队#足球#足球解说#拜仁夺得欧冠冠军 · 欧冠经典比赛# 2019-2020赛季 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 23,
+      "rgb_source_id": 22,
+      "question": "2018-2019赛季欧冠冠军",
+      "expected_output": "利物浦",
+      "ground_truth": "利物浦",
+      "counterfactual_fake_answer": "切尔西",
+      "contexts": [
+        "本屆賽事之決賽會於西班牙首都馬德里的萬達大都會球場舉行。 ... 由熱刺對陣利物浦。這是繼2008年決賽後，再一次由英格蘭球隊包攬決賽席位。最終，利物浦以2–0 擊敗熱刺，並 ...",
+        "2019年6月1日，在马德里万达大都会球场举行的2018-19赛季欧冠决赛中，利物浦以2-0的比分战胜托特纳姆热刺夺得冠军，这是利物浦球队历史上的第六座欧冠冠军。",
+        "2018-2019赛季欧冠决赛利物浦2比0热刺. 时间：2022-04-14 15:21. 视频源播放. 2018-2019赛季欧冠决赛利物浦2比0热刺 ...",
+        "Jun 3, 2019 ... 北京时间昨日凌晨，2018/2019赛季欧冠决赛在马德里万达大都会球场上演，本赛季创下五大联赛最高亚军得分纪录的利物浦，依靠萨拉赫开场伊始的点球建功 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 24,
+      "rgb_source_id": 23,
+      "question": "香港第五任行政长官？",
+      "expected_output": "林郑月娥",
+      "ground_truth": "林郑月娥",
+      "counterfactual_fake_answer": "梁振英",
+      "contexts": [
+        "Mar 26, 2017 ... 林郑月娥26日在香港特别行政区第五任行政长官选举中获得777张有效选票，当选为香港特区第五任行政长官人选。",
+        "Apr 11, 2017 ... 李克强首先祝贺林郑月娥当选香港特区第五任行政长官。李克强表示，中央政府全力支持你和新一届特区政府的工作，全力支持香港发展经济、改善民生、加强 ...",
+        "Mar 26, 2017 ... 3月26日，工作人员在设于香港会展中心的中央点票站开票。 当日，林郑月娥在香港特别行政区第五任行政长官选举中获得777张有效选票，当选为香港特区第 ...",
+        "由习近平监誓香港特别行政区第五任行政长官林郑月娥宣誓就职. 2017年07月01日09:04:26 来源： 新华社. 新华社快讯：1日上午，由国家主席习近平监誓，香港特别行政区第 ...",
+        "Mar 26, 2017 ... 3月26日，三位候选人曾俊华、林郑月娥、胡国兴（从右至左）在香港会展中心合影。香港特别行政区第五任行政长官选举投票3月26日上午9时开始举行。",
+        "Apr 11, 2017 ... 香港特别行政区第五任行政长官林郑月娥女士7日下午在位于香港中环的候任行政长官办公室接受新华社和中央电视台记者的联合采访，就如何全面准确贯彻“ ...",
+        "Mar 26, 2017 ... 3月26日，林郑月娥在香港特区第五任行政长官选举中胜出，其得票已超过选举条例规定的600张有效选票。这是工作人员在设于香港会展中心的中央点票站点票 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 25,
+      "rgb_source_id": 24,
+      "question": "香港第四任行政长官？",
+      "expected_output": "梁振英",
+      "ground_truth": "梁振英",
+      "counterfactual_fake_answer": "林郑月娥",
+      "contexts": [
+        "28日，國務院總理溫家寶召開第7次國務院全體會議，簽署第616號國務院令，任命梁振英為香港特別行政區第四任行政長官，7月1日，就職典禮舉行。 當選編輯. 梁振英在當選後 ...",
+        "Mar 28, 2012 ... 温家宝总理在会上作了讲话。他指出，香港特别行政区第四任行政长官选举是依法进行的，符合香港特别行政区基本法和有关法律的规定。梁振英先生 ...",
+        "Mar 25, 2012 ... 现年57岁的梁振英获得689张有效票，当选为香港特区第四任行政长官人选。 选举投票于当日上午9时至11时举行。主投票站及中央点票站设于香港会展中心。行政 ...",
+        "Apr 10, 2012 ... 温家宝会见梁振英颁发任命梁振英为香港特别行政区第四任行政长官的国务院令. 4月10日，中国国务院总理温家宝在北京中南海向梁振英颁发任命梁振英为 ...",
+        "Dec 9, 2016 ... 现年62岁的梁振英，2012年3月击败当时的竞选对手前政务司司长唐英年，从1,200名选委中取得略多于半数即689票，当选香港特区第四任行政长官。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 26,
+      "rgb_source_id": 25,
+      "question": "CBA2019-2020赛季总冠军",
+      "expected_output": "广东",
+      "ground_truth": "广东",
+      "counterfactual_fake_answer": "北京",
+      "contexts": [
+        "Jul 17, 2020 ... 2019-2020赛季CBA复赛还在进行，今天有一个对于除广东队外所有CBA联赛球队来说的坏消息来了，广东队舔着碧莲包机把马尚接回来了。目前马尚已在个人 ...",
+        "Sep 15, 2022 ... 新赛季CBA联赛将于11月1日正式打响，揭幕战将由上赛季总冠军、“九冠王”广东宏远主场对阵2017-2018赛季总冠军辽宁衡润。 cba2019-2020新赛季从2019年11 ...",
+        "Sep 20, 2019 ... 新赛季CBA联赛将于11月1日正式打响，揭幕战将由上赛季总冠军、“九冠王”广东宏远主场对阵2017-2018赛季总冠军辽宁衡润。 cba2019-2020新赛季从2019年11 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 27,
+      "rgb_source_id": 26,
+      "question": "2010年世界杯的举办国在哪",
+      "expected_output": "南非",
+      "ground_truth": "南非",
+      "counterfactual_fake_answer": "日本",
+      "contexts": [
+        "主办权编辑 · 埃及 · 突尼斯 · 大阿拉伯利比亚人民社会主义民众国 · 摩洛哥 · 南非.",
+        "在泰国，每四年举办一次的世界杯被某些人看. 作是一个纯经济范畴的事件。但是对于主办国南非来. 说，这将是该民族的一个重要时刻。自1994年废除种.",
+        "2010年南非世界杯（The 2010 South Africa FIFA World Cup）是第19届世界杯足球赛，决赛阶段比赛于2010年6月11日至7月11日在南非的9个城市的10座球场举行，这是世界杯 ...",
+        "Oct 10, 2012 ... 联合国环境规划署早些时候发布独立考察报告称，南非在举办2010年足球世界杯期间所产生的二氧化碳排放量远低于预期，由此显示出其节能减排行动的 ...",
+        "Dec 1, 2006 ... 柏林2006世界杯组委会是通过在印度和南非的环保投资获得“碳抵消”（carbon offsets）减排量的。南非也是2010年足球世界杯的举办国。"
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 28,
+      "rgb_source_id": 27,
+      "question": "2016欧洲杯的举办国在哪",
+      "expected_output": "法国",
+      "ground_truth": "法国",
+      "counterfactual_fake_answer": "德国",
+      "contexts": [
+        "除主办国法国，其余23 支参赛球队名单透过预选赛决定。在新的模式下，决赛周球队在小组赛阶段将分入6 个小组，每组4 队，进行角逐，除 ...",
+        "... 的跌宕起伏：在美国举办的2016年百年美洲杯和在法国举办的2016年欧洲足球锦标赛。 ... 此项运动在2013年非洲国家杯足球赛期间继续开展，当时，呼吁预防艾滋病毒的 ...",
+        "May 25, 2016 ... 目录：法国概况法国地理饮食特产风景交通小贴士概况法兰西共和国（法语：République française，英语：the French Republic），简称法国， ...",
+        "Dec 8, 2015 ... 2016年欧洲杯明年夏天将在法国拉开大幕，10座城市、10座球场、51场比赛，独特的魅力属于足球。 主办国：法国人口：六千六百万货币：欧元...",
+        "新浪2016法国欧洲杯(欧锦赛)专题,提供2016欧洲杯赛程,比赛时间,分组,积分榜,新闻报道,欧洲杯直播,花絮,图片,球队/球员数据,更有足坛大咖参与报道与您互动哦!",
+        "Jun 16, 2016 ... 2016年欧洲杯正在法国如火如荼的举行。不过，这些天，除了精彩的绿茵比赛，欧洲杯赛场内外还上演了另一场“大战”——球迷冲突。而这也让本来就因赛事安保 ...",
+        "Jun 13, 2016 ... 法国作为主办国已经是第三次荣膺此项殊荣，24支队伍在全法10个绿茵场展开51场激烈角逐，这届欧洲杯将是欧锦赛历史上最宏大的盛事。 欧洲杯已经成为比肩 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 29,
+      "rgb_source_id": 28,
+      "question": "《流浪地球》的导演",
+      "expected_output": "郭帆",
+      "ground_truth": "郭帆",
+      "counterfactual_fake_answer": "郭敬明",
+      "contexts": [
+        "郭帆（1980年12月15日—），山东济宁人，中国电影导演、制片人和编剧，代表作有《同桌的你》、《流浪地球》系列。 郭帆. 导演. 英文名 ...",
+        "Feb 1, 2023 ... 作为电影《流浪地球》的续集，《流浪地球2》为观众呈现“数字生命 ... 在电影的筹备阶段，导演郭帆与汉米尔顿的设计师们取得联系，想要为其电影新作 ...",
+        "《流浪地球》是2019年上映的中国大陆3D科幻电影，改编自刘慈欣所著同名小说，由郭帆导演，刘慈欣监制，吴京、屈楚萧、李光洁、吴孟达、赵今麦领衔主演，雷佳音友情出演 ...",
+        "2019年郭帆执导的电影 · 本词条是多义词，共13个义项 展开 收起. 2019年郭帆执导的电影; 刘慈欣创作的中篇科幻小说; 2016年万卷出版公司出版的图书; 《流浪地球》电影音乐 ...",
+        "中影製片公司曾找數位導演，但都因中國並不具備拍出好的科幻片能力而被回絕。之後中影集團聯繫郭帆，中影總經理將《流浪地球》、《微紀元》、《超新星紀元》拿出詢問郭 ...",
+        "《流浪地球》VS《满江红》：大国叙事下的新旧之争. 春梅狐狸 11. 《流浪地球2》：郭帆导演的赤子之心，中国影史新的篇章. 狐狸晨曦 7. 花千元刷五次，这电影到底值不值.",
+        "Jan 27, 2023 ... 2019年春节上映的《流浪地球》给中国电影观众带来了非凡的震撼，作家刘慈欣评价，“从《流浪地球》开始，中国科幻电影正式启航了。”睽违4年，导演郭帆 ...",
+        "Jan 22, 2023 ... 2019年春节上映的《流浪地球》给中国电影观众带来了非凡的震撼，作家刘慈欣评价，“从《流浪地球》开始，中国科幻电影正式启航了。” 睽违4年，导演郭帆 ...",
+        "Feb 7, 2023 ... 23年前，刘慈欣的小说《流浪地球》在成都创刊的《科幻世界》杂志上首次发表，震惊世人的同时，也为当年刚考进大学的郭帆种下了一颗梦想的种子；23年 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 30,
+      "rgb_source_id": 29,
+      "question": "《霸王别姬》的导演",
+      "expected_output": "陈凯歌",
+      "ground_truth": "陈凯歌",
+      "counterfactual_fake_answer": "张艺谋",
+      "contexts": [
+        "《霸王别姬》（英语：Farewell My Concubine）改编自李碧华同名小说，由陈凯歌执导，张国荣、巩俐、张丰毅主演的电影。叙述伶人程蝶衣对国粹艺术的执著，进而投影出 ...",
+        "演职员. 陈凯歌 导演 · 张国荣 饰程蝶衣 · 张丰毅 饰段小楼 ... 《霸王别姬》里的粉墨春秋/三角恋. 06:27. 霸王别姬的剧照_1; 霸王别姬的剧照_2; 霸王别姬的剧照_3 ...",
+        "Nov 23, 2018 ... 距离拍摄《霸王别姬》已时隔多年，但导演陈凯歌至今能清晰回忆出一些细节，只因“这样的经验只有这一次”。11月20日，导演陈凯歌受邀出席北京电影学院 ...",
+        "Apr 8, 2023 ... 而说起陈凯歌的电影成就，就不得不提他知道的作品《霸王别姬》，这部上映于1993年的国产电影，集合了两岸三地最顶级的电影人，并最终成就了至今的华语 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    }
+  ]
+}

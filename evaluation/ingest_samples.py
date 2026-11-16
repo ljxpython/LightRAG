@@ -95,12 +95,13 @@ async def ingest_documents(rag_url: str, project_id: str, doc_dir: Path):
 
         # Poll tracking status until all done
         if track_ids:
-            print(f"\n⏳ 正在等待后台图谱抽取与向量构建完成 (共 {len(track_ids)} 篇)...")
+            max_attempts = max(60, len(track_ids) * 3)
+            print(f"\n⏳ 正在等待后台图谱抽取与向量构建完成 (共 {len(track_ids)} 篇，最大轮询 {max_attempts} 次)...")
             pending = set(track_ids.keys())
-            for attempt in range(40):
+            for attempt in range(max_attempts):
                 await asyncio.sleep(3.0)
                 done_this_round = set()
-                for name in pending:
+                for name in list(pending):
                     t_id = track_ids[name]
                     try:
                         poll_res = await client.get(
@@ -121,6 +122,8 @@ async def ingest_documents(rag_url: str, project_id: str, doc_dir: Path):
                 pending -= done_this_round
                 if not pending:
                     break
+                if (attempt + 1) % 5 == 0:
+                    print(f"    ⏳ 抽取构建中... 剩余 {len(pending)}/{len(track_ids)} 篇待完成")
 
             if pending:
                 print(f"  ⚠️ 超时或仍在后台索引中: {pending}")
@@ -145,7 +148,8 @@ def main():
         help="LightRAG server API endpoint (default: http://localhost:9621)",
     )
     parser.add_argument(
-        "--dir", "-d",
+        "--dir", "-d", "--docs-dir",
+        dest="dir",
         type=str,
         default=str(repo_root / "evaluation" / "documents"),
         help="Path to documents folder (default: evaluation/documents)",

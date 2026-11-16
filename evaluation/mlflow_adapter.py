@@ -91,8 +91,9 @@ class MLflowEvaluationTracker:
             ) as run:
                 self.active_run = run
                 run_url = f"{self.tracking_uri.rstrip('/')}/#/experiments/{self.experiment_id}/runs/{run.info.run_id}"
-                print(f"📡 [MLflow] 成功建立上报链路，Run ID: {run.info.run_id}")
-                print(f"   🔗 平台大屏链接: {run_url}")
+                print(f"[MLFLOW_RUN] run_id={run.info.run_id} experiment_id={self.experiment_id}", flush=True)
+                print(f"📡 [MLflow] 成功建立上报链路，Run ID: {run.info.run_id}", flush=True)
+                print(f"   🔗 平台大屏链接: {run_url}", flush=True)
                 yield self
         except Exception as e:
             logger.warning(f"⚠️ MLflow 上报异常 ({e})，本地流程继续。")

@@ -125,6 +125,36 @@ python evaluation/deepeval_runner.py --project eval_benchmark \
 
 ---
 
+## 🏆 权威基准评测：华为诺亚方舟 RGB 评测套件
+
+基于华为诺亚方舟经典基准（RGB: Retrieval-Augmented Generation Benchmark, AAAI 2024），工程化重构为端到端全链路物理质检套件。包含 4 大专项能力集：
+
+| 评测集文件 | 题目数 | 考察维度 | 核心断言指标 |
+|---|---|---|---|
+| `datasets/rgb_zh_noise.json` | 30 题 | **噪声鲁棒性 (Noise Robustness)** | Faithfulness, Contextual Recall & Precision (多负例干扰下的证据锁定) |
+| `datasets/rgb_zh_rejection.json` | 30 题 | **负面拒答 (Negative Rejection)** | `RefusalAssertionMetric` (未登录知识明确拒答率，杜绝幻觉妄断) |
+| `datasets/rgb_zh_integration.json` | 30 题 | **跨文档信息整合 (Multi-Hop)** | 上下文多跳实体召回率 (检验图谱相比传统向量检索的质的飞跃) |
+| `datasets/rgb_zh_counterfactual.json` | 30 题 | **反事实抗扰 (Counterfactual)** | `CounterfactualAssertionMetric` (事实错误检出率与抗扰率) |
+
+### 快速上手命令：
+
+```bash
+# 1. 抽取语料并生成标准化评测集 (默认精选 30 题，带 90 篇物理文档 manifest)
+python evaluation/adapters/rgb_adapter.py --lang zh --subset 30
+
+# 2. 为专属测试项目灌库构建图谱与向量索引
+python evaluation/ingest_samples.py --project eval_rgb_zh --docs-dir evaluation/documents/rgb_zh
+
+# 3. 运行多跳整合打擂评测并上报 MLflow 生产大盘
+evaluation/.eval_venv/bin/python evaluation/deepeval_runner.py \
+  --project eval_rgb_zh \
+  --dataset evaluation/datasets/rgb_zh_integration.json \
+  --mode mix \
+  --mlflow
+```
+
+---
+
 ## 🔒 生产环境安全与二开适配原则
 
 1. **多租户严格物理隔离**：

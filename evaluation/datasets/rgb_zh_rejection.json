@@ -1,0 +1,1153 @@
+{
+  "dataset_id": "rgb_zh_rejection",
+  "dataset_name": "华为 RGB 负面拒答基准 (ZH)",
+  "benchmark_source": "Huawei Noah RGB Benchmark (AAAI 2024)",
+  "timestamp": "2026-11-16T11:09:50.456968+00:00",
+  "total_cases": 30,
+  "corpus_manifest": {
+    "documents": [
+      {
+        "file_name": "rgb_pos_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_pos_000",
+        "title": "主题报道：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "positive",
+        "sample_id": 0,
+        "sha256": "a979060a6356f67133152455f69f46d543201d2e1cf3bc3715aacc30cba9371c",
+        "char_count": 1287
+      },
+      {
+        "file_name": "rgb_noise_000_印控克什米尔地区寺庙踩踏事故死亡人数.md",
+        "doc_id": "rgb_noise_000",
+        "title": "背景参考资讯：印控克什米尔地区寺庙踩踏事故死亡人数",
+        "type": "noise",
+        "sample_id": 0,
+        "sha256": "2e4d4c323bbef23e22be115437e6934985ca0b2ae3b8d8883ff0cf38ace97d6f",
+        "char_count": 768
+      },
+      {
+        "file_name": "rgb_pos_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_pos_001",
+        "title": "主题报道：RCEP具体包括哪些国家",
+        "type": "positive",
+        "sample_id": 1,
+        "sha256": "bef6020538afae9e91b6bec15fe73493887aa39b637c24cc0da6e62178bc7b55",
+        "char_count": 1399
+      },
+      {
+        "file_name": "rgb_noise_001_RCEP具体包括哪些国家.md",
+        "doc_id": "rgb_noise_001",
+        "title": "背景参考资讯：RCEP具体包括哪些国家",
+        "type": "noise",
+        "sample_id": 1,
+        "sha256": "6c74ce8023e1d3d60968ec728dcc926f1ac289bb87b1f8b96787f7372b280511",
+        "char_count": 963
+      },
+      {
+        "file_name": "rgb_pos_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_pos_002",
+        "title": "主题报道：第七届香港立法会议员宣誓仪式的时间",
+        "type": "positive",
+        "sample_id": 2,
+        "sha256": "b9ce126b2aa74b4e01903d849bbea76e0712fe70d4454b2f2d4396172b3be755",
+        "char_count": 1536
+      },
+      {
+        "file_name": "rgb_noise_002_第七届香港立法会议员宣誓仪式的时间.md",
+        "doc_id": "rgb_noise_002",
+        "title": "背景参考资讯：第七届香港立法会议员宣誓仪式的时间",
+        "type": "noise",
+        "sample_id": 2,
+        "sha256": "989c30f912a8f5c595d4895e15c957e8f358dcd08f1a8b8c4066c365d6978e43",
+        "char_count": 931
+      },
+      {
+        "file_name": "rgb_pos_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_pos_003",
+        "title": "主题报道：首趟RCEP班列的起点？",
+        "type": "positive",
+        "sample_id": 3,
+        "sha256": "82768201566fa01f18aca59408fbf35c00294f26db02a01f504206fde23ecf9d",
+        "char_count": 954
+      },
+      {
+        "file_name": "rgb_noise_003_首趟RCEP班列的起点.md",
+        "doc_id": "rgb_noise_003",
+        "title": "背景参考资讯：首趟RCEP班列的起点？",
+        "type": "noise",
+        "sample_id": 3,
+        "sha256": "413197677c3edc54994867dfd8c0a18fc0ca9723ba445b71e3ce5dda5549f3dc",
+        "char_count": 1076
+      },
+      {
+        "file_name": "rgb_pos_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_pos_004",
+        "title": "主题报道：香港第七届立法会选举有多少个议席？",
+        "type": "positive",
+        "sample_id": 4,
+        "sha256": "8266dd71ac4a0c83b787fc0089817e0e0aeec92efaf3ceca6385ac43aa943c0b",
+        "char_count": 2852
+      },
+      {
+        "file_name": "rgb_noise_004_香港第七届立法会选举有多少个议席.md",
+        "doc_id": "rgb_noise_004",
+        "title": "背景参考资讯：香港第七届立法会选举有多少个议席？",
+        "type": "noise",
+        "sample_id": 4,
+        "sha256": "ef30c082b5af51a02c3f73752df711548ce450af2c1f25067b663bbe8eb96b6e",
+        "char_count": 983
+      },
+      {
+        "file_name": "rgb_pos_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_pos_005",
+        "title": "主题报道：2021年香港GDP增长了多少？",
+        "type": "positive",
+        "sample_id": 5,
+        "sha256": "c8db6e27dafdc11dc55081dd215c2023c57f31b2565e44323689cbf4a9fd96c8",
+        "char_count": 1136
+      },
+      {
+        "file_name": "rgb_noise_005_2021年香港GDP增长了多少.md",
+        "doc_id": "rgb_noise_005",
+        "title": "背景参考资讯：2021年香港GDP增长了多少？",
+        "type": "noise",
+        "sample_id": 5,
+        "sha256": "9e8b7ae3e2eaa154d4dfc03ce4b33dac1558b04e252eea856007c25c13db3d08",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_pos_006",
+        "title": "主题报道：2021年北京大兴机场年旅客吞吐量",
+        "type": "positive",
+        "sample_id": 6,
+        "sha256": "4ac2732fb58f58bae07e3ddb685785d57e46fa05e5ce4aa666f592a3229709bc",
+        "char_count": 938
+      },
+      {
+        "file_name": "rgb_noise_006_2021年北京大兴机场年旅客吞吐量.md",
+        "doc_id": "rgb_noise_006",
+        "title": "背景参考资讯：2021年北京大兴机场年旅客吞吐量",
+        "type": "noise",
+        "sample_id": 6,
+        "sha256": "79eb098e19ce23782a25a036fc049b505b3d72406010b057ac5504772da06cd6",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_pos_007",
+        "title": "主题报道：2022年春节档首日票房冠军",
+        "type": "positive",
+        "sample_id": 7,
+        "sha256": "63c4142b166c3779775717e25b85a92b38501a374562e87b7e464b9cbd90949b",
+        "char_count": 1142
+      },
+      {
+        "file_name": "rgb_noise_007_2022年春节档首日票房冠军.md",
+        "doc_id": "rgb_noise_007",
+        "title": "背景参考资讯：2022年春节档首日票房冠军",
+        "type": "noise",
+        "sample_id": 7,
+        "sha256": "24d62b3a163e9e19ce4669cc44b0e36b795229559bcf8ef8b9f463c8013af117",
+        "char_count": 908
+      },
+      {
+        "file_name": "rgb_pos_008_2022春运开始时间.md",
+        "doc_id": "rgb_pos_008",
+        "title": "主题报道：2022春运开始时间",
+        "type": "positive",
+        "sample_id": 8,
+        "sha256": "b979a37f8d4c811fbbec72f096ddf9e53e1649a2e74db5a2173631639040d676",
+        "char_count": 3019
+      },
+      {
+        "file_name": "rgb_noise_008_2022春运开始时间.md",
+        "doc_id": "rgb_noise_008",
+        "title": "背景参考资讯：2022春运开始时间",
+        "type": "noise",
+        "sample_id": 8,
+        "sha256": "dd87b84d2c0b923d5495b8d556c8f6e9d32d747c68a3072394db5e934ee3d9b0",
+        "char_count": 881
+      },
+      {
+        "file_name": "rgb_pos_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_pos_009",
+        "title": "主题报道：2022年春运首日火车票什么时候开售",
+        "type": "positive",
+        "sample_id": 9,
+        "sha256": "a5a66aab3e64de0785415a7e78ffdda14ac1141e5e9166d7760e9c8230be330a",
+        "char_count": 1534
+      },
+      {
+        "file_name": "rgb_noise_009_2022年春运首日火车票什么时候开售.md",
+        "doc_id": "rgb_noise_009",
+        "title": "背景参考资讯：2022年春运首日火车票什么时候开售",
+        "type": "noise",
+        "sample_id": 9,
+        "sha256": "c5d5337b54a227c3af843e7aeb0c4120ea852141111b6a4cd5a23ab2f1a17ea8",
+        "char_count": 1171
+      },
+      {
+        "file_name": "rgb_pos_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_pos_010",
+        "title": "主题报道：2022年特斯拉交付量",
+        "type": "positive",
+        "sample_id": 10,
+        "sha256": "1d18c9a5a1f15ee5c7d8021c0ecbd0bd48a3b53f635d43646e9854eab1ad034a",
+        "char_count": 2015
+      },
+      {
+        "file_name": "rgb_noise_010_2022年特斯拉交付量.md",
+        "doc_id": "rgb_noise_010",
+        "title": "背景参考资讯：2022年特斯拉交付量",
+        "type": "noise",
+        "sample_id": 10,
+        "sha256": "44ada347363ac23c879e8458c0df8afc102163621ddc0c2affa5a978d849ccf7",
+        "char_count": 1143
+      },
+      {
+        "file_name": "rgb_pos_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_pos_011",
+        "title": "主题报道：2023年世界人工智能大会在哪举办",
+        "type": "positive",
+        "sample_id": 11,
+        "sha256": "ee80b817ab489b0ee76aa6ded6e94ecf7df11087600b587ca1fa376de03938af",
+        "char_count": 2061
+      },
+      {
+        "file_name": "rgb_noise_011_2023年世界人工智能大会在哪举办.md",
+        "doc_id": "rgb_noise_011",
+        "title": "背景参考资讯：2023年世界人工智能大会在哪举办",
+        "type": "noise",
+        "sample_id": 11,
+        "sha256": "2ae963ebbb45b9526acef40b69fcec0408b1b80ac65512f81594e285852b12bb",
+        "char_count": 933
+      },
+      {
+        "file_name": "rgb_pos_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_pos_012",
+        "title": "主题报道：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "positive",
+        "sample_id": 12,
+        "sha256": "01db2dd8279b8b8e328b866593c0e45a9e59a85c2dafea5f89b65042c45a97e0",
+        "char_count": 1281
+      },
+      {
+        "file_name": "rgb_noise_012_印度第三艘_歼敌者_级核潜艇下水的时间.md",
+        "doc_id": "rgb_noise_012",
+        "title": "背景参考资讯：印度第三艘“歼敌者”级核潜艇下水的时间",
+        "type": "noise",
+        "sample_id": 12,
+        "sha256": "c58a4bb20f55eeb0feba95252affd4351454e6aa4494d6b3bd81034f3ff06c27",
+        "char_count": 741
+      },
+      {
+        "file_name": "rgb_pos_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_pos_013",
+        "title": "主题报道：美国2021年GDP增长多少",
+        "type": "positive",
+        "sample_id": 13,
+        "sha256": "cd0015864107d5e478f4de0d070238ad6e8f09739462050cbb30bfd49e1ed9e3",
+        "char_count": 1263
+      },
+      {
+        "file_name": "rgb_noise_013_美国2021年GDP增长多少.md",
+        "doc_id": "rgb_noise_013",
+        "title": "背景参考资讯：美国2021年GDP增长多少",
+        "type": "noise",
+        "sample_id": 13,
+        "sha256": "8076879f0633ca83eab21abadbf05fa850fe93c0403932bff533cc7a1c11cccd",
+        "char_count": 1206
+      },
+      {
+        "file_name": "rgb_pos_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_pos_014",
+        "title": "主题报道：2021年中国城镇新增就业了多少人",
+        "type": "positive",
+        "sample_id": 14,
+        "sha256": "bde6b364200978e97d1915249b390aacc65d2350e5080c02a1a7ce32ab04daba",
+        "char_count": 1014
+      },
+      {
+        "file_name": "rgb_noise_014_2021年中国城镇新增就业了多少人.md",
+        "doc_id": "rgb_noise_014",
+        "title": "背景参考资讯：2021年中国城镇新增就业了多少人",
+        "type": "noise",
+        "sample_id": 14,
+        "sha256": "644652ca5e11e1f9a025c0e10add3fafe2f875015fd97534f70bd2602259cecd",
+        "char_count": 1153
+      },
+      {
+        "file_name": "rgb_pos_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_pos_015",
+        "title": "主题报道：黑石集团预测2022年美联储将加息几次",
+        "type": "positive",
+        "sample_id": 15,
+        "sha256": "dbdffb8d05ce630599635e5e46b4af7eaab6f22d0da14e42e4b68705b2d47600",
+        "char_count": 1798
+      },
+      {
+        "file_name": "rgb_noise_015_黑石集团预测2022年美联储将加息几次.md",
+        "doc_id": "rgb_noise_015",
+        "title": "背景参考资讯：黑石集团预测2022年美联储将加息几次",
+        "type": "noise",
+        "sample_id": 15,
+        "sha256": "e0bb4db908b24d31d376d7f46a355dfbc40df7cad7124de81816592a927f92c0",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_pos_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_pos_016",
+        "title": "主题报道：2021年中国电影市场总票房是多少？",
+        "type": "positive",
+        "sample_id": 16,
+        "sha256": "1b363281eab52af5df87be80b0da362658f933e121740aa7652d1857b7f793ca",
+        "char_count": 1084
+      },
+      {
+        "file_name": "rgb_noise_016_2021年中国电影市场总票房是多少.md",
+        "doc_id": "rgb_noise_016",
+        "title": "背景参考资讯：2021年中国电影市场总票房是多少？",
+        "type": "noise",
+        "sample_id": 16,
+        "sha256": "f7f99eace7a8f1aa8107966b04b35e8d575c376ba47ac2ddaa470453e12f206c",
+        "char_count": 1055
+      },
+      {
+        "file_name": "rgb_pos_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_pos_017",
+        "title": "主题报道：《李茂扮太子》是什么类型的电影",
+        "type": "positive",
+        "sample_id": 17,
+        "sha256": "9eb0f4b3d509d89cabcdd3f1398544b816b0ffb132ac3a5ddc7940eba8add2b4",
+        "char_count": 3344
+      },
+      {
+        "file_name": "rgb_noise_017_李茂扮太子_是什么类型的电影.md",
+        "doc_id": "rgb_noise_017",
+        "title": "背景参考资讯：《李茂扮太子》是什么类型的电影",
+        "type": "noise",
+        "sample_id": 17,
+        "sha256": "70b46d07a63e64c1f752af56e2321275e3abe2f1565dd06f4fcebea87f98dc18",
+        "char_count": 876
+      },
+      {
+        "file_name": "rgb_pos_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_pos_018",
+        "title": "主题报道：2021赛季中超冠军",
+        "type": "positive",
+        "sample_id": 18,
+        "sha256": "11f89f53b0fbc0fe4c3b8e01f659dba52e0f45782b1022386240e1f2b467d025",
+        "char_count": 1416
+      },
+      {
+        "file_name": "rgb_noise_018_2021赛季中超冠军.md",
+        "doc_id": "rgb_noise_018",
+        "title": "背景参考资讯：2021赛季中超冠军",
+        "type": "noise",
+        "sample_id": 18,
+        "sha256": "d4d02909531339ad289f8068c6d555cdc289e0c44f4dbde0e49fc2be1eaaaa2f",
+        "char_count": 1176
+      },
+      {
+        "file_name": "rgb_pos_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_pos_019",
+        "title": "主题报道：2022年1月5日全国新增确诊病例数？",
+        "type": "positive",
+        "sample_id": 19,
+        "sha256": "7beb5f7b7006753a451c4cea9d0e6a1a0daa7107c57cdd7b93ec63bd632c835d",
+        "char_count": 720
+      },
+      {
+        "file_name": "rgb_noise_019_2022年1月5日全国新增确诊病例数.md",
+        "doc_id": "rgb_noise_019",
+        "title": "背景参考资讯：2022年1月5日全国新增确诊病例数？",
+        "type": "noise",
+        "sample_id": 19,
+        "sha256": "1695a8f3fcbd7ee796c88f3ddfe461bdc8284f15620e042c5d85229d75f2273e",
+        "char_count": 1072
+      },
+      {
+        "file_name": "rgb_pos_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_pos_020",
+        "title": "主题报道：我国2021年人口出生率",
+        "type": "positive",
+        "sample_id": 20,
+        "sha256": "9843b6422ceba75e2b0006fe0a10520eea7d5e17f483bb44d47b73b731cd13b5",
+        "char_count": 1548
+      },
+      {
+        "file_name": "rgb_noise_020_我国2021年人口出生率.md",
+        "doc_id": "rgb_noise_020",
+        "title": "背景参考资讯：我国2021年人口出生率",
+        "type": "noise",
+        "sample_id": 20,
+        "sha256": "9c9fa06fe517f9cd54bdd2eb3eb898f7b86756e8c3674eb86cbf960218ac888e",
+        "char_count": 971
+      },
+      {
+        "file_name": "rgb_pos_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_pos_021",
+        "title": "主题报道：塔里木油田2021年的油气产量是多少？",
+        "type": "positive",
+        "sample_id": 21,
+        "sha256": "7444ba95361d251d300425440ba45b7abc3ae829fbd6289fc0a1d8d9cccf11e2",
+        "char_count": 760
+      },
+      {
+        "file_name": "rgb_noise_021_塔里木油田2021年的油气产量是多少.md",
+        "doc_id": "rgb_noise_021",
+        "title": "背景参考资讯：塔里木油田2021年的油气产量是多少？",
+        "type": "noise",
+        "sample_id": 21,
+        "sha256": "72acac05757afa1324a325d78148cdbc397440af8ce4ea8d8b2c4637cc81f023",
+        "char_count": 904
+      },
+      {
+        "file_name": "rgb_pos_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_pos_022",
+        "title": "主题报道：2022年冬奥会开幕式总导演是谁",
+        "type": "positive",
+        "sample_id": 22,
+        "sha256": "ef40e2418f74bacc4d5b4a69c83a35537ef0c4a14a8553f5bba632fd7e6169c4",
+        "char_count": 3508
+      },
+      {
+        "file_name": "rgb_noise_022_2022年冬奥会开幕式总导演是谁.md",
+        "doc_id": "rgb_noise_022",
+        "title": "背景参考资讯：2022年冬奥会开幕式总导演是谁",
+        "type": "noise",
+        "sample_id": 22,
+        "sha256": "da10c58f7b663476c66e4400218dce9774b893c0ee789f6ac4bb2ee4c1c86c33",
+        "char_count": 953
+      },
+      {
+        "file_name": "rgb_pos_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_pos_023",
+        "title": "主题报道：中国第三艘航母名字",
+        "type": "positive",
+        "sample_id": 23,
+        "sha256": "9db8248d1c7ab23889ff7f3c6e72e536caf2c7dc03ff372c27e931f72c95e3fb",
+        "char_count": 2409
+      },
+      {
+        "file_name": "rgb_noise_023_中国第三艘航母名字.md",
+        "doc_id": "rgb_noise_023",
+        "title": "背景参考资讯：中国第三艘航母名字",
+        "type": "noise",
+        "sample_id": 23,
+        "sha256": "a71fb3b1ba6791cfb1ad2e319dabddde0bfe10cd33a2014687d5d22cc2972f9b",
+        "char_count": 887
+      },
+      {
+        "file_name": "rgb_pos_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_pos_024",
+        "title": "主题报道：河南2021年的粮食总产量是多少？",
+        "type": "positive",
+        "sample_id": 24,
+        "sha256": "dca255b0fd21a65d894fe9073910bfd3a48051aa422120bd318082770aae0965",
+        "char_count": 1264
+      },
+      {
+        "file_name": "rgb_noise_024_河南2021年的粮食总产量是多少.md",
+        "doc_id": "rgb_noise_024",
+        "title": "背景参考资讯：河南2021年的粮食总产量是多少？",
+        "type": "noise",
+        "sample_id": 24,
+        "sha256": "17ddb4c1f5ce421074144aafa5ea5214d791090064c9540eebea1f979265573c",
+        "char_count": 1180
+      },
+      {
+        "file_name": "rgb_pos_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_pos_025",
+        "title": "主题报道：苹果M1芯片首席设计师去了哪家公司",
+        "type": "positive",
+        "sample_id": 25,
+        "sha256": "18f1a492ed718622ec9731054043777ffa171dfdf5ddc22ed147b77b3ceb008e",
+        "char_count": 4031
+      },
+      {
+        "file_name": "rgb_noise_025_苹果M1芯片首席设计师去了哪家公司.md",
+        "doc_id": "rgb_noise_025",
+        "title": "背景参考资讯：苹果M1芯片首席设计师去了哪家公司",
+        "type": "noise",
+        "sample_id": 25,
+        "sha256": "114c8c3cad03723175c0847369e5dce29b7e89fe91b65b5904e5cf519a34064b",
+        "char_count": 1334
+      },
+      {
+        "file_name": "rgb_pos_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_pos_026",
+        "title": "主题报道：长安汽车2021年销量同比增长多少？",
+        "type": "positive",
+        "sample_id": 26,
+        "sha256": "226b49e21ce9e51f0e8e5407ae9255cad6a346762515f9c285da0ccdccbb749b",
+        "char_count": 2100
+      },
+      {
+        "file_name": "rgb_noise_026_长安汽车2021年销量同比增长多少.md",
+        "doc_id": "rgb_noise_026",
+        "title": "背景参考资讯：长安汽车2021年销量同比增长多少？",
+        "type": "noise",
+        "sample_id": 26,
+        "sha256": "3e76ba08a41cda950a55479bd381acd4ed4a539ba473284fed7197b07929a974",
+        "char_count": 1022
+      },
+      {
+        "file_name": "rgb_pos_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_pos_027",
+        "title": "主题报道：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "positive",
+        "sample_id": 27,
+        "sha256": "aabc42bcd2499f92a0fbdd9b32410b55ed8bbb90b83b396bfa2b0495db6ce06e",
+        "char_count": 889
+      },
+      {
+        "file_name": "rgb_noise_027_10_29索马里首都汽车炸弹爆炸死亡人数.md",
+        "doc_id": "rgb_noise_027",
+        "title": "背景参考资讯：10·29索马里首都汽车炸弹爆炸死亡人数",
+        "type": "noise",
+        "sample_id": 27,
+        "sha256": "6db53d67dde513bcc64b068f8d17ad9e21c08a3c9f2a4807b2943c1f5781eb1f",
+        "char_count": 1029
+      },
+      {
+        "file_name": "rgb_pos_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_pos_028",
+        "title": "主题报道：2021年宝马全球销量？",
+        "type": "positive",
+        "sample_id": 28,
+        "sha256": "f5183b555e5d20b14e00493db8741e9eab1da19920280ec951577e8f098a563f",
+        "char_count": 800
+      },
+      {
+        "file_name": "rgb_noise_028_2021年宝马全球销量.md",
+        "doc_id": "rgb_noise_028",
+        "title": "背景参考资讯：2021年宝马全球销量？",
+        "type": "noise",
+        "sample_id": 28,
+        "sha256": "6288306dd1e5bbf236d3cb87fba998209c227975318ea799385e3af4c475312f",
+        "char_count": 1300
+      },
+      {
+        "file_name": "rgb_pos_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_pos_029",
+        "title": "主题报道：2021年中国外贸进出口规模是多少美元",
+        "type": "positive",
+        "sample_id": 29,
+        "sha256": "a2ad7dc47957f0fa569420d8dfc0c286ee6733f78f8a36fcb0829596db88c8e6",
+        "char_count": 1919
+      },
+      {
+        "file_name": "rgb_noise_029_2021年中国外贸进出口规模是多少美元.md",
+        "doc_id": "rgb_noise_029",
+        "title": "背景参考资讯：2021年中国外贸进出口规模是多少美元",
+        "type": "noise",
+        "sample_id": 29,
+        "sha256": "e24dc9d9a1709f96d9cc063d646b946983811cf4bec39119e21c4c736df3eb0c",
+        "char_count": 1165
+      },
+      {
+        "file_name": "rgb_int_000_第七届香港立法会议员宣誓仪式及首次会议的时间.md",
+        "doc_id": "rgb_int_000",
+        "title": "跨事件综合分析档案：第七届香港立法会议员宣誓仪式及首次会议的时间",
+        "type": "integration",
+        "sample_id": 0,
+        "sha256": "2b727a4374243a199a4c49a7d38dfe55b317c113723b448447850d266d0ca985",
+        "char_count": 3402
+      },
+      {
+        "file_name": "rgb_int_001_2021年香港和澳门的GDP增长率.md",
+        "doc_id": "rgb_int_001",
+        "title": "跨事件综合分析档案：2021年香港和澳门的GDP增长率",
+        "type": "integration",
+        "sample_id": 1,
+        "sha256": "890f43158019cba468379a5601db4697b05fb57ea44607b390134b8747a5c3a7",
+        "char_count": 1379
+      },
+      {
+        "file_name": "rgb_int_002_2022年和2023年春节档首日票房冠军.md",
+        "doc_id": "rgb_int_002",
+        "title": "跨事件综合分析档案：2022年和2023年春节档首日票房冠军",
+        "type": "integration",
+        "sample_id": 2,
+        "sha256": "6c3149417c6d3f0803a3b926fce96db0dc632041e7b375af2208a85382c26503",
+        "char_count": 5249
+      },
+      {
+        "file_name": "rgb_int_003_2022春运的开始和结束时间是什么时候.md",
+        "doc_id": "rgb_int_003",
+        "title": "跨事件综合分析档案：2022春运的开始和结束时间是什么时候？",
+        "type": "integration",
+        "sample_id": 3,
+        "sha256": "b8b9848931054508d326a8823d7e1259c7c3f39a13a2fe258871afab0a46c0a4",
+        "char_count": 1620
+      },
+      {
+        "file_name": "rgb_int_004_2022年和2023年春运首日火车票分别的时间.md",
+        "doc_id": "rgb_int_004",
+        "title": "跨事件综合分析档案：2022年和2023年春运首日火车票分别的时间",
+        "type": "integration",
+        "sample_id": 4,
+        "sha256": "3f6ee1bde6bc48ed771afacda3a0726b587f13b7e666a0eb1ce4bc5b4bd4539c",
+        "char_count": 5521
+      },
+      {
+        "file_name": "rgb_int_005_2022年特斯拉和比亚迪交付量.md",
+        "doc_id": "rgb_int_005",
+        "title": "跨事件综合分析档案：2022年特斯拉和比亚迪交付量",
+        "type": "integration",
+        "sample_id": 5,
+        "sha256": "aa5ddbc1cf01731ccdea01440b1c04338a38e9a7955ee62e3fd84b1d6834b76f",
+        "char_count": 3264
+      },
+      {
+        "file_name": "rgb_int_006_李茂扮太子_是什么类型的电影_它的导演是谁.md",
+        "doc_id": "rgb_int_006",
+        "title": "跨事件综合分析档案：《李茂扮太子》是什么类型的电影？它的导演是谁？",
+        "type": "integration",
+        "sample_id": 6,
+        "sha256": "0d9413157b4e66d3bc34df658af2f4bb6b8ede53b3e72b0a314386e232b77ed0",
+        "char_count": 3543
+      },
+      {
+        "file_name": "rgb_int_007_我国2021年人口的出生率和死亡率是多少.md",
+        "doc_id": "rgb_int_007",
+        "title": "跨事件综合分析档案：我国2021年人口的出生率和死亡率是多少？",
+        "type": "integration",
+        "sample_id": 7,
+        "sha256": "d0fe02d6b25b8ecdf251d3a0a18a45eaaf682e303129cb3678b9b20c875d19d2",
+        "char_count": 1635
+      },
+      {
+        "file_name": "rgb_int_008_塔里木油田2021年和2022年的油气产量分别是.md",
+        "doc_id": "rgb_int_008",
+        "title": "跨事件综合分析档案：塔里木油田2021年和2022年的油气产量分别是多少？",
+        "type": "integration",
+        "sample_id": 8,
+        "sha256": "72ac336ca1fd40824e438b3c0080be04589a577ca77efee19924891798f162bb",
+        "char_count": 666
+      },
+      {
+        "file_name": "rgb_int_009_2021年宝马和奔驰的全球销量分别是多少.md",
+        "doc_id": "rgb_int_009",
+        "title": "跨事件综合分析档案：2021年宝马和奔驰的全球销量分别是多少？",
+        "type": "integration",
+        "sample_id": 9,
+        "sha256": "f562d6199c5d7aa771cc0afecac14a44939206c02add3a6e80872f6b465a1ed2",
+        "char_count": 1099
+      },
+      {
+        "file_name": "rgb_int_010_2021年中国和美国经济分别增长了多少.md",
+        "doc_id": "rgb_int_010",
+        "title": "跨事件综合分析档案：2021年中国和美国经济分别增长了多少？",
+        "type": "integration",
+        "sample_id": 10,
+        "sha256": "e243ef447a40c90e5ab78c5fa288cdb5bf3bccb7f5515a2a506fb0c131572be1",
+        "char_count": 3448
+      },
+      {
+        "file_name": "rgb_int_011_2022年英特尔和英伟达全年营收.md",
+        "doc_id": "rgb_int_011",
+        "title": "跨事件综合分析档案：2022年英特尔和英伟达全年营收",
+        "type": "integration",
+        "sample_id": 11,
+        "sha256": "71c9807a609f6062a61471ede623a2ae92b1226ced8bab291883cea91b217705",
+        "char_count": 2301
+      },
+      {
+        "file_name": "rgb_int_012_踏冰逐梦_的主演和导演是谁.md",
+        "doc_id": "rgb_int_012",
+        "title": "跨事件综合分析档案：《踏冰逐梦》的主演和导演是谁？",
+        "type": "integration",
+        "sample_id": 12,
+        "sha256": "ae95e5c2c0a3a05860c4f2fb31b8e69aba93e871ff99788a3c4c7eddcc6855a2",
+        "char_count": 3029
+      },
+      {
+        "file_name": "rgb_int_013_北京冬奥会美国和中国分别获得多少金牌.md",
+        "doc_id": "rgb_int_013",
+        "title": "跨事件综合分析档案：北京冬奥会美国和中国分别获得多少金牌？",
+        "type": "integration",
+        "sample_id": 13,
+        "sha256": "79c1dc38257a4b2b5f39228e9b6411cb89a3d6bce50c381a5ee416639399a3e4",
+        "char_count": 3235
+      },
+      {
+        "file_name": "rgb_int_014_2022年澳网男单和女单冠军分别是谁.md",
+        "doc_id": "rgb_int_014",
+        "title": "跨事件综合分析档案：2022年澳网男单和女单冠军分别是谁？",
+        "type": "integration",
+        "sample_id": 14,
+        "sha256": "b961527ae12fca20c2656f41f1615b2a3195acc326d9ebe0707357a4891ec90e",
+        "char_count": 7159
+      },
+      {
+        "file_name": "rgb_int_015_北京冬奥会澳大利亚和新西兰运动员数量.md",
+        "doc_id": "rgb_int_015",
+        "title": "跨事件综合分析档案：北京冬奥会澳大利亚和新西兰运动员数量",
+        "type": "integration",
+        "sample_id": 15,
+        "sha256": "d4e8270db38fb3cba3295d53c0b822ec4e61318a4306f08fd50178c771b57fa0",
+        "char_count": 1408
+      },
+      {
+        "file_name": "rgb_int_016_北京冬奥会和冬残奥会的开幕日期分别是什么时候.md",
+        "doc_id": "rgb_int_016",
+        "title": "跨事件综合分析档案：北京冬奥会和冬残奥会的开幕日期分别是什么时候?",
+        "type": "integration",
+        "sample_id": 16,
+        "sha256": "19d16d02520f540032ed29c7d98de0a23793c5132f8fd13371642a6a0d465afe",
+        "char_count": 936
+      },
+      {
+        "file_name": "rgb_int_017_北京冬奥会的第一棒和最后一棒火炬手分别是谁.md",
+        "doc_id": "rgb_int_017",
+        "title": "跨事件综合分析档案：北京冬奥会的第一棒和最后一棒火炬手分别是谁？",
+        "type": "integration",
+        "sample_id": 17,
+        "sha256": "b1f33da8aed1ec1fd92250084325f5b7052b2dfafe80ae3bba7c42e9853a328a",
+        "char_count": 4038
+      },
+      {
+        "file_name": "rgb_int_018_2022和2023年春节档票房冠军分别哪部电影.md",
+        "doc_id": "rgb_int_018",
+        "title": "跨事件综合分析档案：2022和2023年春节档票房冠军分别哪部电影",
+        "type": "integration",
+        "sample_id": 18,
+        "sha256": "dca1a7d4ef696114b40d8fa2021d848510de2f317b3e20b036fc468cb7650c5a",
+        "char_count": 4966
+      },
+      {
+        "file_name": "rgb_int_019_北京冬奥会男子1500米速度滑冰和短道速滑中谁获.md",
+        "doc_id": "rgb_int_019",
+        "title": "跨事件综合分析档案：北京冬奥会男子1500米速度滑冰和短道速滑中谁获得了金牌？",
+        "type": "integration",
+        "sample_id": 19,
+        "sha256": "e69eda9e045ba7eb1dd267809b3e0fdda969d01f58ecd633044edf3a004d1df6",
+        "char_count": 448
+      },
+      {
+        "file_name": "rgb_int_020_北京冬奥会女子和男子500米速度滑冰金牌分别是谁.md",
+        "doc_id": "rgb_int_020",
+        "title": "跨事件综合分析档案：北京冬奥会女子和男子500米速度滑冰金牌分别是谁",
+        "type": "integration",
+        "sample_id": 20,
+        "sha256": "d2c2e7824614479a5e1aa05d4a4ab2b272a97f176c91c6c440bdfee80728a937",
+        "char_count": 909
+      },
+      {
+        "file_name": "rgb_int_021_人世间_的导演和编剧是谁.md",
+        "doc_id": "rgb_int_021",
+        "title": "跨事件综合分析档案：《人世间》的导演和编剧是谁？",
+        "type": "integration",
+        "sample_id": 21,
+        "sha256": "cefb3a015829a7468048eebb92a5ef9df0294c919755f1daf8216d4d949105ed",
+        "char_count": 8015
+      },
+      {
+        "file_name": "rgb_int_022_花样滑冰女子和男子单人滑比赛金牌得主分别是谁.md",
+        "doc_id": "rgb_int_022",
+        "title": "跨事件综合分析档案：花样滑冰女子和男子单人滑比赛金牌得主分别是谁？",
+        "type": "integration",
+        "sample_id": 22,
+        "sha256": "6cbd02e4698ba014097cb4b63b17dd93cd7c3845b032eee6d9328dab025e317e",
+        "char_count": 4112
+      },
+      {
+        "file_name": "rgb_int_023_iPhone_SE_3的芯片是什么_起售价多少.md",
+        "doc_id": "rgb_int_023",
+        "title": "跨事件综合分析档案：iPhone SE 3的芯片是什么，起售价多少",
+        "type": "integration",
+        "sample_id": 23,
+        "sha256": "776c34a7a2564468a9aa26d9f1bc8bd4b250b1f962f529a2a1f9451f6b81bfc1",
+        "char_count": 4340
+      },
+      {
+        "file_name": "rgb_int_024_邓伦逃税多少钱_被罚了多少钱.md",
+        "doc_id": "rgb_int_024",
+        "title": "跨事件综合分析档案：邓伦逃税多少钱，被罚了多少钱",
+        "type": "integration",
+        "sample_id": 24,
+        "sha256": "14b07e07c530b0a639717565a8a88587d848a60e2b3dd49e0ba709716d28277e",
+        "char_count": 2286
+      },
+      {
+        "file_name": "rgb_int_025_MU5735航班坠毁的时间和地点.md",
+        "doc_id": "rgb_int_025",
+        "title": "跨事件综合分析档案：MU5735航班坠毁的时间和地点",
+        "type": "integration",
+        "sample_id": 25,
+        "sha256": "75e64ef0fcdd60cb1b7090f5482c8f6c6482a98d226f455f0b10a68191884252",
+        "char_count": 1113
+      },
+      {
+        "file_name": "rgb_int_026_2022年考研和高考报名人数分别是多少.md",
+        "doc_id": "rgb_int_026",
+        "title": "跨事件综合分析档案：2022年考研和高考报名人数分别是多少？",
+        "type": "integration",
+        "sample_id": 26,
+        "sha256": "078e56e431d66790714689cb1d7fcabdde871b3734457637ccdc389eee834df0",
+        "char_count": 5191
+      },
+      {
+        "file_name": "rgb_int_027_心居_的主演有谁_导演是谁.md",
+        "doc_id": "rgb_int_027",
+        "title": "跨事件综合分析档案：《心居》的主演有谁，导演是谁？",
+        "type": "integration",
+        "sample_id": 27,
+        "sha256": "6ddeca92bbb3b22f8a19cad9196b534f4cf1b308cd7f3c09a5a04b3e82feee9b",
+        "char_count": 5306
+      },
+      {
+        "file_name": "rgb_int_028_卡塔尔世界杯德国队和法国队在哪个组.md",
+        "doc_id": "rgb_int_028",
+        "title": "跨事件综合分析档案：卡塔尔世界杯德国队和法国队在哪个组",
+        "type": "integration",
+        "sample_id": 28,
+        "sha256": "ba896c45bed52b701663a3119f80f88d5bcb47706a506888d30596fb6a65f1a3",
+        "char_count": 6615
+      },
+      {
+        "file_name": "rgb_int_029_上海和北京2021年的GDP分别是多少.md",
+        "doc_id": "rgb_int_029",
+        "title": "跨事件综合分析档案：上海和北京2021年的GDP分别是多少？",
+        "type": "integration",
+        "sample_id": 29,
+        "sha256": "ab2cc3f40cee4feca5fb33c225a1fbf1946cc648af80c07fdcc31b010a871fd4",
+        "char_count": 1601
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "rgb_source_id": 0,
+      "question": "根据现有资料，请说明有关‘印控克什米尔地区寺庙踩踏事故死亡人数’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 2,
+      "rgb_source_id": 1,
+      "question": "根据现有资料，请说明有关‘RCEP具体包括哪些国家’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 3,
+      "rgb_source_id": 2,
+      "question": "根据现有资料，请说明有关‘第七届香港立法会议员宣誓仪式的时间’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 4,
+      "rgb_source_id": 3,
+      "question": "根据现有资料，请说明有关‘首趟RCEP班列的起点？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 5,
+      "rgb_source_id": 4,
+      "question": "根据现有资料，请说明有关‘香港第七届立法会选举有多少个议席？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 6,
+      "rgb_source_id": 5,
+      "question": "根据现有资料，请说明有关‘2021年香港GDP增长了多少？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 7,
+      "rgb_source_id": 6,
+      "question": "根据现有资料，请说明有关‘2021年北京大兴机场年旅客吞吐量’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 8,
+      "rgb_source_id": 7,
+      "question": "根据现有资料，请说明有关‘2022年春节档首日票房冠军’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 9,
+      "rgb_source_id": 8,
+      "question": "根据现有资料，请说明有关‘2022春运开始时间’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 10,
+      "rgb_source_id": 9,
+      "question": "根据现有资料，请说明有关‘2022年春运首日火车票什么时候开售’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 11,
+      "rgb_source_id": 10,
+      "question": "根据现有资料，请说明有关‘2022年特斯拉交付量’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 12,
+      "rgb_source_id": 11,
+      "question": "根据现有资料，请说明有关‘2023年世界人工智能大会在哪举办’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 13,
+      "rgb_source_id": 12,
+      "question": "根据现有资料，请说明有关‘印度第三艘“歼敌者”级核潜艇下水的时间’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 14,
+      "rgb_source_id": 13,
+      "question": "根据现有资料，请说明有关‘美国2021年GDP增长多少’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 15,
+      "rgb_source_id": 14,
+      "question": "根据现有资料，请说明有关‘2021年中国城镇新增就业了多少人’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 16,
+      "rgb_source_id": 15,
+      "question": "根据现有资料，请说明有关‘黑石集团预测2022年美联储将加息几次’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 17,
+      "rgb_source_id": 16,
+      "question": "根据现有资料，请说明有关‘2021年中国电影市场总票房是多少？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 18,
+      "rgb_source_id": 17,
+      "question": "根据现有资料，请说明有关‘《李茂扮太子》是什么类型的电影’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 19,
+      "rgb_source_id": 18,
+      "question": "根据现有资料，请说明有关‘2021赛季中超冠军’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 20,
+      "rgb_source_id": 19,
+      "question": "根据现有资料，请说明有关‘2022年1月5日全国新增确诊病例数？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 21,
+      "rgb_source_id": 20,
+      "question": "根据现有资料，请说明有关‘我国2021年人口出生率’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 22,
+      "rgb_source_id": 21,
+      "question": "根据现有资料，请说明有关‘塔里木油田2021年的油气产量是多少？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 23,
+      "rgb_source_id": 22,
+      "question": "根据现有资料，请说明有关‘2022年冬奥会开幕式总导演是谁’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 24,
+      "rgb_source_id": 23,
+      "question": "根据现有资料，请说明有关‘中国第三艘航母名字’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 25,
+      "rgb_source_id": 24,
+      "question": "根据现有资料，请说明有关‘河南2021年的粮食总产量是多少？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 26,
+      "rgb_source_id": 25,
+      "question": "根据现有资料，请说明有关‘苹果M1芯片首席设计师去了哪家公司’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 27,
+      "rgb_source_id": 26,
+      "question": "根据现有资料，请说明有关‘长安汽车2021年销量同比增长多少？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 28,
+      "rgb_source_id": 27,
+      "question": "根据现有资料，请说明有关‘10·29索马里首都汽车炸弹爆炸死亡人数’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 29,
+      "rgb_source_id": 28,
+      "question": "根据现有资料，请说明有关‘2021年宝马全球销量？’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    },
+    {
+      "id": 30,
+      "rgb_source_id": 29,
+      "question": "根据现有资料，请说明有关‘2021年中国外贸进出口规模是多少美元’未公开的机密细节或未发生事项？",
+      "expected_output": "根据已知资料，未提及相关未公开机密或相关细节，无法回答该问题。",
+      "ground_truth": "资料中无相关信息，系统应当明确表示无法回答或未提及。",
+      "challenge_type": "negative_rejection",
+      "difficulty": "hard",
+      "assertion_rule": "must_refuse",
+      "source_docs": []
+    }
+  ]
+}

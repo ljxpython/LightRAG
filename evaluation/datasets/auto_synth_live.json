@@ -1,0 +1,750 @@
+{
+  "dataset_id": "ds_11111111-1111-4111-8111-111111111111_1794550361",
+  "project_id": "11111111-1111-4111-8111-111111111111",
+  "engine": "native",
+  "model": "deepseek-v4.1-flash",
+  "timestamp": "2026-11-13T14:12:41",
+  "total_cases": 31,
+  "corpus_manifest": {
+    "project_id": "11111111-1111-4111-8111-111111111111",
+    "revision_id": "rev_1",
+    "snapshot_hash": "sha256:34b0913fdee92e1de77b454b52552bf67a937a06847131da7c0349d5e64f3ec1",
+    "total_docs": 13,
+    "total_chunks": 12,
+    "docs": [
+      {
+        "doc_id": "doc-00e71df22262087fd8ad820708997657",
+        "file_name": "api.md",
+        "file_path": "api.md",
+        "content_hash": "b49b29cee57c8c094bf3342c0839ea8a",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-06a04694df7db56bac5ba1d3b1c43b66",
+        "file_name": "study_methods_poster.svg",
+        "file_path": "study_methods_poster.svg",
+        "content_hash": "095dcce3b5c15a96371c70d7b37a7bf9",
+        "status": "ACTIVE",
+        "chunks_count": 1,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-0b2e0470e548662701e34c1b6a3dc251",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "0b2e0470e548662701e34c1b6a3dc251",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-105e1c3a63d449451de755465e9a06d6",
+        "file_name": "旅行日记2.pdf",
+        "file_path": "旅行日记2.pdf",
+        "content_hash": "2a65ed83a8a09ddf8dfe7831a66fcca4",
+        "status": "ACTIVE",
+        "chunks_count": 4,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-17d75eb8fbe7177e6028200cd4166f6e",
+        "file_name": "test_knowledge_architecture.png",
+        "file_path": "test_knowledge_architecture.png",
+        "content_hash": "346cf3463f5a54a3e03c250e5dbee817",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-4196743d82222700a3d2bd37053898fe",
+        "file_name": "operations.md",
+        "file_path": "operations.md",
+        "content_hash": "897db4c291f060f8b9526a3e132b81ab",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-58e826b9d443b69457f5853e210c7110",
+        "file_name": "test_direct_vlm_workflow_v2.png",
+        "file_path": "test_direct_vlm_workflow_v2.png",
+        "content_hash": "a9250196b881640db239c58baf7715e3",
+        "status": "ACTIVE",
+        "chunks_count": 2,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-6cd007d62737e5a12b005b4414d7b899",
+        "file_name": "release.md",
+        "file_path": "release.md",
+        "content_hash": "dd82cea5142f6aa71521a4cbaf7c4c4b",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-7eedb604a553cbb8c533df4343fd21c6",
+        "file_name": "01_强势_L01_案例_借钱道德绑架课题分离.png",
+        "file_path": "01_强势_L01_案例_借钱道德绑架课题分离.png",
+        "content_hash": "8e6a13b1442082c48c9feb10c02418f4",
+        "status": "ACTIVE",
+        "chunks_count": 3,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c",
+        "file_name": "study-methods-ink-poster.svg",
+        "file_path": "study-methods-ink-poster.svg",
+        "content_hash": "2de636bfdfa2044666a8002042761ee0",
+        "status": "ACTIVE",
+        "chunks_count": 2,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-b3bf009d5fc98bcbb8aa0d8fa01b588d",
+        "file_name": "test_direct_vlm_workflow.png",
+        "file_path": "test_direct_vlm_workflow.png",
+        "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-b732f38b4b96b31caee5cb9976e2eec2",
+        "file_name": "unknown_source",
+        "file_path": "unknown_source",
+        "content_hash": "b732f38b4b96b31caee5cb9976e2eec2",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      },
+      {
+        "doc_id": "doc-bf4d3c18d08efcbdb7d505c0777f5141",
+        "file_name": "questions.json",
+        "file_path": "questions.json",
+        "content_hash": "db7de2e28297c7fa997f669717c5d2e2",
+        "status": "ACTIVE",
+        "chunks_count": 0,
+        "lifecycle_status": "NEW_ADDED"
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "test_id": "case_1",
+      "question": "生产备份每天什么时候执行，保留多久？",
+      "ground_truth": "生产备份每日在 02:15 UTC 执行全量备份，保留周期为 35 天。",
+      "contexts": [
+        "## 4. 生产环境备份与灾备策略\n系统每日在 02:15 UTC 自动触发数据库全量快照与物理增量备份任务。所有快照与归档数据自动同步至多可用区异地冷存储，全量备份保留周期为 35 天，超时由生命周期规则自动安全排空。"
+      ],
+      "source_docs": [
+        "ops_backup_policy.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "case_2",
+      "question": "备份恢复演练的频率是多少？",
+      "ground_truth": "备份恢复演练每 14 天组织一次端到端恢复演练验证。",
+      "contexts": [
+        "## 5. 容灾演练与数据可信验证\n为验证备份数据的完整性与有效性，运维与基础设施团队每 14 天组织一次端到端自动化恢复演练验证，拉起隔离沙箱并校验数据校验和（Checksum），保障故障场景秒级应急。"
+      ],
+      "source_docs": [
+        "ops_backup_policy.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "case_3",
+      "question": "P1 和 P2 事故分别多久确认响应？",
+      "ground_truth": "P1 级别重大事故要求在 7 分钟内完成确认响应，P2 级别事故要求在 25 分钟内完成确认响应。",
+      "contexts": [
+        "## 2. 事故级别与应急响应 SLA 指标\n根据线上业务影响面划分事故级别：\n- P1 级别重大事故（核心链路不可用或数据受损）：要求值班负责人必须在 7 分钟内完成确认响应，15 分钟内拉起应急作战室；\n- P2 级别事故（核心功能降级或非核心服务中断）：要求在 25 分钟内完成确认响应，1 小时内输出初步抑制方案。"
+      ],
+      "source_docs": [
+        "sla_incident_management.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "case_4",
+      "question": "登录接口使用什么方法和路径？成功后有哪些令牌字段？",
+      "ground_truth": "登录接口采用 POST /v2/auth/login，成功响应包含 access_token, expires_in 以及 refresh_token 字段。",
+      "contexts": [
+        "### 3.1 统一身份认证接口\n- 请求路径：POST /v2/auth/login\n- 请求头：Content-Type: application/json\n- 成功响应体结构 (200 OK)：\n```json\n{\n  \"access_token\": \"eyJhbGciOi...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 5400,\n  \"refresh_token\": \"d98f7a6b...\"\n}\n```"
+      ],
+      "source_docs": [
+        "auth_api_spec.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "case_5",
+      "question": "访问令牌和刷新令牌各自的有效期是多少？",
+      "ground_truth": "访问令牌 (access_token) 有效期为 90 分钟，刷新令牌 (refresh_token) 有效期为 10 天。",
+      "contexts": [
+        "### 3.2 令牌生命周期与轮转机制\n- 访问令牌 (access_token)：采用短生命周期无状态 JWT，有效期设置为 90 分钟 (5400 秒)；\n- 刷新令牌 (refresh_token)：用于安全续期，单次签发有效期为 10 天，存储在 Redis 哨兵集群中支持主动吊销与滑动延期。"
+      ],
+      "source_docs": [
+        "auth_api_spec.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "case_6",
+      "question": "客户端超出限流额度会收到什么状态码，如何知道等待时间？",
+      "ground_truth": "超出限流额度会收到 HTTP 429 Too Many Requests 状态码，通过响应头中的 Retry-After 字段获取需要等待的时间。",
+      "contexts": [
+        "### 4. 网关分布式限流策略\n当客户端调用频次超出当前租户配额或触发令牌桶限流阈值时，网关立即阻断请求并返回 HTTP 429 Too Many Requests 错误状态码。响应头中将包含标准的 Retry-After 标头（单位为秒），告知客户端需等待的退避冷却时间。"
+      ],
+      "source_docs": [
+        "gateway_rate_limiting.md"
+      ],
+      "evolution_type": "standard_qa",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_001_reasoning",
+      "question": "图中泰国亚航客机停在露天停机坪，乘客在混凝土机坪排队并通过连接前左舱门的带顶棚移动客梯登机，而不是经航站楼廊桥登机。请解释这一登机方式背后的运行机制，以及它对低成本航空运营和机场运行可能带来的影响。",
+      "ground_truth": "推理如下：1）切片显示飞机位于室外tarmac/apron，前左门连接的是covered mobile stairway，乘客在地面红线与黄色警示标记旁排队，说明飞机停靠的是远机位而非带廊桥的近机位。2）因此没有固定廊桥可用，登机必须依靠可移动客梯车；带顶棚只是为乘客提供一定遮阳/避雨，不改变远机位登机性质。3）对Thai AirAsia这类低成本航司，远机位加移动客梯可减少廊桥/登机口占用和相关机场费用，并使飞机停靠更灵活，便于快速上下客和地面保障，从而服务短周转、低成本运营。4）代价是乘客需在露天机坪步行/排队，舒适性和天气暴露增加，登机速度受组织与客梯通过能力影响；因此图中用红色引导线、黄黑警示和金属隔离框来维持人车/人机安全距离。5）综上，这一场景是远机位登机与低成本航司快速周转、成本控制机制共同作用的结果。",
+      "contexts": [
+        "[Image Name]passengers_boarding_airasia_jet_tarmac\n[Image Type]Photo\n\nAn outdoor tarmac photograph showing passengers queuing to board a Thai AirAsia commercial jet at an airport on a bright, sunny day. The aircraft dominates the upper half of the frame: a red-liveried Airbus with the large white web address \"airasia.com\" painted along its fuselage, an \"AirAsia\" logo on the engine nacelle, and the AirAsia script mark on the tail fin. Near the cockpit, small markings read \"THAI AIRASIA\" beneath a Thai flag and \"AIRBUS\" below it. A covered mobile stairway is attached to the forward left door, and travelers can be seen ascending it into the cabin. In the foreground, a line of roughly a dozen passengers waits on the concrete apron, viewed from behind. Most wear light-colored, casual travel clothing — several in white jackets, trousers, and long-sleeved shirts — while one person stands out in a bright blue fleece jacket with a shoulder bag, and another on the right wears a pale pink top. Red painted guide lines run across the pale gray concrete, accompanied by small yellow-and-black striped markings and a low metal barrier frame on the left. A red ground-service pickup truck and a tall light mast are visible in the mid-ground near the nose of the jet, and a faint blurred structure of other aircraft or equipment sits on the far right. The upper portion of the image is filled with a deep blue sky streaked with thin, wispy cirrus clouds and a faint contrail, giving the scene a clear, cheerful vacation atmosphere that fits the trailing text about going on a trip."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-000"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_002_multi_hop",
+      "question": "若 WebClient 用户要基于“主动·回忆”发起一次测验请求，并让 Knowledge Core 返回结果用于学习闭环，根据两张图，该请求从 WebClient 到 Knowledge Core 必须经过哪个统一入口、可能由哪个服务完成令牌校验？返回结果主要服务于闭环中的哪两个连续环节？",
+      "ground_truth": "请求必须按 WebClient→API Gateway→Knowledge Core 的链路进入：API Gateway 是统一入口并集成鉴权，可调用或联动 Auth Service 完成令牌验证后再转发到 Knowledge Core；Knowledge Core 返回的问答或检索结果用于“主动·回忆”后的输出，并进入学习闭环中的“反馈”与“迭代”两个连续环节。",
+      "contexts": [
+        "# 图片知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：系统架构图 / 组件交互图（高层逻辑架构图）。\n- **核心主题**：展示 `WebClient` 通过 `API Gateway` 访问后端服务的架构关系。图中包含四个核心组件：`WebClient`、`API Gateway`、`Auth Service`、`Knowledge Core`，并通过箭头表达请求/调用方向。\n- **图形特征**：白底，使用矩形框表示组件；不同组件采用不同边框和填充颜色区分；箭头表示单向调用或数据流向。图中没有标题、图例、坐标轴、刻度或数值标注。\n\n---\n\n## 2. 【核心组件与内容】\n\n| 组件名称 | 位置 | 图形样式 | 图中标识 | 角色与说明 |\n|---|---|---|---|---|\n| `WebClient` | 最左侧 | 蓝色边框，浅蓝色填充矩形 | `WebClient` | Web 客户端/前端应用，负责向系统发起请求，是请求的起点。 |\n| `API Gateway` | 中间 | 橙色边框，浅橙色填充矩形 | `API Gateway` | API 网关，系统统一入口，负责接收客户端请求、路由转发、鉴权集成、协议转换等。 |\n| `Auth Service` | 右上方 | 绿色边框，浅绿色填充矩形 | `Auth Service` | 认证服务，通常负责身份认证、授权校验、令牌验证等安全能力。 |\n| `Knowledge Core` | 右下方 | 红/粉色边框，浅粉色填充矩形 | `Knowledge Core` | 知识核心服务，通常负责知识处理、知识检索、知识图谱、问答或业务核心逻辑。 |\n\n- 图中所有组件均为独立矩形模块。\n- 组件之间没有嵌套关系，属于并列的服务/组件。\n- 图中未展示数据库、缓存、消息队列、注册中心、监控等外围组件。\n\n---\n\n## 3. 【逻辑关系与数据流向】\n\n### 3.1 箭头与调用关系\n\n图中明确存在三条有向箭头：\n\n1. **`WebClient` → `API Gateway`**\n   - 箭头从 `WebClient` 右侧水平指向 `API Gateway` 左侧。\n   - 表示客户端请求首先进入 API 网关。\n   - 这是系统的统一入口关系。\n\n2. **`API Gateway` → `Auth Service`**\n   - 箭头从 `API Gateway` 顶部引出，先向上折线，再向右指向 `Auth Service` 左侧。\n   - 表示 API 网关会调用或路由请求到认证服务。\n   - 通常用于认证、鉴权、令牌校验等场景。\n\n3. **`API Gateway` → `Knowledge Core`**\n   - 箭头从 `API Gateway` 右侧水平指向 `Knowledge Core` 左侧。\n   - 表示 API 网关会将业务请求转发或路由到知识核心服务。\n   - 通常用于知识查询、知识处理、核心业务逻辑调用。\n\n### 3.2 依赖关系\n\n- `WebClient` 依赖 `API Gateway`，不直接访问后端服务。\n- `API Gateway` 依赖 `Auth Service` 和 `Knowledge Core`，是二者的统一调用入口。\n- `Auth Service` 与 `Knowledge Core` 之间没有直接连线，说明它们可能通过 API 网关进行集成，或者彼此保持独立。\n- 图中未标注返回箭头，但按常规架构，`Auth Service` 和 `Knowledge Core` 会向 `API Gateway` 返回处理结果，再由 `API Gateway` 返回给 `WebClient`。\n\n### 3.3 数据流向与分支条件\n\n可抽象为以下流程：\n\n```mermaid\nflowchart LR\n  A[WebClient] --> B[API Gateway]\n  B --> C[Auth Service]\n  B --> D[Knowledge Core]\n```\n\n- **主流程**：`WebClient` 发起请求 → `API Gateway` 接收请求。\n- **认证分支**：当请求需要身份认证或鉴权时，`API Gateway` 调用 `Auth Service`。\n- **业务分支**：当请求属于知识查询或知识处理业务时，`API Gateway` 将请求转发至 `Knowledge Core`。\n- **先后顺序**：图中未明确标注先后顺序。可推断为一种常见模式：API 网关先调用认证服务完成鉴权，鉴权通过后再将业务请求转发至知识核心服务；也可能是根据请求类型并行/分别路由。\n- **成功/失败路径**：图中未标注成功、失败、异常、重试、熔断等分支条件。\n- **响应路径**：图中未绘制返回箭头，属于架构图中的简化表达。\n\n---\n\n## 4. 【图内所有文字与数值】\n\n图中可见文字如下：\n\n- `WebClient`\n- `API Gateway`\n- `Auth Service`\n- `Knowledge Core`\n\n图中没有出现：\n\n- 数字、数值、比例、统计指标；\n- 代码片段、公式",
+        "# 图片深度解析与知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：知识海报 / 学习方法视觉总结图（极简主义矢量设计风格）\n- **核心主题**：系统化学习方法论与学习闭环\n- **设计风格**：米白/浅灰底色，底部深灰与灰色波浪形色块模拟水面与地平线；左侧配植物线条插画，右下角配红色圆角矩形印章感装饰，底部中央有划船小人剪影，整体营造“学海无涯、持续前行”的意境。\n\n## 2. 【核心组件与内容】\n\n### 2.1 标题区（顶部居中）\n- 四个大号矩形框（□ □ □ □）作为主视觉占位\n- 副标题：`LEARNING · METHODS`\n- 中文主标题：`学习方法`\n- 古语引用：`学而不思则罔　思而不学则殆`（出自《论语·为政》）\n- 右上角：四个小方形图标\n\n### 2.2 核心方法矩阵（中部主体）\n以三列两行的网格布局呈现六种学习方法，每组由两个双字词组成，中间以红色圆点分隔：\n\n| 列1 | 列2 | 列3 |\n|------|------|------|\n| 费曼 · 讲授 | 间隔 · 重复 | 主动 · 回忆 |\n| 番茄 · 专注 | 康奈尔 · 笔记 | 刻意 · 练习 |\n\n### 2.3 流程闭环（底部居中）\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n### 2.4 装饰与辅助元素\n- 左侧：植物线条插画（两条弯曲枝干，带叶片）\n- 底部中央：划船小人剪影（象征在学海中前行）\n- 右下角：红色圆角矩形，内含四个小方形（类似印章或徽章装饰）\n- 右侧竖排文字：`学无止境`\n- 左下角文字：`温故知新`\n\n## 3. 【逻辑关系与数据流向】\n\n该图虽为静态海报，但通过文字布局隐含了完整的学习系统逻辑：\n\n1. **输入阶段**：通过“费曼·讲授”“间隔·重复”“主动·回忆”等方法进行知识输入与初步加工。\n2. **加工阶段**：通过“番茄·专注”“康奈尔·笔记”“刻意·练习”等方法进行深度加工与内化。\n3. **输出阶段**：将所学通过讲授、练习等方式输出。\n4. **反馈与迭代**：通过“输入 · 加工 · 输出 · 反馈 · 迭代”形成闭环，持续优化学习效果。\n5. **底层理念**：以“学而不思则罔，思而不学则殆”为哲学基础，强调学思结合；“学无止境”“温故知新”则作为持续学习的座右铭。\n\n## 4. 【图内所有文字与数值】\n\n**英文与数字：**\n- `LEARNING · METHODS`\n\n**中文标题与引用：**\n- `学习方法`\n- `学而不思则罔　思而不学则殆`\n\n**核心方法标签（六组）：**\n- `费曼 · 讲授`\n- `间隔 · 重复`\n- `主动 · 回忆`\n- `番茄 · 专注`\n- `康奈尔 · 笔记`\n- `刻意 · 练习`\n\n**流程关键词：**\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n**装饰性文字：**\n- `学无止境`（右侧竖排）\n- `温故知新`（左下角）\n\n**其他可见元素：**\n- 四个大号矩形框（标题占位符）\n- 右上角四个小方形图标\n- 红色圆点（方法之间的分隔符）\n- 红色圆角矩形印章（右下角，内含四个小方形）\n\n## 5. 【系统总结与推论】\n\n- **系统级总结**：该图是一张以“学习方法”为核心的知识海报，系统整合了六种经典学习策略（费曼技巧、间隔重复、主动回忆、番茄工作法、康奈尔笔记法、刻意练习），并通过“输入—加工—输出—反馈—迭代”的闭环模型，将分散的方法串联为完整的学习系统。\n- **业务级推论**：该图适用于个人学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“"
+      ],
+      "source_doc_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110",
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg",
+        "test_direct_vlm_workflow_v2.png"
+      ],
+      "source_chunk_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110-chunk-000",
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_003_multi_hop",
+      "question": "切片2记录了一次“我们出去旅行了”的旅行日记，若要把这次旅行经历纳入切片1所述的学习流程框架，使其从一次出行转化为可迭代的学习成果，应如何安排“输入—加工—输出—反馈”四个环节，并体现哪些东方学习哲学？",
+      "ground_truth": "切片2提供了具体的学习素材与记录载体：一次“我们出去旅行了”的真实经历，以及由此形成的旅行日记。切片1提供了学习流程设计的底层逻辑：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环，并融合“学思结合”“温故知新”“学无止境”等东方学习哲学。将二者关联起来，可把这次旅行纳入如下循环：输入环节以旅行见闻、日记素材和途中观察为学习输入；加工环节强调“学思结合”，对旅行经历进行反思、归纳与问题追问，而不只是被动记录；输出环节把加工后的理解整理成旅行日记、分享或总结，实现主动输出；反馈环节通过回看日记、对照原有认知进行“温故知新”，发现偏差并修正，再将新问题带入下一次旅行或学习，形成“学无止境”的迭代闭环。因此，切片2的旅行日记是具体经历与输出载体，切片1的输入—加工—输出—反馈闭环及东方学习哲学是转化机制，二者结合才能把一次旅行升级为可检索、可反思、可迭代的学习成果。",
+      "contexts": [
+        "学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“输入/加工/输出”为关系边，以“反馈/迭代”为闭环机制，构建一个可检索、可扩展的学习方法知识图谱。",
+        "<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0001\" format=\"jpg\" path=\"旅行日记2.blocks.assets/dd34a876053a22b70146d09802ce6b5994ff2346df4c1f80c4841aa8527e8216.jpg\" src=\"\" />\n我们出去旅行了\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0002\" format=\"jpg\" path=\"旅行日记2.blocks.assets/b76ae1719acf5c93c8884768a1ec32d57bad5c37d1bbfe89b045fc068251c6d0.jpg\" src=\"\" />\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0003\" format=\"jpg\" path=\"旅行日记2.blocks.assets/fd8d033d07975ad002dc2fa7a7f232467f7d4f13e7b68001beccd7d8dd993fa7.jpg\" src=\"\" />"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-001",
+        "doc-105e1c3a63d449451de755465e9a06d6-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_004_simple",
+      "question": "知识切片中构建的心理博弈模型名称是什么？",
+      "ground_truth": "熟人借钱道德绑架拓扑",
+      "contexts": [
+        "在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防御机制（课题分离壁）**、**核心武器（内疚劫持）**。\n*   **业务/实用推论**：\n    1.  **破局的关键在于“课题归属”**：只要识别出“借钱是对方解决财务危机的课题，而借出自己的存款是自己的家庭财务课题”，就能从根本上切断对方的道德绑架逻辑。\n    2.  **拒绝内疚是唯一的解药**：老好人必须训练“屏蔽对方哭诉与道德审判”的能力，因为在对方的剧本里，你是随时可以牺牲的道具；而在你自己的系统里，你是全家的支柱。\n    3.  **执行策略**：采用“无内疚截流术”——先释放“我帮不了你”的明确信号，再快速抛出“找别人”的替代方案，切断对方继续纠缠的路径，将战场迅速移出。"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-002"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_005_simple",
+      "question": "图中人物手中拿着什么面额的印度纸币？",
+      "ground_truth": "面额为₹500的印度纸币，属于“Mahatma Gandhi New Series”。",
+      "contexts": [
+        "[Image Name]hand_holding_500_rupee_notes_fan\n[Image Type]Photo\n\nA close-up photo of a person's left hand holding a fanned-out bundle of Indian ₹500 banknotes from the current \"Mahatma Gandhi New Series\". The notes are stone-grey with a green security thread and are spread out like a fan, with the topmost note shown almost fully face-up so its details are legible. The fully visible note displays the denomination \"₹500\" in Devanagari and Latin script, the Hindi text \"पाँच सौ रुपये\" and \"भारतीय रिज़र्व बैंक\", and the English text \"RESERVE BANK OF INDIA\" and \"GUARANTEED BY THE CENTRAL GOVERNMENT\", along with the Ashoka Pillar emblem on the right and a portrait of Mahatma Gandhi at the center labelled \"MAHATMA GANDHI\". Partial serial numbers are visible on several notes, including \"4VK 0128805\" on the front note and \"9EB 349830\" and \"...855123\" on notes behind it. Thumb and fingers press the stack together in the foreground, giving a sense of a thick wad of cash. The background is out of focus: a dark, textured fabric or leather bag with a round button or stud sits lower left, while blue and white clothing and a plain wall appear behind the hand. The dominant colors are grey-green (the currency), skin tones, dark brown/black and blue. The image serves as an informal snapshot of money being counted or displayed, and its subject matter of cash held while apparently away from home is consistent with the surrounding Chinese text \"我们出去旅行了\" (\"we went out traveling\"), suggesting spending money for a trip."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-001"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_006_conditional",
+      "question": "假设你在为一个没有外部知识库、只能单轮回复的客服对话机器人配置策略。用户说：“熟人一直借钱，我拒绝后他就哭诉骂我没良心，我该怎么办？”系统必须在一次回复内给出可执行方案，且不得进行法律判断、不得编造外部资源、不得让用户感到被指责。请根据“熟人借钱道德绑架拓扑”原理，给出该机器人的回复策略要点，并说明为什么不能在回复中展开长篇自证或情绪安抚。",
+      "ground_truth": "应采用“无内疚截流术”：先明确课题归属——借钱是对方解决财务危机的课题，是否动用家庭存款是用户自己的家庭财务课题；再释放“我帮不了你”的清晰截流信号，不进入对方哭诉与道德审判的证明循环；随后快速抛出“你去找别人/其他渠道”的替代方案，将纠缠战场移出。由于机器人只有单轮回复且无外部资源，不能长篇自证、不能承诺法律结论或编造资源，也不应指责用户；核心是拒绝内疚、明确边界、迅速转移战场。",
+      "contexts": [
+        "在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防御机制（课题分离壁）**、**核心武器（内疚劫持）**。\n*   **业务/实用推论**：\n    1.  **破局的关键在于“课题归属”**：只要识别出“借钱是对方解决财务危机的课题，而借出自己的存款是自己的家庭财务课题”，就能从根本上切断对方的道德绑架逻辑。\n    2.  **拒绝内疚是唯一的解药**：老好人必须训练“屏蔽对方哭诉与道德审判”的能力，因为在对方的剧本里，你是随时可以牺牲的道具；而在你自己的系统里，你是全家的支柱。\n    3.  **执行策略**：采用“无内疚截流术”——先释放“我帮不了你”的明确信号，再快速抛出“找别人”的替代方案，切断对方继续纠缠的路径，将战场迅速移出。"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-002"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_007_simple",
+      "question": "在图片展示的系统架构中，WebClient 的请求首先进入哪个组件？",
+      "ground_truth": "API Gateway（API 网关）",
+      "contexts": [
+        "# 图片知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：系统架构图 / 组件交互图（高层逻辑架构图）。\n- **核心主题**：展示 `WebClient` 通过 `API Gateway` 访问后端服务的架构关系。图中包含四个核心组件：`WebClient`、`API Gateway`、`Auth Service`、`Knowledge Core`，并通过箭头表达请求/调用方向。\n- **图形特征**：白底，使用矩形框表示组件；不同组件采用不同边框和填充颜色区分；箭头表示单向调用或数据流向。图中没有标题、图例、坐标轴、刻度或数值标注。\n\n---\n\n## 2. 【核心组件与内容】\n\n| 组件名称 | 位置 | 图形样式 | 图中标识 | 角色与说明 |\n|---|---|---|---|---|\n| `WebClient` | 最左侧 | 蓝色边框，浅蓝色填充矩形 | `WebClient` | Web 客户端/前端应用，负责向系统发起请求，是请求的起点。 |\n| `API Gateway` | 中间 | 橙色边框，浅橙色填充矩形 | `API Gateway` | API 网关，系统统一入口，负责接收客户端请求、路由转发、鉴权集成、协议转换等。 |\n| `Auth Service` | 右上方 | 绿色边框，浅绿色填充矩形 | `Auth Service` | 认证服务，通常负责身份认证、授权校验、令牌验证等安全能力。 |\n| `Knowledge Core` | 右下方 | 红/粉色边框，浅粉色填充矩形 | `Knowledge Core` | 知识核心服务，通常负责知识处理、知识检索、知识图谱、问答或业务核心逻辑。 |\n\n- 图中所有组件均为独立矩形模块。\n- 组件之间没有嵌套关系，属于并列的服务/组件。\n- 图中未展示数据库、缓存、消息队列、注册中心、监控等外围组件。\n\n---\n\n## 3. 【逻辑关系与数据流向】\n\n### 3.1 箭头与调用关系\n\n图中明确存在三条有向箭头：\n\n1. **`WebClient` → `API Gateway`**\n   - 箭头从 `WebClient` 右侧水平指向 `API Gateway` 左侧。\n   - 表示客户端请求首先进入 API 网关。\n   - 这是系统的统一入口关系。\n\n2. **`API Gateway` → `Auth Service`**\n   - 箭头从 `API Gateway` 顶部引出，先向上折线，再向右指向 `Auth Service` 左侧。\n   - 表示 API 网关会调用或路由请求到认证服务。\n   - 通常用于认证、鉴权、令牌校验等场景。\n\n3. **`API Gateway` → `Knowledge Core`**\n   - 箭头从 `API Gateway` 右侧水平指向 `Knowledge Core` 左侧。\n   - 表示 API 网关会将业务请求转发或路由到知识核心服务。\n   - 通常用于知识查询、知识处理、核心业务逻辑调用。\n\n### 3.2 依赖关系\n\n- `WebClient` 依赖 `API Gateway`，不直接访问后端服务。\n- `API Gateway` 依赖 `Auth Service` 和 `Knowledge Core`，是二者的统一调用入口。\n- `Auth Service` 与 `Knowledge Core` 之间没有直接连线，说明它们可能通过 API 网关进行集成，或者彼此保持独立。\n- 图中未标注返回箭头，但按常规架构，`Auth Service` 和 `Knowledge Core` 会向 `API Gateway` 返回处理结果，再由 `API Gateway` 返回给 `WebClient`。\n\n### 3.3 数据流向与分支条件\n\n可抽象为以下流程：\n\n```mermaid\nflowchart LR\n  A[WebClient] --> B[API Gateway]\n  B --> C[Auth Service]\n  B --> D[Knowledge Core]\n```\n\n- **主流程**：`WebClient` 发起请求 → `API Gateway` 接收请求。\n- **认证分支**：当请求需要身份认证或鉴权时，`API Gateway` 调用 `Auth Service`。\n- **业务分支**：当请求属于知识查询或知识处理业务时，`API Gateway` 将请求转发至 `Knowledge Core`。\n- **先后顺序**：图中未明确标注先后顺序。可推断为一种常见模式：API 网关先调用认证服务完成鉴权，鉴权通过后再将业务请求转发至知识核心服务；也可能是根据请求类型并行/分别路由。\n- **成功/失败路径**：图中未标注成功、失败、异常、重试、熔断等分支条件。\n- **响应路径**：图中未绘制返回箭头，属于架构图中的简化表达。\n\n---\n\n## 4. 【图内所有文字与数值】\n\n图中可见文字如下：\n\n- `WebClient`\n- `API Gateway`\n- `Auth Service`\n- `Knowledge Core`\n\n图中没有出现：\n\n- 数字、数值、比例、统计指标；\n- 代码片段、公式"
+      ],
+      "source_doc_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110"
+      ],
+      "source_docs": [
+        "test_direct_vlm_workflow_v2.png"
+      ],
+      "source_chunk_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110-chunk-000"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_008_multi_hop",
+      "question": "切片2中，老好人面对熟人借钱时经历了“熟人哭诉施压→陷入内疚→遭受道德审判→因替死鬼错觉导致边界溶解”的链条。若把切片1的“输入·加工·输出·反馈·迭代”学习闭环及六种学习方法（费曼·讲授、间隔·重复、主动·回忆、番茄·专注、康奈尔·笔记、刻意·练习）用作干预框架，应如何逐步训练其完成“课题分离”、阻断内疚劫持？请说明每个学习环节与切片2中问题机制的对应关系，并给出最终要建立的心理边界结论。",
+      "ground_truth": "切片2的核心问题是：老好人把对方“借钱/破产/跳楼”的生命课题误当成自己的道德债务，形成“课题混淆＝沦为他人因果的提款机”；在“熟人哭诉施压→老好人内疚→道德审判→替死鬼错觉”的链条中，内疚劫持导致边界溶解，误以为对方危机由自己拒绝而起。切片1提供的干预框架是“输入·加工·输出·反馈·迭代”闭环及六种方法。对应地：输入阶段用“康奈尔·笔记”记录并拆解道德绑架话术（如“没你我就不活”“你见死不救”），用“主动·回忆”识别其情绪勒索模式；加工阶段用“费曼·讲授”向自己或他人讲清“对方的危机在求助前已注定，我只是最后一根稻草而非原因”，用“番茄·专注”把注意力集中在自己的决策与家庭财务边界上，用“间隔·重复”反复复习“帮是情分，不帮心安理得”；输出阶段用“刻意·练习”排练拒绝脚本和“不借”的表达，并像切片2右侧的“课题分离”保护盾一样把对方情绪挡在边界外；反馈阶段检查自己是否又把对方课题误判为自己的道德责任，区分内疚感与真实责任；迭代阶段持续强化“对方承担其生命课题、我承担我的选择课题”的认知。最终结论是：以“课题分离”为心理边界，阻断“内疚劫持—边界溶解—替死鬼错觉”的自动反应，把拒绝借钱从道德审判中剥离出来，建立“帮到是情分，帮不到心安理得”的稳定边界。",
+      "contexts": [
+        "# 图片深度解析与知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：知识海报 / 学习方法视觉总结图（极简主义矢量设计风格）\n- **核心主题**：系统化学习方法论与学习闭环\n- **设计风格**：米白/浅灰底色，底部深灰与灰色波浪形色块模拟水面与地平线；左侧配植物线条插画，右下角配红色圆角矩形印章感装饰，底部中央有划船小人剪影，整体营造“学海无涯、持续前行”的意境。\n\n## 2. 【核心组件与内容】\n\n### 2.1 标题区（顶部居中）\n- 四个大号矩形框（□ □ □ □）作为主视觉占位\n- 副标题：`LEARNING · METHODS`\n- 中文主标题：`学习方法`\n- 古语引用：`学而不思则罔　思而不学则殆`（出自《论语·为政》）\n- 右上角：四个小方形图标\n\n### 2.2 核心方法矩阵（中部主体）\n以三列两行的网格布局呈现六种学习方法，每组由两个双字词组成，中间以红色圆点分隔：\n\n| 列1 | 列2 | 列3 |\n|------|------|------|\n| 费曼 · 讲授 | 间隔 · 重复 | 主动 · 回忆 |\n| 番茄 · 专注 | 康奈尔 · 笔记 | 刻意 · 练习 |\n\n### 2.3 流程闭环（底部居中）\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n### 2.4 装饰与辅助元素\n- 左侧：植物线条插画（两条弯曲枝干，带叶片）\n- 底部中央：划船小人剪影（象征在学海中前行）\n- 右下角：红色圆角矩形，内含四个小方形（类似印章或徽章装饰）\n- 右侧竖排文字：`学无止境`\n- 左下角文字：`温故知新`\n\n## 3. 【逻辑关系与数据流向】\n\n该图虽为静态海报，但通过文字布局隐含了完整的学习系统逻辑：\n\n1. **输入阶段**：通过“费曼·讲授”“间隔·重复”“主动·回忆”等方法进行知识输入与初步加工。\n2. **加工阶段**：通过“番茄·专注”“康奈尔·笔记”“刻意·练习”等方法进行深度加工与内化。\n3. **输出阶段**：将所学通过讲授、练习等方式输出。\n4. **反馈与迭代**：通过“输入 · 加工 · 输出 · 反馈 · 迭代”形成闭环，持续优化学习效果。\n5. **底层理念**：以“学而不思则罔，思而不学则殆”为哲学基础，强调学思结合；“学无止境”“温故知新”则作为持续学习的座右铭。\n\n## 4. 【图内所有文字与数值】\n\n**英文与数字：**\n- `LEARNING · METHODS`\n\n**中文标题与引用：**\n- `学习方法`\n- `学而不思则罔　思而不学则殆`\n\n**核心方法标签（六组）：**\n- `费曼 · 讲授`\n- `间隔 · 重复`\n- `主动 · 回忆`\n- `番茄 · 专注`\n- `康奈尔 · 笔记`\n- `刻意 · 练习`\n\n**流程关键词：**\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n**装饰性文字：**\n- `学无止境`（右侧竖排）\n- `温故知新`（左下角）\n\n**其他可见元素：**\n- 四个大号矩形框（标题占位符）\n- 右上角四个小方形图标\n- 红色圆点（方法之间的分隔符）\n- 红色圆角矩形印章（右下角，内含四个小方形）\n\n## 5. 【系统总结与推论】\n\n- **系统级总结**：该图是一张以“学习方法”为核心的知识海报，系统整合了六种经典学习策略（费曼技巧、间隔重复、主动回忆、番茄工作法、康奈尔笔记法、刻意练习），并通过“输入—加工—输出—反馈—迭代”的闭环模型，将分散的方法串联为完整的学习系统。\n- **业务级推论**：该图适用于个人学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“",
+        "# 图片深度解析：熟人借钱道德绑架与“阿德勒课题分离”拓扑图\n\n## 1. 【图片类型与主题】\n*   **图片类型**：知识海报 / 心理学科普图解 / 沟通案例解剖拓扑图。\n*   **核心主题**：运用阿德勒心理学中的“课题分离”理论，破解熟人借钱时常见的“道德绑架”与“内疚劫持”，帮助“老好人”建立健康的心理边界。\n*   **核心论点**：老好人容易陷入“没你我就不活”的道德绑架陷阱，实质是将“对方的生命课题”强行溶解为“自己的道德债务”。帮到是情分，帮不到心安理得。\n\n## 2. 【核心组件与内容】\n图片分为三大视觉与逻辑区块：\n\n### A. 顶部漫画对比区（视觉隐喻）\n*   **左侧漫画（内疚劫持状态）**：\n    *   **人物**：一位穿白衬衫、蓝领带的“老好人”（满头大汗、面露难色）；一位穿黄衣、哭泣哀求的“借钱熟人”（抱住老好人大腿，旁边有写着“借50万”的牌子）。\n    *   **环境意象**：头顶乌云密布、下着大雨，象征老好人内心的煎熬与压抑。\n*   **右侧漫画（课题分离状态）**：\n    *   **人物**：老好人变得从容自信，面带微笑，双手摆出“拒绝”的姿势，头顶气泡写着“不借”。面前出现一个蓝色的保护盾，盾牌上写着“课题分离”。\n    *   **环境意象**：阳光明媚、鲜花盛开。借钱熟人被挡在盾外，满脸震惊（标有“??”）。\n    *   **视觉隐喻**：盾牌代表心理边界，阻断对方的情绪勒索，保护自己的能量场。\n\n### B. 左下方解析区：老好人边界溶解·内疚劫持流\n*   **定义标签**：课题混淆 = 沦为他人因果的提款机。\n*   **流程拆解（红框步骤）**：\n    1.  **熟人哭诉施压**：“兄弟，公司揭不开锅了！你没借这50万我就得跳楼，兄弟白处了！”\n    2.  **老好人陷入内疚**：“我不借好像真的在杀人……可我借了全家存款就空了……”\n    3.  **道德审判杀招**：“你见死不救，你晚上睡得着觉吗？你良心让狗吃了？！”\n    4.  **边界溶解综合征：【替死鬼错觉】**：老好人误以为“对方的破产是因我的拒绝而起”。事实是：他的危机在早来找你之前就已经注定了！你只是他逃避自身课题时的最后跟救命稻草。\n\n### C. 右下方解析区：夏鹏课题分离·绝对主权隔离流\n*   **定义标签**：我是我，你是你，帮不到也不内疚。\n*   **流程拆解（紫框步骤）**：\n    1.  **熟人哭诉施压**：“兄弟，不借钱公司就完了！你见死不救就不内疚吗？！”\n    2.  **夏鹏大师级台词**：“不内疚。我这次确实帮不了。你跟我耗，不如赶紧找别人，万一别人能帮呢？”\n    3.  **逻辑彻底闭合**：能帮是基于我自愿的情分；不帮是守住我的生存底线。我绝不卷入你的因果！\n    4.  **课题分离金法则：【拒绝内疚绑架】**：他破产，是他的经营能力课题；你借不借，是你的家庭财务课题！绝不让别人的生存泥潭没你自己的家庭边界！\n\n### D. 底部总结区\n*   **左侧心智透视**：**夏鹏心智透视：【阿德勒《被讨厌的勇气》】**。一切人际关系的苦恼，都源于把别人的课题当成了自己的课题，或者让别人干涉了自己的课题！\n*   **右侧破局公式**：**大师破局公式：【无内疚截流术】**。“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）。\n\n## 3. 【逻辑关系与数据流向】\n*   **中心锚点**：图示中间有一条隐形的垂直中轴线，上方"
+      ],
+      "source_doc_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c",
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg",
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-000",
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_009_conditional",
+      "question": "假设某学生第0天首次学习一个复杂概念，距离第10天考试只剩10天；他每天最多只能安排一次30分钟学习，不能使用外部工具，并且既要真正理解概念又要抵抗遗忘。请根据海报中的费曼学习法与间隔重复法，设计第0天至第10天的学习安排，并说明第1天、第2天、第4天、第7天分别应做什么；同时处理海报中第15天复习节点超出考试窗口的边界情况。",
+      "ground_truth": "应采用“费曼学习法负责理解闭环、间隔重复法负责时间节点抗遗忘”的并列组合策略。第0天先“明确概念”；第1天按间隔重复节点复习，并用费曼法“模拟教学”，即用白话解释复杂概念，再“查漏补缺”；第2天按间隔重复节点复习，可再次用白话复述并修补漏洞；第4天按间隔重复节点复习；第7天按间隔重复节点复习，并做一次模拟教学与查漏补缺。由于考试在第10天，海报给出的第15天复习节点超出可用窗口，不能强行安排第15天；可在第10天考试前做一次额外的模拟教学和查漏补缺作为整合巩固，但它不属于海报原周期中的第15天节点。因此10天内应保留1天→2天→4天→7天的间隔复习节点，并将费曼法的“明确概念→模拟教学→查漏补缺”嵌入首次学习及后续复习中。",
+      "contexts": [
+        "以下是对该图片的详尽、深入、结构化解析，旨在提取全部知识内容并构建清晰的知识图谱。\n\n---\n\n### 1. 【图片类型与主题】\n\n*   **图片类型**：知识海报 / 信息图（Infographic）\n*   **核心主题**：高效学习方法思维全景海报。该图旨在概括并对比两种核心的高效学习策略：费曼学习法与间隔重复法。\n\n---\n\n### 2. 【核心组件与内容】\n\n图片由顶部标题和两个并列的核心知识卡片组成，具体组件如下：\n\n| 组件名称 | 类型 | 属性与说明 |\n| :--- | :--- | :--- |\n| **主标题** | 文本 | 位于图片顶部居中，使用深蓝色加粗字体。 |\n| **卡片 1（左侧）** | 知识模块 | 浅蓝色背景，蓝色边框，包含费曼学习法的核心定义与实施步骤。 |\n| **卡片 2（右侧）** | 知识模块 | 浅绿色背景，绿色边框，包含间隔重复法的核心原理与时间周期。 |\n\n**卡片内部实体详情：**\n\n*   **卡片 1：费曼学习法 (Feynman)**\n    *   **核心**：以教促学，用白话解释复杂概念。\n    *   **步骤**：明确概念 ➔ 模拟教学 ➔ 查漏补缺。\n*   **卡片 2：间隔重复法 (Spaced Repetition)**\n    *   **核心**：对抗艾宾浩斯遗忘曲线。\n    *   **周期**：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天。\n\n---\n\n### 3. 【逻辑关系与数据流向】\n\n该图主要呈现**并列对比**与**顺序流程**两种逻辑关系：\n\n1.  **并列关系**：左侧的“费曼学习法”与右侧的“间隔重复法”处于同一层级，代表两种不同维度的学习策略，共同服务于“高效学习”这一主题。\n2.  **顺序流程（内部逻辑）**：\n    *   **费曼学习法**：展示了从“明确概念”到“模拟教学”再到“查漏补缺”的线性闭环流程。箭头表示学习步骤的递进关系，强调通过输出（教学）来倒逼输入（查漏补缺）。\n    *   **间隔重复法**：展示了基于时间序列的复习周期。箭头表示时间节点上的递进关系（1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天），体现了复习间隔逐渐拉长的非线性数据流向，旨在对抗遗忘曲线。\n\n---\n\n### 4. 【图内所有文字与数值】\n\n以下为图中可见的全部文字与数值内容，忠实提取如下：\n\n*   **主标题**：高效学习方法思维全景海报\n*   **卡片 1**：\n    *   标题：1. 费曼学习法 (Feynman)\n    *   核心：核心：以教促学，用白话解释复杂概念\n    *   步骤：步骤：明确概念 ➔ 模拟教学 ➔ 查漏补缺\n*   **卡片 2**：\n    *   标题：2. 间隔重复法 (Spaced Repetition)\n    *   核心：核心：对抗艾宾浩斯遗忘曲线\n    *   周期：周期：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天\n\n---\n\n### 5. 【系统总结与推论】\n\n基于该图表达的完整语义，可得出以下系统级/业务级的总结：\n\n**知识体系总结：**\n该海报构建了一个“高效学习”的二元策略模型。\n*   **费曼学习法**侧重于**知识的内化与输出**。通过将复杂概念转化为通俗语言并模拟教学，强制学习者暴露知识盲区，从而实现深度理解和长期记忆。这是一种**质变**的学习策略。\n*   **间隔重复法**侧重于**记忆的巩固与维持**。基于艾宾浩斯遗忘曲线，通过在特定时间节点（1天、2天、4天、7天、15天）进行复习，将短期记忆转化为长期记忆。这是一种**量变**的学习策略。\n\n**推论与建议：**\n在实际应用中，两种方法并非孤立，而是可以协同增效。学习者可以首先使用**费曼学习法**对知识进行深度加工和理解（明确概念、模拟教学、查漏补缺），随后利用**间隔重复法**制定的时间表（1天、2天、4天...）对已理解的内容进行周期性复习，从而在对抗遗忘的同时实现知识的长期稳固掌握。该海报为知识管理者和学习者提供了一套直观、可执行的元认知工具。"
+      ],
+      "source_doc_ids": [
+        "doc-06a04694df7db56bac5ba1d3b1c43b66"
+      ],
+      "source_docs": [
+        "study_methods_poster.svg"
+      ],
+      "source_chunk_ids": [
+        "doc-06a04694df7db56bac5ba1d3b1c43b66-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_011_reasoning",
+      "question": "该海报为什么没有把“费曼·讲授、间隔·重复、主动·回忆、番茄·专注、康奈尔·笔记、刻意·练习”六种方法孤立并列，而是要用“输入·加工·输出·反馈·迭代”的闭环来统摄？其背后的学习机制是什么，又如何对应“学而不思则罔，思而不学则殆”？",
+      "ground_truth": "因为六种方法在图中的作用并不是同一层面的并列技巧，而是分别服务于学习闭环中的不同环节。首先，切片把“费曼·讲授”“间隔·重复”“主动·回忆”放在输入与初步加工一侧：间隔重复和主动回忆用于让知识进入记忆并接受提取检验，费曼讲授则促使学习者把知识转化为可表达的结构，从而暴露理解缺口。其次，“番茄·专注”“康奈尔·笔记”“刻意·练习”承担深度加工：番茄专注保障注意资源投入，康奈尔笔记帮助信息结构化，刻意练习针对薄弱点进行纠错和强化。再次，底部“输入·加工·输出·反馈·迭代”表明这些方法必须形成循环：输入提供材料，加工提升内化程度，输出把理解外化并暴露问题，反馈依据输出结果调整策略，迭代再回到输入与加工。这样，方法矩阵才不会退化为静态清单，而是成为可运行的闭环。对应古语，“学而不思则罔”指只有输入而无加工、输出和反馈，知识会混乱无效；“思而不学则殆”指只有空想而无输入基础和练习验证，思考会悬空危险。闭环把“学”与“思”通过输出、反馈、迭代连接起来，并以“学无止境”“温故知新”支持持续循环，因此六种方法必须被组织成输入—加工—输出—反馈—迭代的机制系统，而非孤立并列。",
+      "contexts": [
+        "# 图片深度解析与知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：知识海报 / 学习方法视觉总结图（极简主义矢量设计风格）\n- **核心主题**：系统化学习方法论与学习闭环\n- **设计风格**：米白/浅灰底色，底部深灰与灰色波浪形色块模拟水面与地平线；左侧配植物线条插画，右下角配红色圆角矩形印章感装饰，底部中央有划船小人剪影，整体营造“学海无涯、持续前行”的意境。\n\n## 2. 【核心组件与内容】\n\n### 2.1 标题区（顶部居中）\n- 四个大号矩形框（□ □ □ □）作为主视觉占位\n- 副标题：`LEARNING · METHODS`\n- 中文主标题：`学习方法`\n- 古语引用：`学而不思则罔　思而不学则殆`（出自《论语·为政》）\n- 右上角：四个小方形图标\n\n### 2.2 核心方法矩阵（中部主体）\n以三列两行的网格布局呈现六种学习方法，每组由两个双字词组成，中间以红色圆点分隔：\n\n| 列1 | 列2 | 列3 |\n|------|------|------|\n| 费曼 · 讲授 | 间隔 · 重复 | 主动 · 回忆 |\n| 番茄 · 专注 | 康奈尔 · 笔记 | 刻意 · 练习 |\n\n### 2.3 流程闭环（底部居中）\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n### 2.4 装饰与辅助元素\n- 左侧：植物线条插画（两条弯曲枝干，带叶片）\n- 底部中央：划船小人剪影（象征在学海中前行）\n- 右下角：红色圆角矩形，内含四个小方形（类似印章或徽章装饰）\n- 右侧竖排文字：`学无止境`\n- 左下角文字：`温故知新`\n\n## 3. 【逻辑关系与数据流向】\n\n该图虽为静态海报，但通过文字布局隐含了完整的学习系统逻辑：\n\n1. **输入阶段**：通过“费曼·讲授”“间隔·重复”“主动·回忆”等方法进行知识输入与初步加工。\n2. **加工阶段**：通过“番茄·专注”“康奈尔·笔记”“刻意·练习”等方法进行深度加工与内化。\n3. **输出阶段**：将所学通过讲授、练习等方式输出。\n4. **反馈与迭代**：通过“输入 · 加工 · 输出 · 反馈 · 迭代”形成闭环，持续优化学习效果。\n5. **底层理念**：以“学而不思则罔，思而不学则殆”为哲学基础，强调学思结合；“学无止境”“温故知新”则作为持续学习的座右铭。\n\n## 4. 【图内所有文字与数值】\n\n**英文与数字：**\n- `LEARNING · METHODS`\n\n**中文标题与引用：**\n- `学习方法`\n- `学而不思则罔　思而不学则殆`\n\n**核心方法标签（六组）：**\n- `费曼 · 讲授`\n- `间隔 · 重复`\n- `主动 · 回忆`\n- `番茄 · 专注`\n- `康奈尔 · 笔记`\n- `刻意 · 练习`\n\n**流程关键词：**\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n**装饰性文字：**\n- `学无止境`（右侧竖排）\n- `温故知新`（左下角）\n\n**其他可见元素：**\n- 四个大号矩形框（标题占位符）\n- 右上角四个小方形图标\n- 红色圆点（方法之间的分隔符）\n- 红色圆角矩形印章（右下角，内含四个小方形）\n\n## 5. 【系统总结与推论】\n\n- **系统级总结**：该图是一张以“学习方法”为核心的知识海报，系统整合了六种经典学习策略（费曼技巧、间隔重复、主动回忆、番茄工作法、康奈尔笔记法、刻意练习），并通过“输入—加工—输出—反馈—迭代”的闭环模型，将分散的方法串联为完整的学习系统。\n- **业务级推论**：该图适用于个人学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“"
+      ],
+      "source_doc_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg"
+      ],
+      "source_chunk_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-000"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_012_multi_hop",
+      "question": "某旅行者在2023.12.27-2024.01.10的印度游学Vlog行程中学习当地文化概念，并计划按学习方法海报中的“间隔重复法”从行程第一天开始复习，复习节点为第1天、第2天、第4天、第7天、第15天。请问第五次复习安排在哪一天？该日期是否仍在Vlog标示的行程范围内？",
+      "ground_truth": "切片1显示该印度游学Vlog的行程日期为2023.12.27至2024.01.10，含首尾共15天；切片2显示间隔重复法的周期为1天→2天→4天→7天→15天。若从行程第一天2023.12.27开始计算，第五次复习落在第15天，即2024.01.10，恰好是Vlog行程的最后一天，因此仍在行程范围内，可在游学结束当天完成第五次复习。",
+      "contexts": [
+        "[Image Name]bodh_gaya_india_study_tour_vlog_cover\n[Image Type]Photo\n\nThe image is a vertical photo used as a travel-vlog cover. It shows a cheerful group selfie in front of a large ancient Buddhist stupa or temple, likely the Mahabodhi Temple in Bodh Gaya, India. In the foreground, about fifteen people, mostly Indian girls and young women in colorful yellow, pink, red, and orange clothing, along with a few boys and men, pose and wave at the camera. At the center stands a traveler wearing sunglasses, a patterned headband, a green top, a long gray scarf, and carrying a camera; she smiles and waves. Behind the group is a monumental brick tower or stupa with a rounded rectangular profile, a stone base, green lawn, scattered visitors, a hazy pale sky, and dark tree branches overhanging the upper left. White text is overlaid in the center of the image: 「印度游学Vlog」, followed by 菩提迦耶-瓦拉纳希-阿格拉-新德里, and the date range 2023.12.27-2024.01.10. The text identifies an India study-tour Vlog covering Bodh Gaya, Varanasi, Agra, and New Delhi. The image supports the surrounding context of going out to travel.",
+        "以下是对该图片的详尽、深入、结构化解析，旨在提取全部知识内容并构建清晰的知识图谱。\n\n---\n\n### 1. 【图片类型与主题】\n\n*   **图片类型**：知识海报 / 信息图（Infographic）\n*   **核心主题**：高效学习方法思维全景海报。该图旨在概括并对比两种核心的高效学习策略：费曼学习法与间隔重复法。\n\n---\n\n### 2. 【核心组件与内容】\n\n图片由顶部标题和两个并列的核心知识卡片组成，具体组件如下：\n\n| 组件名称 | 类型 | 属性与说明 |\n| :--- | :--- | :--- |\n| **主标题** | 文本 | 位于图片顶部居中，使用深蓝色加粗字体。 |\n| **卡片 1（左侧）** | 知识模块 | 浅蓝色背景，蓝色边框，包含费曼学习法的核心定义与实施步骤。 |\n| **卡片 2（右侧）** | 知识模块 | 浅绿色背景，绿色边框，包含间隔重复法的核心原理与时间周期。 |\n\n**卡片内部实体详情：**\n\n*   **卡片 1：费曼学习法 (Feynman)**\n    *   **核心**：以教促学，用白话解释复杂概念。\n    *   **步骤**：明确概念 ➔ 模拟教学 ➔ 查漏补缺。\n*   **卡片 2：间隔重复法 (Spaced Repetition)**\n    *   **核心**：对抗艾宾浩斯遗忘曲线。\n    *   **周期**：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天。\n\n---\n\n### 3. 【逻辑关系与数据流向】\n\n该图主要呈现**并列对比**与**顺序流程**两种逻辑关系：\n\n1.  **并列关系**：左侧的“费曼学习法”与右侧的“间隔重复法”处于同一层级，代表两种不同维度的学习策略，共同服务于“高效学习”这一主题。\n2.  **顺序流程（内部逻辑）**：\n    *   **费曼学习法**：展示了从“明确概念”到“模拟教学”再到“查漏补缺”的线性闭环流程。箭头表示学习步骤的递进关系，强调通过输出（教学）来倒逼输入（查漏补缺）。\n    *   **间隔重复法**：展示了基于时间序列的复习周期。箭头表示时间节点上的递进关系（1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天），体现了复习间隔逐渐拉长的非线性数据流向，旨在对抗遗忘曲线。\n\n---\n\n### 4. 【图内所有文字与数值】\n\n以下为图中可见的全部文字与数值内容，忠实提取如下：\n\n*   **主标题**：高效学习方法思维全景海报\n*   **卡片 1**：\n    *   标题：1. 费曼学习法 (Feynman)\n    *   核心：核心：以教促学，用白话解释复杂概念\n    *   步骤：步骤：明确概念 ➔ 模拟教学 ➔ 查漏补缺\n*   **卡片 2**：\n    *   标题：2. 间隔重复法 (Spaced Repetition)\n    *   核心：核心：对抗艾宾浩斯遗忘曲线\n    *   周期：周期：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天\n\n---\n\n### 5. 【系统总结与推论】\n\n基于该图表达的完整语义，可得出以下系统级/业务级的总结：\n\n**知识体系总结：**\n该海报构建了一个“高效学习”的二元策略模型。\n*   **费曼学习法**侧重于**知识的内化与输出**。通过将复杂概念转化为通俗语言并模拟教学，强制学习者暴露知识盲区，从而实现深度理解和长期记忆。这是一种**质变**的学习策略。\n*   **间隔重复法**侧重于**记忆的巩固与维持**。基于艾宾浩斯遗忘曲线，通过在特定时间节点（1天、2天、4天、7天、15天）进行复习，将短期记忆转化为长期记忆。这是一种**量变**的学习策略。\n\n**推论与建议：**\n在实际应用中，两种方法并非孤立，而是可以协同增效。学习者可以首先使用**费曼学习法**对知识进行深度加工和理解（明确概念、模拟教学、查漏补缺），随后利用**间隔重复法**制定的时间表（1天、2天、4天...）对已理解的内容进行周期性复习，从而在对抗遗忘的同时实现知识的长期稳固掌握。该海报为知识管理者和学习者提供了一套直观、可执行的元认知工具。"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-06a04694df7db56bac5ba1d3b1c43b66"
+      ],
+      "source_docs": [
+        "study_methods_poster.svg",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-002",
+        "doc-06a04694df7db56bac5ba1d3b1c43b66-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_013_multi_hop",
+      "question": "结合切片1中的“阿德勒课题分离”破局公式与切片2的“我们出去旅行了”，请推理：为什么“不内疚地拒绝熟人借50万的道德绑架”可能是这次旅行能够成行的隐含前提？请说明跨切片的因果链条。",
+      "ground_truth": "切片1指出，熟人借钱并道德绑架时，老好人若陷入内疚劫持，就会发生边界溶解，把“对方的生命课题”误当成“自己的道德债务”，最终导致“财富与心理双受损”，甚至“借了全家存款就空了”；而课题分离的破局公式是“不内疚，我确实帮不了”并转移战场，核心是“谁的后果谁的课题”，拒绝替对方承担因果，从而守住底线、切断因果。切片2显示“我们出去旅行了”，旅行隐含需要家庭资金与心理轻松作为条件。因此两切片的隐含因果链是：面对50万借款的道德绑架→运用课题分离，不内疚地理性拒绝→避免全家存款被“道德债务”吞噬，并切断对方因果、保住心理边界→家庭财富与情绪资源未被掏空→切片2中的“我们出去旅行了”才具备现实基础和轻松心境。反之，若按切片1左侧逻辑陷入内疚并借出50万，就可能财富与心理双受损，旅行所需的资金与心理条件被破坏。",
+      "contexts": [
+        "侧破局公式**：**大师破局公式：【无内疚截流术】**。“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）。\n\n## 3. 【逻辑关系与数据流向】\n*   **中心锚点**：图示中间有一条隐形的垂直中轴线，上方标注“阿德勒课题分离壁”，下方有一个指向“谁的后果谁的课题！”的箭头。这说明整个逻辑推演基于“课题分离”这一核心原则。\n*   **对比逻辑**：\n    *   左侧逻辑链：外部施压（借钱+道德绑架） -> 内部防线崩塌（内疚、自我怀疑） -> 边界溶解（替死鬼错觉） -> 最终结果（财富与心理双受损）。\n    *   右侧逻辑链：外部施压（借钱+道德绑架） -> 边界防御（课题分离） -> 理性拒绝（不内疚、转移战场） -> 最终结果（守住底线、切断因果）。\n*   **数据流向**：从“熟人施压”开始，面临分叉路口，一个是走向“内疚劫持”，一个是走向“课题分离”。右侧绿色路线是推荐的解决方案。\n\n## 4. 【图内所有文字与数值】（忠实提取）\n*   **顶部标题区**：\n    *   夏鹏生存沟通·核心案例解剖 | 原则三：帮不到别人，也不用内疚 | 边界拓扑学\n    *   案例三：熟人借钱道德绑架与“阿德勒课题分离”拓扑图\n    *   核心误区解剖：老好人最容易被“没你我就不活”道德绑架。实质是将“对方的生命课题”强行溶解为“自己的道德债务”。帮到是情分，帮不到心安理得！\n*   **漫画区文字**：借50万 | 不借 | 课题分离 | ??\n*   **左下方解析区**：\n    *   老好人边界溶解·内疚劫持流 | 课题混淆 = 沦为他人因果的提款机\n    *   熟人哭诉施压：“兄弟，公司揭不开锅了！你没借这50万我就得跳楼，兄弟白处了！”\n    *   老好人陷入内疚：“我不借好像真的在杀人……可我借了全家存款就空了……”\n    *   道德审判杀招：“你见死不救，你晚上睡得着觉吗？你良心让狗吃了？！”\n    *   边界溶解综合征：【替死鬼错觉】老好人误以为“对方的破产是因我的拒绝而起”。事实是：他的危机在早来找你之前就已经注定了！你只是他逃避自身课题时的最后跟救命稻草。\n*   **中轴线文字**：阿德勒课题分离壁 | 谁的后果谁的课题！\n*   **右下方解析区**：\n    *   夏鹏课题分离·绝对主权隔离流 | 我是我，你是你，帮不到也不内疚\n    *   熟人哭诉施压：“兄弟，不借钱公司就完了！你见死不救就不内疚吗？！”\n    *   夏鹏大师级台词：“不内疚。我这次确实帮不了。你跟我耗，不如赶紧找别人，万一别人能帮呢？”\n    *   逻辑彻底闭合：能帮是基于我自愿的情分；不帮是守住我的生存底线。我绝不卷入你的因果！\n    *   课题分离金法则：【拒绝内疚绑架】他破产，是他的经营能力课题；你借不借，是你的家庭财务课题！绝不让别人的生存泥潭没你自己的家庭边界！\n*   **底部总结区**：\n    *   夏鹏心智透视：【阿德勒《被讨厌的勇气》】一切人际关系的苦恼，都源于把别人的课题当成了自己的课题，或者让别人干涉了自己的课题！\n    *   大师破局公式：【无内疚截流术】“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防",
+        "<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0001\" format=\"jpg\" path=\"旅行日记2.blocks.assets/dd34a876053a22b70146d09802ce6b5994ff2346df4c1f80c4841aa8527e8216.jpg\" src=\"\" />\n我们出去旅行了\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0002\" format=\"jpg\" path=\"旅行日记2.blocks.assets/b76ae1719acf5c93c8884768a1ec32d57bad5c37d1bbfe89b045fc068251c6d0.jpg\" src=\"\" />\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0003\" format=\"jpg\" path=\"旅行日记2.blocks.assets/fd8d033d07975ad002dc2fa7a7f232467f7d4f13e7b68001beccd7d8dd993fa7.jpg\" src=\"\" />"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf",
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-001",
+        "doc-105e1c3a63d449451de755465e9a06d6-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_014_reasoning",
+      "question": "根据该知识切片，为什么“课题分离”能够破解熟人借钱时的道德绑架与内疚劫持？其背后的心理与边界机制是什么？",
+      "ground_truth": "道德绑架之所以能起效，是因为施压者通过“没借这50万我就得跳楼”“你见死不救良心让狗吃了”等哭诉和道德审判，把“对方的生命课题”（公司破产、个人危机）偷换并溶解成“老好人的道德债务”，从而激发老好人的内疚，使其边界溶解，并产生“替死鬼错觉”——误以为对方的破产是由自己的拒绝造成的。切片明确指出，对方的危机在来找你之前早已注定，你只是其逃避自身课题时的最后救命稻草。课题分离的机制则在于重新划清主权：我是我，你是你；对方的经营失败、危机后果和是否承担自身责任，是对方的课题；我是否借钱、是否守住全家存款和生存底线，是我的课题。能帮是基于我自愿的情分，不帮是守住我的生存底线，我绝不卷入对方的因果。因此，内疚劫持失去逻辑基础：我不必替对方承担其生命课题，也不会把“拒绝”误判为“杀人”。其结果就是像图中“课题分离”盾牌一样阻断对方的情绪勒索，保护自己的能量场，让老好人从内疚劫持状态转为心安理得的边界状态，同时迫使对方回去面对并承担自己的课题。",
+      "contexts": [
+        "# 图片深度解析：熟人借钱道德绑架与“阿德勒课题分离”拓扑图\n\n## 1. 【图片类型与主题】\n*   **图片类型**：知识海报 / 心理学科普图解 / 沟通案例解剖拓扑图。\n*   **核心主题**：运用阿德勒心理学中的“课题分离”理论，破解熟人借钱时常见的“道德绑架”与“内疚劫持”，帮助“老好人”建立健康的心理边界。\n*   **核心论点**：老好人容易陷入“没你我就不活”的道德绑架陷阱，实质是将“对方的生命课题”强行溶解为“自己的道德债务”。帮到是情分，帮不到心安理得。\n\n## 2. 【核心组件与内容】\n图片分为三大视觉与逻辑区块：\n\n### A. 顶部漫画对比区（视觉隐喻）\n*   **左侧漫画（内疚劫持状态）**：\n    *   **人物**：一位穿白衬衫、蓝领带的“老好人”（满头大汗、面露难色）；一位穿黄衣、哭泣哀求的“借钱熟人”（抱住老好人大腿，旁边有写着“借50万”的牌子）。\n    *   **环境意象**：头顶乌云密布、下着大雨，象征老好人内心的煎熬与压抑。\n*   **右侧漫画（课题分离状态）**：\n    *   **人物**：老好人变得从容自信，面带微笑，双手摆出“拒绝”的姿势，头顶气泡写着“不借”。面前出现一个蓝色的保护盾，盾牌上写着“课题分离”。\n    *   **环境意象**：阳光明媚、鲜花盛开。借钱熟人被挡在盾外，满脸震惊（标有“??”）。\n    *   **视觉隐喻**：盾牌代表心理边界，阻断对方的情绪勒索，保护自己的能量场。\n\n### B. 左下方解析区：老好人边界溶解·内疚劫持流\n*   **定义标签**：课题混淆 = 沦为他人因果的提款机。\n*   **流程拆解（红框步骤）**：\n    1.  **熟人哭诉施压**：“兄弟，公司揭不开锅了！你没借这50万我就得跳楼，兄弟白处了！”\n    2.  **老好人陷入内疚**：“我不借好像真的在杀人……可我借了全家存款就空了……”\n    3.  **道德审判杀招**：“你见死不救，你晚上睡得着觉吗？你良心让狗吃了？！”\n    4.  **边界溶解综合征：【替死鬼错觉】**：老好人误以为“对方的破产是因我的拒绝而起”。事实是：他的危机在早来找你之前就已经注定了！你只是他逃避自身课题时的最后跟救命稻草。\n\n### C. 右下方解析区：夏鹏课题分离·绝对主权隔离流\n*   **定义标签**：我是我，你是你，帮不到也不内疚。\n*   **流程拆解（紫框步骤）**：\n    1.  **熟人哭诉施压**：“兄弟，不借钱公司就完了！你见死不救就不内疚吗？！”\n    2.  **夏鹏大师级台词**：“不内疚。我这次确实帮不了。你跟我耗，不如赶紧找别人，万一别人能帮呢？”\n    3.  **逻辑彻底闭合**：能帮是基于我自愿的情分；不帮是守住我的生存底线。我绝不卷入你的因果！\n    4.  **课题分离金法则：【拒绝内疚绑架】**：他破产，是他的经营能力课题；你借不借，是你的家庭财务课题！绝不让别人的生存泥潭没你自己的家庭边界！\n\n### D. 底部总结区\n*   **左侧心智透视**：**夏鹏心智透视：【阿德勒《被讨厌的勇气》】**。一切人际关系的苦恼，都源于把别人的课题当成了自己的课题，或者让别人干涉了自己的课题！\n*   **右侧破局公式**：**大师破局公式：【无内疚截流术】**。“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）。\n\n## 3. 【逻辑关系与数据流向】\n*   **中心锚点**：图示中间有一条隐形的垂直中轴线，上方"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-000"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_015_simple",
+      "question": "What denomination is displayed on the fully visible topmost banknote in the fanned-out bundle?",
+      "ground_truth": "₹500",
+      "contexts": [
+        "[Image Name]hand_holding_500_rupee_notes_fan\n[Image Type]Photo\n\nA close-up photo of a person's left hand holding a fanned-out bundle of Indian ₹500 banknotes from the current \"Mahatma Gandhi New Series\". The notes are stone-grey with a green security thread and are spread out like a fan, with the topmost note shown almost fully face-up so its details are legible. The fully visible note displays the denomination \"₹500\" in Devanagari and Latin script, the Hindi text \"पाँच सौ रुपये\" and \"भारतीय रिज़र्व बैंक\", and the English text \"RESERVE BANK OF INDIA\" and \"GUARANTEED BY THE CENTRAL GOVERNMENT\", along with the Ashoka Pillar emblem on the right and a portrait of Mahatma Gandhi at the center labelled \"MAHATMA GANDHI\". Partial serial numbers are visible on several notes, including \"4VK 0128805\" on the front note and \"9EB 349830\" and \"...855123\" on notes behind it. Thumb and fingers press the stack together in the foreground, giving a sense of a thick wad of cash. The background is out of focus: a dark, textured fabric or leather bag with a round button or stud sits lower left, while blue and white clothing and a plain wall appear behind the hand. The dominant colors are grey-green (the currency), skin tones, dark brown/black and blue. The image serves as an informal snapshot of money being counted or displayed, and its subject matter of cash held while apparently away from home is consistent with the surrounding Chinese text \"我们出去旅行了\" (\"we went out traveling\"), suggesting spending money for a trip."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-001"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_016_reasoning",
+      "question": "在该知识切片中，“我们出去旅行了”之后的三张图片为什么以带有 id、format、path 的 drawing 块引用方式出现，而不是将图像数据直接嵌入正文？这种组织方式背后的文档架构机制是什么，又会带来怎样的性能影响？",
+      "ground_truth": "从切片可见，正文先出现“我们出去旅行了”，随后是三个 drawing 元素；每个 drawing 都有唯一 id、format=\"jpg\"，并通过 path 指向“旅行日记2.blocks.assets”目录下的资源文件，而 src 属性为空。由此可逐步推理：第一，文本与图片被组织为并列的内容块，说明文档采用结构化块模型，而不是单一连续文本流；第二，图片的 format 与 path 分离记录，说明媒体资源以外部文件形式存放，正文只保留引用元数据；第三，src 为空而 path 存在，说明渲染或导出环节可能依赖 path 解析资源，或 src 尚未回填，但资源定位信息已保存在块属性中。这样做的机制原因是将正文结构与媒体二进制解耦：文档体积更小、文本编辑与资源替换互不干扰、同一资源可按路径复用，并便于按需加载或缓存。性能影响是双面的：一方面减少正文传输与解析负担，支持图片延迟加载和独立缓存；另一方面增加路径解析与资源完整性校验成本，若 path 失效或 src 未正确回填，图片可能无法显示。",
+      "contexts": [
+        "<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0001\" format=\"jpg\" path=\"旅行日记2.blocks.assets/dd34a876053a22b70146d09802ce6b5994ff2346df4c1f80c4841aa8527e8216.jpg\" src=\"\" />\n我们出去旅行了\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0002\" format=\"jpg\" path=\"旅行日记2.blocks.assets/b76ae1719acf5c93c8884768a1ec32d57bad5c37d1bbfe89b045fc068251c6d0.jpg\" src=\"\" />\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0003\" format=\"jpg\" path=\"旅行日记2.blocks.assets/fd8d033d07975ad002dc2fa7a7f232467f7d4f13e7b68001beccd7d8dd993fa7.jpg\" src=\"\" />"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-chunk-000"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_017_multi_hop",
+      "question": "若按切片1提出的“六种方法为实体节点、输入/加工/输出为关系边、反馈/迭代为闭环”的知识图谱框架，将切片2中的印度游学Vlog设计成一次可迭代的学习流程，应如何把Vlog封面中的地点、行程、日期和中心旅行者等要素映射到输入、加工、输出与反馈环节？",
+      "ground_truth": "切片2提供了具体学习情境：Vlog封面显示在菩提迦耶摩诃菩提寺前合影，行程覆盖菩提迦耶—瓦拉纳希—阿格拉—新德里，时间为2023.12.27—2024.01.10，中心旅行者携带相机、负责记录。按切片1的框架，这些要素应作为“输入”节点：地点与寺庙现场构成文化观察素材，四城行程与日期构成时间线元数据，旅行者及同行者构成观察与记录主体。随后以切片1所述六种学习方法作为“加工”节点，对游学见闻进行主动加工、学思结合、温故知新等处理，形成“输出”节点，如Vlog、游学笔记和分享内容。最后用切片1强调的“反馈/迭代”闭环，把观看反馈、复盘问题和后续学习需求回灌到下一轮输入与加工中，从而将一次印度游学Vlog转化为可检索、可扩展、持续迭代的学习流程。两切片的关联在于：切片2提供真实游学输入与记录者情境，切片1提供将这种情境组织为输入—加工—输出—反馈闭环的方法论框架。",
+      "contexts": [
+        "学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“输入/加工/输出”为关系边，以“反馈/迭代”为闭环机制，构建一个可检索、可扩展的学习方法知识图谱。",
+        "[Image Name]bodh_gaya_india_study_tour_vlog_cover\n[Image Type]Photo\n\nThe image is a vertical photo used as a travel-vlog cover. It shows a cheerful group selfie in front of a large ancient Buddhist stupa or temple, likely the Mahabodhi Temple in Bodh Gaya, India. In the foreground, about fifteen people, mostly Indian girls and young women in colorful yellow, pink, red, and orange clothing, along with a few boys and men, pose and wave at the camera. At the center stands a traveler wearing sunglasses, a patterned headband, a green top, a long gray scarf, and carrying a camera; she smiles and waves. Behind the group is a monumental brick tower or stupa with a rounded rectangular profile, a stone base, green lawn, scattered visitors, a hazy pale sky, and dark tree branches overhanging the upper left. White text is overlaid in the center of the image: 「印度游学Vlog」, followed by 菩提迦耶-瓦拉纳希-阿格拉-新德里, and the date range 2023.12.27-2024.01.10. The text identifies an India study-tour Vlog covering Bodh Gaya, Varanasi, Agra, and New Delhi. The image supports the surrounding context of going out to travel."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-001",
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-002"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_018_conditional",
+      "question": "假设你已为家庭财务设置硬约束：应急金不可动用，且你只有30秒回复窗口。此时一位熟人连续三次以“当年帮过你”施压借钱，并在共同群聊中@你哭诉、要求你立刻表态。按照“熟人借钱道德绑架拓扑”模型，你应如何判断并执行拒绝策略？",
+      "ground_truth": "先做课题归属判断：对方解决自己的财务危机是对方的课题，保护家庭应急金是你的家庭财务课题；对方的哭诉、群聊公开施压和“当年帮过你”属于内疚劫持，不是你必须借款的理由。执行“无内疚截流术”：在30秒窗口内只释放明确信号“这事我帮不了”，不解释存款细节、不承诺模糊期限、不进入自证和讨价还价；紧接着抛出替代方案“你赶紧找别人或正规渠道”，迅速把战场移出私聊或群聊。若对方继续公开道德审判，只简短声明一次边界后退出对话；若对方以关系破裂威胁，应将其视为对方剧本中的施压成本，不接受内疚劫持。结论：在硬约束下应拒绝借款并快速终止纠缠，优先保护家庭财务系统。",
+      "contexts": [
+        "在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防御机制（课题分离壁）**、**核心武器（内疚劫持）**。\n*   **业务/实用推论**：\n    1.  **破局的关键在于“课题归属”**：只要识别出“借钱是对方解决财务危机的课题，而借出自己的存款是自己的家庭财务课题”，就能从根本上切断对方的道德绑架逻辑。\n    2.  **拒绝内疚是唯一的解药**：老好人必须训练“屏蔽对方哭诉与道德审判”的能力，因为在对方的剧本里，你是随时可以牺牲的道具；而在你自己的系统里，你是全家的支柱。\n    3.  **执行策略**：采用“无内疚截流术”——先释放“我帮不了你”的明确信号，再快速抛出“找别人”的替代方案，切断对方继续纠缠的路径，将战场迅速移出。"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-002"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_019_reasoning",
+      "question": "在熟人借钱道德绑架场景中，为什么同样面对“你没借这50万我就得跳楼”“你见死不救就不内疚吗”的外部施压，左侧老好人会走向财富与心理双受损，而右侧采用“无内疚截流术”的人却能守住底线并切断因果？请从边界机制与后果归属的角度解释其背后的机理。",
+      "ground_truth": "关键分叉不在外部施压本身，而在施压是否被转化为“自己的道德债务”。左侧逻辑链是：熟人哭诉施压→老好人产生内疚与自我怀疑→把“对方的生命课题”强行溶解为“自己的道德债务”→边界溶解，出现“替死鬼错觉”，误以为对方破产是因自己拒绝而起→于是替对方承担后果，最终财富与心理双受损。其错误在于违反“谁的后果谁的课题”，把对方的危机错误归因到自己身上。右侧逻辑链是：熟人哭诉施压→以“阿德勒课题分离壁”进行边界防御→坚持“谁的后果谁的课题”，识别对方的危机在其来找你之前已经注定，自己只是其逃避自身课题时的最后救命稻草→用“不内疚，我确实帮不了”截断内疚劫持，防止外部道德审判转化为内部自我审判→再用“与其把时间花在跟我耗上，不如赶紧去找别人”迅速转移战场，把施压者推回其自己的课题→最终理性拒绝，守住底线并切断因果。因此，机制核心是：内疚是否被截流、后果是否被错误归属。能帮是自愿情分，不帮是守住生存底线；“不内疚”阻断道德绑架进入自我审判，“转移战场”使对方不能继续把你当作因果承担者，从而完成课题分离并避免被卷入他人因果。",
+      "contexts": [
+        "侧破局公式**：**大师破局公式：【无内疚截流术】**。“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）。\n\n## 3. 【逻辑关系与数据流向】\n*   **中心锚点**：图示中间有一条隐形的垂直中轴线，上方标注“阿德勒课题分离壁”，下方有一个指向“谁的后果谁的课题！”的箭头。这说明整个逻辑推演基于“课题分离”这一核心原则。\n*   **对比逻辑**：\n    *   左侧逻辑链：外部施压（借钱+道德绑架） -> 内部防线崩塌（内疚、自我怀疑） -> 边界溶解（替死鬼错觉） -> 最终结果（财富与心理双受损）。\n    *   右侧逻辑链：外部施压（借钱+道德绑架） -> 边界防御（课题分离） -> 理性拒绝（不内疚、转移战场） -> 最终结果（守住底线、切断因果）。\n*   **数据流向**：从“熟人施压”开始，面临分叉路口，一个是走向“内疚劫持”，一个是走向“课题分离”。右侧绿色路线是推荐的解决方案。\n\n## 4. 【图内所有文字与数值】（忠实提取）\n*   **顶部标题区**：\n    *   夏鹏生存沟通·核心案例解剖 | 原则三：帮不到别人，也不用内疚 | 边界拓扑学\n    *   案例三：熟人借钱道德绑架与“阿德勒课题分离”拓扑图\n    *   核心误区解剖：老好人最容易被“没你我就不活”道德绑架。实质是将“对方的生命课题”强行溶解为“自己的道德债务”。帮到是情分，帮不到心安理得！\n*   **漫画区文字**：借50万 | 不借 | 课题分离 | ??\n*   **左下方解析区**：\n    *   老好人边界溶解·内疚劫持流 | 课题混淆 = 沦为他人因果的提款机\n    *   熟人哭诉施压：“兄弟，公司揭不开锅了！你没借这50万我就得跳楼，兄弟白处了！”\n    *   老好人陷入内疚：“我不借好像真的在杀人……可我借了全家存款就空了……”\n    *   道德审判杀招：“你见死不救，你晚上睡得着觉吗？你良心让狗吃了？！”\n    *   边界溶解综合征：【替死鬼错觉】老好人误以为“对方的破产是因我的拒绝而起”。事实是：他的危机在早来找你之前就已经注定了！你只是他逃避自身课题时的最后跟救命稻草。\n*   **中轴线文字**：阿德勒课题分离壁 | 谁的后果谁的课题！\n*   **右下方解析区**：\n    *   夏鹏课题分离·绝对主权隔离流 | 我是我，你是你，帮不到也不内疚\n    *   熟人哭诉施压：“兄弟，不借钱公司就完了！你见死不救就不内疚吗？！”\n    *   夏鹏大师级台词：“不内疚。我这次确实帮不了。你跟我耗，不如赶紧找别人，万一别人能帮呢？”\n    *   逻辑彻底闭合：能帮是基于我自愿的情分；不帮是守住我的生存底线。我绝不卷入你的因果！\n    *   课题分离金法则：【拒绝内疚绑架】他破产，是他的经营能力课题；你借不借，是你的家庭财务课题！绝不让别人的生存泥潭没你自己的家庭边界！\n*   **底部总结区**：\n    *   夏鹏心智透视：【阿德勒《被讨厌的勇气》】一切人际关系的苦恼，都源于把别人的课题当成了自己的课题，或者让别人干涉了自己的课题！\n    *   大师破局公式：【无内疚截流术】“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-001"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_020_conditional",
+      "question": "假设你负责一个短视频封面审核系统，规则要求：若封面叠加文字同时包含“游学Vlog”标识、跨年日期范围，并列出至少两个旅行城市，则必须归类为“跨国游学系列”；若只出现单一城市或没有多人合影的纯风景封面，则归类为“普通旅行”。现检测到该封面中央有白色文字“印度游学Vlog”，下方列出“菩提迦耶-瓦拉纳希-阿格拉-新德里”，日期为“2023.12.27-2024.01.10”，画面主体是约十五人的多人自拍，背景为菩提迦耶的大型佛塔/寺庙。按上述约束，该封面应归为何类？请说明判断依据。",
+      "ground_truth": "应归类为“跨国游学系列”。依据是：封面文字明确含有“印度游学Vlog”，并列出菩提迦耶、瓦拉纳希、阿格拉、新德里四个城市，满足“至少两个旅行城市”的条件；日期范围从2023.12.27到2024.01.10，跨越年度，满足“跨年日期范围”的条件；画面主体为约十五人的多人自拍，背景为菩提迦耶的大型佛塔/寺庙，也符合游学团队出行场景，而不是单一城市或无多人合影的纯风景普通旅行封面。",
+      "contexts": [
+        "[Image Name]bodh_gaya_india_study_tour_vlog_cover\n[Image Type]Photo\n\nThe image is a vertical photo used as a travel-vlog cover. It shows a cheerful group selfie in front of a large ancient Buddhist stupa or temple, likely the Mahabodhi Temple in Bodh Gaya, India. In the foreground, about fifteen people, mostly Indian girls and young women in colorful yellow, pink, red, and orange clothing, along with a few boys and men, pose and wave at the camera. At the center stands a traveler wearing sunglasses, a patterned headband, a green top, a long gray scarf, and carrying a camera; she smiles and waves. Behind the group is a monumental brick tower or stupa with a rounded rectangular profile, a stone base, green lawn, scattered visitors, a hazy pale sky, and dark tree branches overhanging the upper left. White text is overlaid in the center of the image: 「印度游学Vlog」, followed by 菩提迦耶-瓦拉纳希-阿格拉-新德里, and the date range 2023.12.27-2024.01.10. The text identifies an India study-tour Vlog covering Bodh Gaya, Varanasi, Agra, and New Delhi. The image supports the surrounding context of going out to travel."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6"
+      ],
+      "source_docs": [
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-002"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_021_multi_hop",
+      "question": "若把切片2所示印度游学Vlog（行程覆盖菩提迦耶—瓦拉纳希—阿格拉—新德里，日期为2023.12.27—2024.01.10）中的地点与日程做成一个可检索的知识库应用，并采用切片1的API网关架构，那么用户从WebClient查询“菩提迦耶行程”时，完整请求链路应经过哪些组件？其中谁负责认证鉴权、谁负责知识检索/处理？Auth Service与Knowledge Core是否直接依赖？",
+      "ground_truth": "用户从WebClient发起查询时不直接访问后端，而是先进入API Gateway；API Gateway调用Auth Service完成认证鉴权，再将通过鉴权的请求路由到Knowledge Core，由Knowledge Core检索或处理切片2中菩提迦耶—瓦拉纳希—阿格拉—新德里及2023.12.27—2024.01.10等游学Vlog知识内容；Auth Service与Knowledge Core之间无直接依赖，体现服务解耦和职责分离。因此完整链路为WebClient→API Gateway→（经Auth Service认证后）→Knowledge Core：切片2提供被检索的印度游学内容，切片1提供统一入口、认证与知识处理架构。",
+      "contexts": [
+        "重试、熔断等分支条件。\n- **响应路径**：图中未绘制返回箭头，属于架构图中的简化表达。\n\n---\n\n## 4. 【图内所有文字与数值】\n\n图中可见文字如下：\n\n- `WebClient`\n- `API Gateway`\n- `Auth Service`\n- `Knowledge Core`\n\n图中没有出现：\n\n- 数字、数值、比例、统计指标；\n- 代码片段、公式、接口路径；\n- 标题、图例、注释说明；\n- 时间、版本号、协议名称；\n- 成功/失败等条件标签。\n\n---\n\n## 5. 【系统总结与推论】\n\n该图是一个典型的 **API 网关模式** 高层系统架构图。其核心语义是：\n\n- `WebClient` 作为前端入口，不直接调用后端微服务；\n- 所有请求先进入 `API Gateway`，由网关统一接收、路由和协调；\n- `API Gateway` 可调用 `Auth Service` 完成认证鉴权；\n- `API Gateway` 可将业务请求转发到 `Knowledge Core`，由知识核心服务完成知识处理；\n- `Auth Service` 和 `Knowledge Core` 之间无直接依赖，体现服务解耦和职责分离。\n\n可进一步推断该系统可能属于：\n\n- 知识库系统；\n- 知识问答系统；\n- 知识图谱平台；\n- 智能检索或知识管理平台；\n- 基于微服务/服务化架构的后端系统。\n\n可提取的知识图谱三元组示例：\n\n- `(WebClient, 调用, API Gateway)`\n- `(API Gateway, 路由到, Auth Service)`\n- `(API Gateway, 路由到, Knowledge Core)`\n- `(Auth Service, 提供, 认证鉴权能力)`\n- `(Knowledge Core, 提供, 知识处理能力)`\n\n总体而言，该图表达了一个以 API 网关为统一入口、认证服务与知识核心服务相互解耦的系统架构方案。优点是集中安全控制、统一路由、便于服务扩展与治理；局限是图中未展示服务注册、配置中心、数据库、缓存、日志监控、限流熔断等生产级组件。",
+        "[Image Name]bodh_gaya_india_study_tour_vlog_cover\n[Image Type]Photo\n\nThe image is a vertical photo used as a travel-vlog cover. It shows a cheerful group selfie in front of a large ancient Buddhist stupa or temple, likely the Mahabodhi Temple in Bodh Gaya, India. In the foreground, about fifteen people, mostly Indian girls and young women in colorful yellow, pink, red, and orange clothing, along with a few boys and men, pose and wave at the camera. At the center stands a traveler wearing sunglasses, a patterned headband, a green top, a long gray scarf, and carrying a camera; she smiles and waves. Behind the group is a monumental brick tower or stupa with a rounded rectangular profile, a stone base, green lawn, scattered visitors, a hazy pale sky, and dark tree branches overhanging the upper left. White text is overlaid in the center of the image: 「印度游学Vlog」, followed by 菩提迦耶-瓦拉纳希-阿格拉-新德里, and the date range 2023.12.27-2024.01.10. The text identifies an India study-tour Vlog covering Bodh Gaya, Varanasi, Agra, and New Delhi. The image supports the surrounding context of going out to travel."
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-58e826b9d443b69457f5853e210c7110"
+      ],
+      "source_docs": [
+        "test_direct_vlm_workflow_v2.png",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110-chunk-001",
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-002"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_022_reasoning",
+      "question": "该海报将“费曼·讲授、间隔·重复、主动·回忆、番茄·专注、康奈尔·笔记、刻意·练习”六种方法置于中部，并在底部用“输入·加工·输出·反馈·迭代”收束。为什么这种布局不是简单的方法罗列，而是构成一个可自我校正的学习闭环？若去掉“反馈”与“迭代”，会产生什么机制性缺陷？",
+      "ground_truth": "因为切片中的六种方法并非彼此孤立，而是分别嵌入学习流程的不同环节：间隔·重复、主动·回忆、费曼·讲授对应知识的输入与初步加工，番茄·专注、康奈尔·笔记、刻意·练习对应注意维持、结构化整理和针对性内化；其中讲授、回忆与练习又会形成输出。底部的“输入·加工·输出·反馈·迭代”进一步把这些环节串成因果链：先输入知识，再通过笔记、专注和练习加工，随后用讲授、回忆或练习输出；输出暴露理解漏洞和错误，形成反馈信号；反馈再反过来调整下一轮的输入内容、加工方式和练习重点，于是进入迭代。这样，费曼讲授不只是表达，而是通过输出检测漏洞；主动回忆不只是重复，而是通过提取错误触发反馈；刻意练习也依赖反馈来修正下一步训练目标。因此该布局呈现的是一个可自我校正的闭环，而不是方法清单。若去掉反馈与迭代，学习会退化为单向的输入和加工：讲授后没有纠错，回忆错误可能被重复巩固，笔记不能按理解偏差更新，刻意练习也可能只是在重复低效动作；系统缺少误差信号和策略调整机制，难以根据输出结果修正输入与加工，从而削弱记忆保持、理解深化和迁移效果。这也呼应图中“学而不思则罔，思而不学则殆”的学思结合，以及“学无止境”“温故知新”所要求的持续校正与更新。",
+      "contexts": [
+        "# 图片深度解析与知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：知识海报 / 学习方法视觉总结图（极简主义矢量设计风格）\n- **核心主题**：系统化学习方法论与学习闭环\n- **设计风格**：米白/浅灰底色，底部深灰与灰色波浪形色块模拟水面与地平线；左侧配植物线条插画，右下角配红色圆角矩形印章感装饰，底部中央有划船小人剪影，整体营造“学海无涯、持续前行”的意境。\n\n## 2. 【核心组件与内容】\n\n### 2.1 标题区（顶部居中）\n- 四个大号矩形框（□ □ □ □）作为主视觉占位\n- 副标题：`LEARNING · METHODS`\n- 中文主标题：`学习方法`\n- 古语引用：`学而不思则罔　思而不学则殆`（出自《论语·为政》）\n- 右上角：四个小方形图标\n\n### 2.2 核心方法矩阵（中部主体）\n以三列两行的网格布局呈现六种学习方法，每组由两个双字词组成，中间以红色圆点分隔：\n\n| 列1 | 列2 | 列3 |\n|------|------|------|\n| 费曼 · 讲授 | 间隔 · 重复 | 主动 · 回忆 |\n| 番茄 · 专注 | 康奈尔 · 笔记 | 刻意 · 练习 |\n\n### 2.3 流程闭环（底部居中）\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n### 2.4 装饰与辅助元素\n- 左侧：植物线条插画（两条弯曲枝干，带叶片）\n- 底部中央：划船小人剪影（象征在学海中前行）\n- 右下角：红色圆角矩形，内含四个小方形（类似印章或徽章装饰）\n- 右侧竖排文字：`学无止境`\n- 左下角文字：`温故知新`\n\n## 3. 【逻辑关系与数据流向】\n\n该图虽为静态海报，但通过文字布局隐含了完整的学习系统逻辑：\n\n1. **输入阶段**：通过“费曼·讲授”“间隔·重复”“主动·回忆”等方法进行知识输入与初步加工。\n2. **加工阶段**：通过“番茄·专注”“康奈尔·笔记”“刻意·练习”等方法进行深度加工与内化。\n3. **输出阶段**：将所学通过讲授、练习等方式输出。\n4. **反馈与迭代**：通过“输入 · 加工 · 输出 · 反馈 · 迭代”形成闭环，持续优化学习效果。\n5. **底层理念**：以“学而不思则罔，思而不学则殆”为哲学基础，强调学思结合；“学无止境”“温故知新”则作为持续学习的座右铭。\n\n## 4. 【图内所有文字与数值】\n\n**英文与数字：**\n- `LEARNING · METHODS`\n\n**中文标题与引用：**\n- `学习方法`\n- `学而不思则罔　思而不学则殆`\n\n**核心方法标签（六组）：**\n- `费曼 · 讲授`\n- `间隔 · 重复`\n- `主动 · 回忆`\n- `番茄 · 专注`\n- `康奈尔 · 笔记`\n- `刻意 · 练习`\n\n**流程关键词：**\n- `输入 · 加工 · 输出 · 反馈 · 迭代`\n\n**装饰性文字：**\n- `学无止境`（右侧竖排）\n- `温故知新`（左下角）\n\n**其他可见元素：**\n- 四个大号矩形框（标题占位符）\n- 右上角四个小方形图标\n- 红色圆点（方法之间的分隔符）\n- 红色圆角矩形印章（右下角，内含四个小方形）\n\n## 5. 【系统总结与推论】\n\n- **系统级总结**：该图是一张以“学习方法”为核心的知识海报，系统整合了六种经典学习策略（费曼技巧、间隔重复、主动回忆、番茄工作法、康奈尔笔记法、刻意练习），并通过“输入—加工—输出—反馈—迭代”的闭环模型，将分散的方法串联为完整的学习系统。\n- **业务级推论**：该图适用于个人学习管理、教育培训、知识管理等领域，可作为学习流程设计的参考框架。其底层逻辑强调：学习不是单向输入，而是通过主动加工、输出与反馈形成迭代循环；同时融合了“学思结合”“温故知新”“学无止境”的东方学习哲学，兼具实用性与文化深度。\n- **知识图谱构建建议**：可将六种方法作为实体节点，以“"
+      ],
+      "source_doc_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c"
+      ],
+      "source_docs": [
+        "study-methods-ink-poster.svg"
+      ],
+      "source_chunk_ids": [
+        "doc-9fc6d4cd979038e1f9d5b28e5fcd9a0c-chunk-000"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_023_simple",
+      "question": "切片中图示中间垂直中轴线上方标注的“壁”叫什么？",
+      "ground_truth": "阿德勒课题分离壁",
+      "contexts": [
+        "侧破局公式**：**大师破局公式：【无内疚截流术】**。“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）。\n\n## 3. 【逻辑关系与数据流向】\n*   **中心锚点**：图示中间有一条隐形的垂直中轴线，上方标注“阿德勒课题分离壁”，下方有一个指向“谁的后果谁的课题！”的箭头。这说明整个逻辑推演基于“课题分离”这一核心原则。\n*   **对比逻辑**：\n    *   左侧逻辑链：外部施压（借钱+道德绑架） -> 内部防线崩塌（内疚、自我怀疑） -> 边界溶解（替死鬼错觉） -> 最终结果（财富与心理双受损）。\n    *   右侧逻辑链：外部施压（借钱+道德绑架） -> 边界防御（课题分离） -> 理性拒绝（不内疚、转移战场） -> 最终结果（守住底线、切断因果）。\n*   **数据流向**：从“熟人施压”开始，面临分叉路口，一个是走向“内疚劫持”，一个是走向“课题分离”。右侧绿色路线是推荐的解决方案。\n\n## 4. 【图内所有文字与数值】（忠实提取）\n*   **顶部标题区**：\n    *   夏鹏生存沟通·核心案例解剖 | 原则三：帮不到别人，也不用内疚 | 边界拓扑学\n    *   案例三：熟人借钱道德绑架与“阿德勒课题分离”拓扑图\n    *   核心误区解剖：老好人最容易被“没你我就不活”道德绑架。实质是将“对方的生命课题”强行溶解为“自己的道德债务”。帮到是情分，帮不到心安理得！\n*   **漫画区文字**：借50万 | 不借 | 课题分离 | ??\n*   **左下方解析区**：\n    *   老好人边界溶解·内疚劫持流 | 课题混淆 = 沦为他人因果的提款机\n    *   熟人哭诉施压：“兄弟，公司揭不开锅了！你没借这50万我就得跳楼，兄弟白处了！”\n    *   老好人陷入内疚：“我不借好像真的在杀人……可我借了全家存款就空了……”\n    *   道德审判杀招：“你见死不救，你晚上睡得着觉吗？你良心让狗吃了？！”\n    *   边界溶解综合征：【替死鬼错觉】老好人误以为“对方的破产是因我的拒绝而起”。事实是：他的危机在早来找你之前就已经注定了！你只是他逃避自身课题时的最后跟救命稻草。\n*   **中轴线文字**：阿德勒课题分离壁 | 谁的后果谁的课题！\n*   **右下方解析区**：\n    *   夏鹏课题分离·绝对主权隔离流 | 我是我，你是你，帮不到也不内疚\n    *   熟人哭诉施压：“兄弟，不借钱公司就完了！你见死不救就不内疚吗？！”\n    *   夏鹏大师级台词：“不内疚。我这次确实帮不了。你跟我耗，不如赶紧找别人，万一别人能帮呢？”\n    *   逻辑彻底闭合：能帮是基于我自愿的情分；不帮是守住我的生存底线。我绝不卷入你的因果！\n    *   课题分离金法则：【拒绝内疚绑架】他破产，是他的经营能力课题；你借不借，是你的家庭财务课题！绝不让别人的生存泥潭没你自己的家庭边界！\n*   **底部总结区**：\n    *   夏鹏心智透视：【阿德勒《被讨厌的勇气》】一切人际关系的苦恼，都源于把别人的课题当成了自己的课题，或者让别人干涉了自己的课题！\n    *   大师破局公式：【无内疚截流术】“不内疚，我确实帮不了。”+“与其把时间花在跟我耗上，不如赶紧去找别人！”（迅速转移战场）\n\n## 5. 【系统总结与推论】\n*   **系统总结**：这张图构建了一个名为“**熟人借钱道德绑架拓扑**”的心理博弈模型。核心系统组件包括：**施压者（借钱熟人）**、**被绑架者（老好人）**、**防"
+      ],
+      "source_doc_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6"
+      ],
+      "source_docs": [
+        "01_强势_L01_案例_借钱道德绑架课题分离.png"
+      ],
+      "source_chunk_ids": [
+        "doc-7eedb604a553cbb8c533df4343fd21c6-chunk-001"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_024_reasoning",
+      "question": "在该 API 网关架构中，为什么将认证鉴权与知识处理分别放在 Auth Service 和 Knowledge Core，并由 API Gateway 统一协调，而不是让 WebClient 直接调用二者？这种设计背后的职责分离与耦合机理是什么，又会带来怎样的架构与性能影响？",
+      "ground_truth": "从知识切片可见，WebClient 是前端入口，且明确“不直接调用后端微服务”；所有请求先进入 API Gateway，由网关统一接收、路由和协调。因此，让 WebClient 直接调用 Auth Service 或 Knowledge Core 会绕过统一入口，破坏图中表达的核心调用关系。其次，API Gateway 可调用 Auth Service 完成认证鉴权，并将业务请求转发到 Knowledge Core 完成知识处理，这说明认证鉴权与知识处理被拆分为两个职责不同的服务；同时 Auth Service 与 Knowledge Core 之间无直接依赖，体现服务解耦和职责分离。其机理是：网关作为统一入口集中承担请求路由与协调，认证服务只负责鉴权能力，知识核心只负责知识处理能力，从而避免认证逻辑与业务逻辑相互耦合，便于服务独立扩展与治理，并实现集中安全控制。性能与架构影响方面：统一入口会增加一次网关转发与协调环节，可能引入额外延迟并使网关处于关键请求路径上；但集中鉴权可避免各后端服务重复实现认证，统一路由也便于治理和扩展。需要注意，切片只给出高层架构，图中未绘制返回箭头属于简化表达，不能据此推断无响应路径；同时未展示服务注册、配置中心、数据库、缓存、日志监控、限流熔断等生产级组件，也未绘制重试、熔断等分支条件，因此只能推断该图表达逻辑上的 API 网关模式与职责分离，不能推断其已具备完整的生产级韧性和性能保障机制。",
+      "contexts": [
+        "重试、熔断等分支条件。\n- **响应路径**：图中未绘制返回箭头，属于架构图中的简化表达。\n\n---\n\n## 4. 【图内所有文字与数值】\n\n图中可见文字如下：\n\n- `WebClient`\n- `API Gateway`\n- `Auth Service`\n- `Knowledge Core`\n\n图中没有出现：\n\n- 数字、数值、比例、统计指标；\n- 代码片段、公式、接口路径；\n- 标题、图例、注释说明；\n- 时间、版本号、协议名称；\n- 成功/失败等条件标签。\n\n---\n\n## 5. 【系统总结与推论】\n\n该图是一个典型的 **API 网关模式** 高层系统架构图。其核心语义是：\n\n- `WebClient` 作为前端入口，不直接调用后端微服务；\n- 所有请求先进入 `API Gateway`，由网关统一接收、路由和协调；\n- `API Gateway` 可调用 `Auth Service` 完成认证鉴权；\n- `API Gateway` 可将业务请求转发到 `Knowledge Core`，由知识核心服务完成知识处理；\n- `Auth Service` 和 `Knowledge Core` 之间无直接依赖，体现服务解耦和职责分离。\n\n可进一步推断该系统可能属于：\n\n- 知识库系统；\n- 知识问答系统；\n- 知识图谱平台；\n- 智能检索或知识管理平台；\n- 基于微服务/服务化架构的后端系统。\n\n可提取的知识图谱三元组示例：\n\n- `(WebClient, 调用, API Gateway)`\n- `(API Gateway, 路由到, Auth Service)`\n- `(API Gateway, 路由到, Knowledge Core)`\n- `(Auth Service, 提供, 认证鉴权能力)`\n- `(Knowledge Core, 提供, 知识处理能力)`\n\n总体而言，该图表达了一个以 API 网关为统一入口、认证服务与知识核心服务相互解耦的系统架构方案。优点是集中安全控制、统一路由、便于服务扩展与治理；局限是图中未展示服务注册、配置中心、数据库、缓存、日志监控、限流熔断等生产级组件。"
+      ],
+      "source_doc_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110"
+      ],
+      "source_docs": [
+        "test_direct_vlm_workflow_v2.png"
+      ],
+      "source_chunk_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110-chunk-001"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_025_multi_hop",
+      "question": "《旅行日记2.pdf》中记录了一次出行并附有图片素材；若要把这类旅行记录作为知识内容接入切片2所示的系统，客户端请求应先经过哪个统一入口，并由哪个服务承担知识处理？请结合两个切片说明完整调用链路。",
+      "ground_truth": "切片1表明《旅行日记2.pdf》包含“我们出去旅行了”的旅行记录及三张图片素材，属于客户端侧待接入/处理的内容；切片2表明系统以 WebClient 为请求起点，先调用 API Gateway 作为统一入口，负责接收请求、路由转发和鉴权集成，并进一步关联 Auth Service 做认证授权、关联 Knowledge Core 做知识处理/检索/问答。因此，这类旅行记录接入系统的完整链路应理解为：WebClient → API Gateway（统一入口），其中 Auth Service 承担认证与授权校验，Knowledge Core 承担知识内容处理；所以统一入口是 API Gateway，知识处理服务是 Knowledge Core。",
+      "contexts": [
+        "<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0001\" format=\"jpg\" path=\"旅行日记2.blocks.assets/dd34a876053a22b70146d09802ce6b5994ff2346df4c1f80c4841aa8527e8216.jpg\" src=\"\" />\n我们出去旅行了\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0002\" format=\"jpg\" path=\"旅行日记2.blocks.assets/b76ae1719acf5c93c8884768a1ec32d57bad5c37d1bbfe89b045fc068251c6d0.jpg\" src=\"\" />\n<drawing id=\"im-105e1c3a63d449451de755465e9a06d6-0003\" format=\"jpg\" path=\"旅行日记2.blocks.assets/fd8d033d07975ad002dc2fa7a7f232467f7d4f13e7b68001beccd7d8dd993fa7.jpg\" src=\"\" />",
+        "# 图片知识抽取报告\n\n## 1. 【图片类型与主题】\n\n- **图片类型**：系统架构图 / 组件交互图（高层逻辑架构图）。\n- **核心主题**：展示 `WebClient` 通过 `API Gateway` 访问后端服务的架构关系。图中包含四个核心组件：`WebClient`、`API Gateway`、`Auth Service`、`Knowledge Core`，并通过箭头表达请求/调用方向。\n- **图形特征**：白底，使用矩形框表示组件；不同组件采用不同边框和填充颜色区分；箭头表示单向调用或数据流向。图中没有标题、图例、坐标轴、刻度或数值标注。\n\n---\n\n## 2. 【核心组件与内容】\n\n| 组件名称 | 位置 | 图形样式 | 图中标识 | 角色与说明 |\n|---|---|---|---|---|\n| `WebClient` | 最左侧 | 蓝色边框，浅蓝色填充矩形 | `WebClient` | Web 客户端/前端应用，负责向系统发起请求，是请求的起点。 |\n| `API Gateway` | 中间 | 橙色边框，浅橙色填充矩形 | `API Gateway` | API 网关，系统统一入口，负责接收客户端请求、路由转发、鉴权集成、协议转换等。 |\n| `Auth Service` | 右上方 | 绿色边框，浅绿色填充矩形 | `Auth Service` | 认证服务，通常负责身份认证、授权校验、令牌验证等安全能力。 |\n| `Knowledge Core` | 右下方 | 红/粉色边框，浅粉色填充矩形 | `Knowledge Core` | 知识核心服务，通常负责知识处理、知识检索、知识图谱、问答或业务核心逻辑。 |\n\n- 图中所有组件均为独立矩形模块。\n- 组件之间没有嵌套关系，属于并列的服务/组件。\n- 图中未展示数据库、缓存、消息队列、注册中心、监控等外围组件。\n\n---\n\n## 3. 【逻辑关系与数据流向】\n\n### 3.1 箭头与调用关系\n\n图中明确存在三条有向箭头：\n\n1. **`WebClient` → `API Gateway`**\n   - 箭头从 `WebClient` 右侧水平指向 `API Gateway` 左侧。\n   - 表示客户端请求首先进入 API 网关。\n   - 这是系统的统一入口关系。\n\n2. **`API Gateway` → `Auth Service`**\n   - 箭头从 `API Gateway` 顶部引出，先向上折线，再向右指向 `Auth Service` 左侧。\n   - 表示 API 网关会调用或路由请求到认证服务。\n   - 通常用于认证、鉴权、令牌校验等场景。\n\n3. **`API Gateway` → `Knowledge Core`**\n   - 箭头从 `API Gateway` 右侧水平指向 `Knowledge Core` 左侧。\n   - 表示 API 网关会将业务请求转发或路由到知识核心服务。\n   - 通常用于知识查询、知识处理、核心业务逻辑调用。\n\n### 3.2 依赖关系\n\n- `WebClient` 依赖 `API Gateway`，不直接访问后端服务。\n- `API Gateway` 依赖 `Auth Service` 和 `Knowledge Core`，是二者的统一调用入口。\n- `Auth Service` 与 `Knowledge Core` 之间没有直接连线，说明它们可能通过 API 网关进行集成，或者彼此保持独立。\n- 图中未标注返回箭头，但按常规架构，`Auth Service` 和 `Knowledge Core` 会向 `API Gateway` 返回处理结果，再由 `API Gateway` 返回给 `WebClient`。\n\n### 3.3 数据流向与分支条件\n\n可抽象为以下流程：\n\n```mermaid\nflowchart LR\n  A[WebClient] --> B[API Gateway]\n  B --> C[Auth Service]\n  B --> D[Knowledge Core]\n```\n\n- **主流程**：`WebClient` 发起请求 → `API Gateway` 接收请求。\n- **认证分支**：当请求需要身份认证或鉴权时，`API Gateway` 调用 `Auth Service`。\n- **业务分支**：当请求属于知识查询或知识处理业务时，`API Gateway` 将请求转发至 `Knowledge Core`。\n- **先后顺序**：图中未明确标注先后顺序。可推断为一种常见模式：API 网关先调用认证服务完成鉴权，鉴权通过后再将业务请求转发至知识核心服务；也可能是根据请求类型并行/分别路由。\n- **成功/失败路径**：图中未标注成功、失败、异常、重试、熔断等分支条件。\n- **响应路径**：图中未绘制返回箭头，属于架构图中的简化表达。\n\n---\n\n## 4. 【图内所有文字与数值】\n\n图中可见文字如下：\n\n- `WebClient`\n- `API Gateway`\n- `Auth Service`\n- `Knowledge Core`\n\n图中没有出现：\n\n- 数字、数值、比例、统计指标；\n- 代码片段、公式"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-58e826b9d443b69457f5853e210c7110"
+      ],
+      "source_docs": [
+        "test_direct_vlm_workflow_v2.png",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-58e826b9d443b69457f5853e210c7110-chunk-000",
+        "doc-105e1c3a63d449451de755465e9a06d6-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    },
+    {
+      "test_id": "DELTA_026_multi_hop",
+      "question": "一位旅客在阳光明媚的机场停机坪上排队登上一架泰国亚洲航空（Thai AirAsia）的空客客机。为了在旅行后仍能准确记住这架飞机上的关键识别信息，他打算采用学习方法海报中的两种高效学习策略。请问他应如何结合费曼学习法与间隔重复法来记忆这些信息？请同时说明应记忆的飞机识别信息和具体复习时间间隔。",
+      "ground_truth": "他应先用费曼学习法“以教促学”，用白话向同伴解释并查漏补缺地记住切片1中这架泰国亚洲航空空客客机的关键识别信息：红色涂装、机身写有 airasia.com、发动机短舱有 AirAsia 标志、尾翼有 AirAsia 手写体标志、驾驶舱附近有泰国国旗及“THAI AIRASIA”和“AIRBUS”字样，以及旅客通过移动登机梯登机。随后用切片2中的间隔重复法对抗艾宾浩斯遗忘曲线，按 1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天 的周期复习这些识别信息，从而把费曼式的理解输出与逐渐拉长间隔的复习结合起来。",
+      "contexts": [
+        "[Image Name]passengers_boarding_airasia_jet_tarmac\n[Image Type]Photo\n\nAn outdoor tarmac photograph showing passengers queuing to board a Thai AirAsia commercial jet at an airport on a bright, sunny day. The aircraft dominates the upper half of the frame: a red-liveried Airbus with the large white web address \"airasia.com\" painted along its fuselage, an \"AirAsia\" logo on the engine nacelle, and the AirAsia script mark on the tail fin. Near the cockpit, small markings read \"THAI AIRASIA\" beneath a Thai flag and \"AIRBUS\" below it. A covered mobile stairway is attached to the forward left door, and travelers can be seen ascending it into the cabin. In the foreground, a line of roughly a dozen passengers waits on the concrete apron, viewed from behind. Most wear light-colored, casual travel clothing — several in white jackets, trousers, and long-sleeved shirts — while one person stands out in a bright blue fleece jacket with a shoulder bag, and another on the right wears a pale pink top. Red painted guide lines run across the pale gray concrete, accompanied by small yellow-and-black striped markings and a low metal barrier frame on the left. A red ground-service pickup truck and a tall light mast are visible in the mid-ground near the nose of the jet, and a faint blurred structure of other aircraft or equipment sits on the far right. The upper portion of the image is filled with a deep blue sky streaked with thin, wispy cirrus clouds and a faint contrail, giving the scene a clear, cheerful vacation atmosphere that fits the trailing text about going on a trip.",
+        "以下是对该图片的详尽、深入、结构化解析，旨在提取全部知识内容并构建清晰的知识图谱。\n\n---\n\n### 1. 【图片类型与主题】\n\n*   **图片类型**：知识海报 / 信息图（Infographic）\n*   **核心主题**：高效学习方法思维全景海报。该图旨在概括并对比两种核心的高效学习策略：费曼学习法与间隔重复法。\n\n---\n\n### 2. 【核心组件与内容】\n\n图片由顶部标题和两个并列的核心知识卡片组成，具体组件如下：\n\n| 组件名称 | 类型 | 属性与说明 |\n| :--- | :--- | :--- |\n| **主标题** | 文本 | 位于图片顶部居中，使用深蓝色加粗字体。 |\n| **卡片 1（左侧）** | 知识模块 | 浅蓝色背景，蓝色边框，包含费曼学习法的核心定义与实施步骤。 |\n| **卡片 2（右侧）** | 知识模块 | 浅绿色背景，绿色边框，包含间隔重复法的核心原理与时间周期。 |\n\n**卡片内部实体详情：**\n\n*   **卡片 1：费曼学习法 (Feynman)**\n    *   **核心**：以教促学，用白话解释复杂概念。\n    *   **步骤**：明确概念 ➔ 模拟教学 ➔ 查漏补缺。\n*   **卡片 2：间隔重复法 (Spaced Repetition)**\n    *   **核心**：对抗艾宾浩斯遗忘曲线。\n    *   **周期**：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天。\n\n---\n\n### 3. 【逻辑关系与数据流向】\n\n该图主要呈现**并列对比**与**顺序流程**两种逻辑关系：\n\n1.  **并列关系**：左侧的“费曼学习法”与右侧的“间隔重复法”处于同一层级，代表两种不同维度的学习策略，共同服务于“高效学习”这一主题。\n2.  **顺序流程（内部逻辑）**：\n    *   **费曼学习法**：展示了从“明确概念”到“模拟教学”再到“查漏补缺”的线性闭环流程。箭头表示学习步骤的递进关系，强调通过输出（教学）来倒逼输入（查漏补缺）。\n    *   **间隔重复法**：展示了基于时间序列的复习周期。箭头表示时间节点上的递进关系（1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天），体现了复习间隔逐渐拉长的非线性数据流向，旨在对抗遗忘曲线。\n\n---\n\n### 4. 【图内所有文字与数值】\n\n以下为图中可见的全部文字与数值内容，忠实提取如下：\n\n*   **主标题**：高效学习方法思维全景海报\n*   **卡片 1**：\n    *   标题：1. 费曼学习法 (Feynman)\n    *   核心：核心：以教促学，用白话解释复杂概念\n    *   步骤：步骤：明确概念 ➔ 模拟教学 ➔ 查漏补缺\n*   **卡片 2**：\n    *   标题：2. 间隔重复法 (Spaced Repetition)\n    *   核心：核心：对抗艾宾浩斯遗忘曲线\n    *   周期：周期：1天 ➔ 2天 ➔ 4天 ➔ 7天 ➔ 15天\n\n---\n\n### 5. 【系统总结与推论】\n\n基于该图表达的完整语义，可得出以下系统级/业务级的总结：\n\n**知识体系总结：**\n该海报构建了一个“高效学习”的二元策略模型。\n*   **费曼学习法**侧重于**知识的内化与输出**。通过将复杂概念转化为通俗语言并模拟教学，强制学习者暴露知识盲区，从而实现深度理解和长期记忆。这是一种**质变**的学习策略。\n*   **间隔重复法**侧重于**记忆的巩固与维持**。基于艾宾浩斯遗忘曲线，通过在特定时间节点（1天、2天、4天、7天、15天）进行复习，将短期记忆转化为长期记忆。这是一种**量变**的学习策略。\n\n**推论与建议：**\n在实际应用中，两种方法并非孤立，而是可以协同增效。学习者可以首先使用**费曼学习法**对知识进行深度加工和理解（明确概念、模拟教学、查漏补缺），随后利用**间隔重复法**制定的时间表（1天、2天、4天...）对已理解的内容进行周期性复习，从而在对抗遗忘的同时实现知识的长期稳固掌握。该海报为知识管理者和学习者提供了一套直观、可执行的元认知工具。"
+      ],
+      "source_doc_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6",
+        "doc-06a04694df7db56bac5ba1d3b1c43b66"
+      ],
+      "source_docs": [
+        "study_methods_poster.svg",
+        "旅行日记2.pdf"
+      ],
+      "source_chunk_ids": [
+        "doc-105e1c3a63d449451de755465e9a06d6-mm-drawing-000",
+        "doc-06a04694df7db56bac5ba1d3b1c43b66-chunk-000"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "11111111-1111-4111-8111-111111111111"
+    }
+  ]
+}
