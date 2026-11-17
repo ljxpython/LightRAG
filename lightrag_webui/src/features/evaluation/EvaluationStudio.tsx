@@ -670,35 +670,35 @@ export default function EvaluationStudio() {
   return (
     <div className="h-full w-full flex flex-col p-4 xl:p-6 space-y-3.5 overflow-hidden bg-background">
       {/* 1. Header & Actions (全宽自适应，无 max-w-6xl 限制) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-border/60 pb-3.5 shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 border-b border-border/60 pb-3 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="size-9 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
             <ActivityIcon className="size-5 animate-pulse" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold tracking-tight text-foreground">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
                 评测工坊 (Evaluation Studio)
               </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-mono font-medium">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-mono font-medium shrink-0">
                 DeepEval 驱动
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground truncate max-w-xl">
               汇总全量测试用例表格 · 在线内联编辑 · 全生命周期差量自动合成 · 嵌入式 MLflow 评测大屏
             </p>
           </div>
         </div>
 
-        {/* 顶部右侧：子视图切换 + 动作按钮 */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* 切换 Tab：表格视图 vs MLflow 嵌入大屏 */}
-          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 text-xs font-medium">
+        {/* 顶部右侧：子视图切换 + 动作按钮 (响应式分组排版，杜绝断崖式单独折行) */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between xl:justify-end gap-2 shrink-0">
+          {/* 切换 Tab：表格视图 vs 打擂任务大厅 vs MLflow 嵌入大屏 */}
+          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 text-xs font-medium shrink-0">
             <button
               type="button"
               onClick={() => setActiveSubTab('cases')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
                 activeSubTab === 'cases'
                   ? 'bg-background text-foreground shadow-xs font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
@@ -711,7 +711,7 @@ export default function EvaluationStudio() {
               type="button"
               onClick={() => setActiveSubTab('tasks')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer relative',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer relative whitespace-nowrap',
                 activeSubTab === 'tasks'
                   ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400 font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
@@ -727,7 +727,7 @@ export default function EvaluationStudio() {
               type="button"
               onClick={() => setActiveSubTab('mlflow')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer',
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
                 activeSubTab === 'mlflow'
                   ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400 font-semibold'
                   : 'text-muted-foreground hover:text-foreground'
@@ -738,70 +738,72 @@ export default function EvaluationStudio() {
             </button>
           </div>
 
-          <div className="h-5 w-px bg-border/60 mx-1 hidden sm:block" />
+          <div className="h-5 w-px bg-border/60 hidden md:block shrink-0" />
 
-          {/* 模态框 1 触发：⚡ 自动合成题库 */}
-          <Button
-            size="sm"
-            onClick={() => {
-              if (
-                selectedDatasetName &&
-                (projectDatasets.some((d) => d.name === selectedDatasetName) ||
-                  selectedDatasetName.startsWith('lineage_') ||
-                  selectedDatasetName.startsWith('synth_'))
-              ) {
-                setSynthTargetMode('overwrite')
-                setSynthName(selectedDatasetName)
-              } else {
-                setSynthTargetMode('create')
-                const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
-                setSynthName(`${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`)
-              }
-              setSynthOpen(true)
-            }}
-            className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5 text-xs shadow-xs"
-          >
-            <SparklesIcon className="size-3.5" />
-            <span>自动合成题库</span>
-          </Button>
+          {/* 模态框动作组（自动合成、矩阵打擂、新窗口）紧凑并列 */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Button
+              size="sm"
+              onClick={() => {
+                if (
+                  selectedDatasetName &&
+                  (projectDatasets.some((d) => d.name === selectedDatasetName) ||
+                    selectedDatasetName.startsWith('lineage_') ||
+                    selectedDatasetName.startsWith('synth_'))
+                ) {
+                  setSynthTargetMode('overwrite')
+                  setSynthName(selectedDatasetName)
+                } else {
+                  setSynthTargetMode('create')
+                  const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
+                  setSynthName(`${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`)
+                }
+                setSynthOpen(true)
+              }}
+              className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5 text-xs shadow-xs px-2.5 sm:px-3 whitespace-nowrap"
+            >
+              <SparklesIcon className="size-3.5" />
+              <span>自动合成题库</span>
+            </Button>
 
-          {/* 模态框 2 触发：⚔️ 矩阵打擂 */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (readiness?.status === 'missing') {
-                toast.error(
-                  `当前知识库完全缺失该题库所需的原材料文档！强行打擂将全部失分。\n请在右上角切换到【评测基准】知识库再运行打擂。`
-                )
-                return
-              }
-              setMatrixOpen(true)
-            }}
-            disabled={!datasetDetail || cases.length === 0}
-            className={cn(
-              'h-8 gap-1.5 text-xs transition-colors',
-              readiness?.status === 'missing'
-                ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
-                : 'border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
-            )}
-            tooltip={readiness?.status === 'missing' ? '原材料缺失不可打擂，点击查看提示' : undefined}
-          >
-            <SwordsIcon className="size-3.5" />
-            <span>{readiness?.status === 'missing' ? '原料缺失(禁止打擂)' : '矩阵参数打擂'}</span>
-          </Button>
+            {/* 模态框 2 触发：⚔️ 矩阵打擂 */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (readiness?.status === 'missing') {
+                  toast.error(
+                    `当前知识库完全缺失该题库所需的原材料文档！强行打擂将全部失分。\n请在右上角切换到【评测基准】知识库再运行打擂。`
+                  )
+                  return
+                }
+                setMatrixOpen(true)
+              }}
+              disabled={!datasetDetail || cases.length === 0}
+              className={cn(
+                'h-8 gap-1.5 text-xs transition-colors px-2.5 sm:px-3 whitespace-nowrap',
+                readiness?.status === 'missing'
+                  ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
+                  : 'border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
+              )}
+              tooltip={readiness?.status === 'missing' ? '原材料缺失不可打擂，点击查看提示' : undefined}
+            >
+              <SwordsIcon className="size-3.5" />
+              <span>{readiness?.status === 'missing' ? '原料缺失(禁止打擂)' : '矩阵参数打擂'}</span>
+            </Button>
 
-          {/* 新窗口直达 MLflow 外部链接 */}
-          <a
-            href={mlflowUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted/80 border border-border/50 transition-colors"
-            title="在新标签页独立打开 MLflow"
-          >
-            <span>新窗口</span>
-            <ArrowUpRightIcon className="size-3.5" />
-          </a>
+            {/* 新窗口直达 MLflow 外部链接 */}
+            <a
+              href={mlflowUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted/80 border border-border/50 transition-colors shrink-0 whitespace-nowrap"
+              title="在新标签页独立打开 MLflow"
+            >
+              <span>新窗口</span>
+              <ArrowUpRightIcon className="size-3.5" />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -919,17 +921,17 @@ export default function EvaluationStudio() {
         /* 视图 A：考题全量数据表格汇总 (Table Grid) */
         /* ----------------------------------------------------------------- */
         <div className="flex-1 flex flex-col min-h-0 space-y-3 overflow-hidden">
-          {/* 题库血缘与操作状态条 (全宽自适应) */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/25 px-3.5 py-2.5 rounded-lg border border-border/50 shrink-0 text-xs">
-            <div className="flex flex-wrap items-center gap-3">
+          {/* 题库血缘与操作状态条 (全宽自适应，响应式排版) */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 bg-muted/25 px-3 py-2 rounded-lg border border-border/50 shrink-0 text-xs">
+            <div className="flex flex-wrap items-center gap-2.5 min-w-0">
               {/* 题库选择下拉框 */}
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground font-medium">当前评测集:</span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-muted-foreground font-medium whitespace-nowrap">当前评测集:</span>
                 <select
                   value={selectedDatasetName}
                   onChange={(e) => setSelectedDatasetName(e.target.value)}
                   disabled={loadingDatasets}
-                  className="text-xs h-7 pl-2.5 pr-7 rounded-md bg-background text-foreground border border-border/80 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium cursor-pointer"
+                  className="text-xs h-7 pl-2 pr-7 max-w-[200px] sm:max-w-[260px] truncate rounded-md bg-background text-foreground border border-border/80 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium cursor-pointer"
                 >
                   {datasets.length === 0 ? (
                     <option value="">暂无评测题库</option>
@@ -993,22 +995,22 @@ export default function EvaluationStudio() {
                   )}
               </div>
 
-              <div className="h-4 w-px bg-border/60 hidden sm:block" />
+              <div className="h-4 w-px bg-border/60 hidden sm:block shrink-0" />
 
-              {/* 知识库与血缘契约简要信息 */}
-              <div className="flex flex-wrap items-center gap-2.5 text-[11px] text-muted-foreground">
+              {/* 知识库与血缘契约简要信息 (大屏幕展示全部，小屏幕收敛冗余项) */}
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                 <span
-                  className="flex items-center gap-1"
+                  className="hidden 2xl:inline-flex items-center gap-1"
                   title={`当前激活知识库: ${currentProjectName} (${currentProjectId})`}
                 >
                   <FolderGit2Icon className="size-3 text-indigo-500" />
                   <span>知识库:</span>
-                  <strong className="text-foreground font-medium">
+                  <strong className="text-foreground font-medium truncate max-w-[120px]">
                     {currentProjectName}
                   </strong>
                 </span>
 
-                <span className="flex items-center gap-1">
+                <span className="hidden 2xl:inline-flex items-center gap-1">
                   <LayersIcon className="size-3" />
                   <span>基线:</span>
                   <span className="font-mono text-foreground">
@@ -1016,17 +1018,17 @@ export default function EvaluationStudio() {
                   </span>
                 </span>
 
-                <span className="flex items-center gap-1">
+                <span className="inline-flex items-center gap-1 shrink-0">
                   <FileTextIcon className="size-3" />
-                  <span>覆盖文档:</span>
+                  <span>覆盖:</span>
                   <strong className="text-foreground">
-                    {docCount > 0 ? `${docCount} 篇` : '手工编制'}
+                    {docCount > 0 ? `${docCount} 篇` : '手工'}
                   </strong>
                 </span>
 
                 <span
                   className={cn(
-                    'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-help',
+                    'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-help shrink-0',
                     lineageStatus.className
                   )}
                   title={lineageStatus.desc}
@@ -1036,14 +1038,14 @@ export default function EvaluationStudio() {
 
                 {/* 原材料就绪度指示徽章 (Readiness Guard) */}
                 {checkingReadiness ? (
-                  <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] bg-muted text-muted-foreground animate-pulse">
+                  <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] bg-muted text-muted-foreground animate-pulse shrink-0">
                     <Loader2Icon className="size-2.5 animate-spin" />
-                    <span>检测原料就绪度...</span>
+                    <span>检测就绪度...</span>
                   </span>
                 ) : readiness ? (
                   <span
                     className={cn(
-                      'inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium transition-colors cursor-help',
+                      'inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium transition-colors cursor-help shrink-0',
                       readiness.status === 'ready' &&
                         'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30',
                       readiness.status === 'partial' &&
@@ -1053,9 +1055,9 @@ export default function EvaluationStudio() {
                     )}
                     title={
                       readiness.status === 'missing'
-                        ? `【严重警告】当前库完全缺失该题库所需的原材料文档！(${readiness.missing_docs.join(', ')})，强行打擂将全部失分。`
+                        ? `【严重警告】当前库完全缺失该题库所需的原材料文档！(缺失 ${readiness.missing_docs.length} 篇)`
                         : readiness.status === 'partial'
-                          ? `【部分就绪】具备 ${readiness.matched_docs.length}/${readiness.total_required} 篇文档，缺失: ${readiness.missing_docs.join(', ')}`
+                          ? `【部分就绪】具备 ${readiness.matched_docs.length}/${readiness.total_required} 篇文档，缺失 ${readiness.missing_docs.length} 篇（${readiness.missing_docs.slice(0, 3).join(', ')}${readiness.missing_docs.length > 3 ? ` 等共 ${readiness.missing_docs.length} 篇` : ''}）`
                           : `【契约就绪】当前知识库包含题库所需的全部 ${readiness.total_required} 篇原材料文档，可随时启动矩阵打擂！`
                     }
                   >
@@ -1073,15 +1075,15 @@ export default function EvaluationStudio() {
             </div>
 
             {/* 表格操作：搜索过滤 + 新增题目 + 保存 */}
-            <div className="flex items-center gap-2 ml-auto">
-              <div className="relative w-48 sm:w-64">
-                <SearchIcon className="size-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+              <div className="relative w-36 sm:w-48 lg:w-56">
+                <SearchIcon className="size-3 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="搜索问题或答案关键词..."
+                  placeholder="搜索问题或答案..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs pl-8 pr-3 py-1 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full text-xs pl-7 pr-2.5 py-1 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -1089,7 +1091,7 @@ export default function EvaluationStudio() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddCase}
-                className="h-7 gap-1 text-xs px-2.5"
+                className="h-7 gap-1 text-xs px-2 sm:px-2.5 whitespace-nowrap"
               >
                 <PlusIcon className="size-3" />
                 <span>添加考题</span>
@@ -1100,7 +1102,7 @@ export default function EvaluationStudio() {
                 onClick={handleSaveDataset}
                 disabled={!isDirty || saving}
                 className={cn(
-                  'h-7 gap-1 text-xs px-3 transition-all',
+                  'h-7 gap-1 text-xs px-2.5 sm:px-3 transition-all whitespace-nowrap',
                   isDirty
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-semibold'
                     : 'bg-muted text-muted-foreground'
@@ -1124,14 +1126,14 @@ export default function EvaluationStudio() {
                 <div>
                   <span className="font-semibold">【契约拦截】当前知识库完全缺失该评测集所需的全部原材料文档！</span>
                   <span className="text-[11px] opacity-90 block mt-0.5">
-                    所需原材料文档（{readiness.missing_docs.join(', ') || '未声明'}）不在当前知识库中。已主动拦截矩阵打擂，请在右上角切换到「评测基准 (eval_benchmark)」知识库后再进行评测！
+                    所需原材料文档缺失共 {readiness.missing_docs.length} 篇（如 {readiness.missing_docs.slice(0, 3).join(', ')}{readiness.missing_docs.length > 3 ? ' 等' : ''}）不在当前知识库中。已主动拦截矩阵打擂，请在右上角切换到对应知识库或先灌入文档！
                   </span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 3. 汇总数据表格 (Full-width Data Table) */}
+          {/* 3. 汇总数据表格 (Full-width Data Table with responsive min-width) */}
           <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-border/60 bg-card/60 shadow-xs relative">
             {loadingDetail ? (
               <div className="h-64 flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground">
@@ -1147,145 +1149,147 @@ export default function EvaluationStudio() {
                 </p>
               </div>
             ) : (
-              <Table className="w-full text-xs">
-                <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-xs z-10 border-b border-border/80">
-                  <TableRow className="hover:bg-transparent text-muted-foreground font-semibold">
-                    <TableHead className="w-14 text-center py-2.5">#</TableHead>
-                    <TableHead className="w-28 py-2.5">用例标识</TableHead>
-                    <TableHead className="w-[38%] py-2.5">提问问题 (Question / Query)</TableHead>
-                    <TableHead className="w-[38%] py-2.5">标准黄金答案 (Ground Truth)</TableHead>
-                    <TableHead className="w-32 py-2.5">支撑上下文</TableHead>
-                    <TableHead className="w-20 text-right pr-4 py-2.5">操作</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <div className="min-w-[960px] w-full">
+                <Table className="w-full text-xs table-fixed">
+                  <TableHeader className="sticky top-0 bg-muted/90 backdrop-blur-xs z-10 border-b border-border/80">
+                    <TableRow className="hover:bg-transparent text-muted-foreground font-semibold">
+                      <TableHead className="w-12 text-center py-2.5">#</TableHead>
+                      <TableHead className="w-24 py-2.5">用例标识</TableHead>
+                      <TableHead className="min-w-[280px] py-2.5">提问问题 (Question / Query)</TableHead>
+                      <TableHead className="w-52 xl:w-64 py-2.5">标准黄金答案 (Ground Truth)</TableHead>
+                      <TableHead className="w-48 lg:w-56 py-2.5">支撑上下文</TableHead>
+                      <TableHead className="w-16 text-right pr-4 py-2.5">操作</TableHead>
+                    </TableRow>
+                  </TableHeader>
 
-                <TableBody className="divide-y divide-border/30">
-                  {filteredCases.map((c, index) => (
-                    <TableRow
-                      key={c.id || index}
-                      className="group hover:bg-muted/40 transition-colors align-top"
-                    >
-                      {/* 1. 序号 */}
-                      <TableCell className="text-center font-mono py-3 text-muted-foreground font-semibold">
-                        <span className="inline-block size-6 rounded bg-muted/60 text-center leading-6 text-[11px]">
-                          {index + 1}
-                        </span>
-                      </TableCell>
-
-                      {/* 2. 用例标识 & 进化类型 */}
-                      <TableCell className="py-3">
-                        <div className="space-y-1">
-                          <span className="font-mono text-xs font-medium text-foreground block truncate">
-                            {c.id || `case_${index + 1}`}
+                  <TableBody className="divide-y divide-border/30">
+                    {filteredCases.map((c, index) => (
+                      <TableRow
+                        key={c.id || index}
+                        className="group hover:bg-muted/40 transition-colors align-top"
+                      >
+                        {/* 1. 序号 */}
+                        <TableCell className="text-center font-mono py-3 text-muted-foreground font-semibold">
+                          <span className="inline-block size-6 rounded bg-muted/60 text-center leading-6 text-[11px]">
+                            {index + 1}
                           </span>
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                            {c.metadata?.evolution_type || 'DeepEval'}
-                          </span>
-                        </div>
-                      </TableCell>
+                        </TableCell>
 
-                      {/* 3. 提问问题 (Question) 可直接内联编辑 */}
-                      <TableCell className="py-2.5">
-                        <textarea
-                          value={c.question || ''}
-                          onChange={(e) => handleCaseChange(index, 'question', e.target.value)}
-                          rows={2}
-                          placeholder="输入提问内容..."
-                          className="w-full text-xs font-medium p-2 rounded-md border border-border/50 bg-background/50 hover:bg-background focus:bg-background focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-y transition-colors leading-relaxed"
-                        />
-                      </TableCell>
+                        {/* 2. 用例标识 & 进化类型 */}
+                        <TableCell className="py-3">
+                          <div className="space-y-1">
+                            <span className="font-mono text-xs font-medium text-foreground block truncate" title={c.id || `case_${index + 1}`}>
+                              {c.id || `case_${index + 1}`}
+                            </span>
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                              {c.metadata?.evolution_type || 'DeepEval'}
+                            </span>
+                          </div>
+                        </TableCell>
 
-                      {/* 4. 标准黄金答案 (Ground Truth) 可直接内联编辑 */}
-                      <TableCell className="py-2.5">
-                        <textarea
-                          value={c.ground_truth || ''}
-                          onChange={(e) => handleCaseChange(index, 'ground_truth', e.target.value)}
-                          rows={2}
-                          placeholder="输入黄金标准答案..."
-                          className="w-full text-xs font-mono p-2 rounded-md border border-border/50 bg-background/50 hover:bg-background focus:bg-background focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-y transition-colors leading-relaxed text-emerald-700 dark:text-emerald-300"
-                        />
-                      </TableCell>
+                        {/* 3. 提问问题 (Question) 可直接内联编辑 */}
+                        <TableCell className="py-2.5">
+                          <textarea
+                            value={c.question || ''}
+                            onChange={(e) => handleCaseChange(index, 'question', e.target.value)}
+                            rows={2}
+                            placeholder="输入提问内容..."
+                            className="w-full text-xs font-medium p-2 rounded-md border border-border/50 bg-background/50 hover:bg-background focus:bg-background focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-y transition-colors leading-relaxed"
+                          />
+                        </TableCell>
 
-                      {/* 5. 支撑上下文片段 */}
-                      <TableCell className="py-2.5 text-[11px] text-muted-foreground">
-                        {(() => {
-                          const ctxs = getCaseContexts(c)
-                          if (ctxs.length > 0) {
-                            const totalChars = ctxs.reduce((sum, item) => sum + item.length, 0)
+                        {/* 4. 标准黄金答案 (Ground Truth) 可直接内联编辑 */}
+                        <TableCell className="py-2.5">
+                          <textarea
+                            value={c.ground_truth || ''}
+                            onChange={(e) => handleCaseChange(index, 'ground_truth', e.target.value)}
+                            rows={2}
+                            placeholder="输入黄金标准答案..."
+                            className="w-full text-xs font-mono p-2 rounded-md border border-border/50 bg-background/50 hover:bg-background focus:bg-background focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-y transition-colors leading-relaxed text-emerald-700 dark:text-emerald-300"
+                          />
+                        </TableCell>
+
+                        {/* 5. 支撑上下文片段 */}
+                        <TableCell className="py-2.5 text-[11px] text-muted-foreground">
+                          {(() => {
+                            const ctxs = getCaseContexts(c)
+                            if (ctxs.length > 0) {
+                              const totalChars = ctxs.reduce((sum, item) => sum + item.length, 0)
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setInspectCase(c)
+                                    setEditingContextText(ctxs.join('\n\n---\n\n'))
+                                    setIsEditingContext(false)
+                                  }}
+                                  className="text-left font-mono hover:text-foreground text-[10px] bg-emerald-500/5 hover:bg-emerald-500/10 p-2 rounded-md border border-emerald-500/20 hover:border-emerald-500/40 transition-colors cursor-pointer w-full group/ctx flex flex-col gap-1 text-left"
+                                  title="点击查看完整支撑切片与来源文档"
+                                >
+                                  <div className="flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
+                                    <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span className="shrink-0">{ctxs.length} 个切片证据</span>
+                                    <span className="text-[9px] text-muted-foreground font-normal shrink-0">
+                                      ({totalChars} 字)
+                                    </span>
+                                  </div>
+                                  <div className="line-clamp-2 text-foreground/80 text-[10px] leading-relaxed break-all">
+                                    {ctxs[0]}
+                                  </div>
+                                </button>
+                              )
+                            }
                             return (
                               <button
                                 type="button"
                                 onClick={() => {
                                   setInspectCase(c)
-                                  setEditingContextText(ctxs.join('\n\n---\n\n'))
-                                  setIsEditingContext(false)
+                                  setEditingContextText('')
+                                  setIsEditingContext(true)
                                 }}
-                                className="text-left font-mono hover:text-foreground text-[10px] bg-emerald-500/5 hover:bg-emerald-500/10 p-2 rounded-md border border-emerald-500/20 hover:border-emerald-500/40 transition-colors cursor-pointer w-full group/ctx flex flex-col gap-1 text-left"
-                                title="点击查看完整支撑切片与来源文档"
+                                className="text-left font-mono text-[10px] text-muted-foreground/70 hover:text-indigo-600 dark:hover:text-indigo-400 bg-muted/20 hover:bg-indigo-500/5 px-2 py-1.5 rounded-md border border-dashed border-border/60 hover:border-indigo-500/40 transition-colors w-full flex items-center justify-between gap-1 cursor-pointer"
+                                title="该考题暂无切片证据，点击可手动补充录入"
                               >
-                                <div className="flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
-                                  <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                  <span>{ctxs.length} 个切片证据</span>
-                                  <span className="text-[9px] text-muted-foreground font-normal">
-                                    ({totalChars} 字)
-                                  </span>
-                                </div>
-                                <div className="line-clamp-2 text-foreground/80 text-[10px] leading-relaxed break-all">
-                                  {ctxs[0]}
-                                </div>
+                                <span className="truncate">未关联切片</span>
+                                <span className="text-[10px] text-indigo-500 font-semibold hover:underline shrink-0 whitespace-nowrap">
+                                  + 补充
+                                </span>
                               </button>
                             )
-                          }
-                          return (
+                          })()}
+                        </TableCell>
+
+                        {/* 6. 操作按钮 */}
+                        <TableCell className="text-right pr-4 py-3">
+                          <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                             <button
                               type="button"
                               onClick={() => {
                                 setInspectCase(c)
-                                setEditingContextText('')
-                                setIsEditingContext(true)
+                                const ctxs = getCaseContexts(c)
+                                setEditingContextText(ctxs.join('\n\n---\n\n'))
+                                setIsEditingContext(false)
                               }}
-                              className="text-left font-mono text-[10px] text-muted-foreground/70 hover:text-indigo-600 dark:hover:text-indigo-400 bg-muted/20 hover:bg-indigo-500/5 p-2 rounded-md border border-dashed border-border/60 hover:border-indigo-500/40 transition-colors w-full flex items-center justify-between cursor-pointer"
-                              title="该考题暂无切片证据，点击可手动补充录入"
+                              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                              title="检视完整考题用例"
                             >
-                              <span>未关联切片 (手工用例)</span>
-                              <span className="text-[10px] text-indigo-500 font-semibold hover:underline">
-                                + 补充
-                              </span>
+                              <Maximize2Icon className="size-3.5" />
                             </button>
-                          )
-                        })()}
-                      </TableCell>
-
-                      {/* 6. 操作按钮 */}
-                      <TableCell className="text-right pr-4 py-3">
-                        <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setInspectCase(c)
-                              const ctxs = getCaseContexts(c)
-                              setEditingContextText(ctxs.join('\n\n---\n\n'))
-                              setIsEditingContext(false)
-                            }}
-                            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                            title="检视完整考题用例"
-                          >
-                            <Maximize2Icon className="size-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteCase(index)}
-                            className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-                            title="删除该考题"
-                          >
-                            <Trash2Icon className="size-3.5" />
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCase(index)}
+                              className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                              title="删除该考题"
+                            >
+                              <Trash2Icon className="size-3.5" />
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </div>
 
@@ -1835,8 +1839,8 @@ export default function EvaluationStudio() {
                   <div className="space-y-1">
                     <div className="font-semibold">【契约拦截】当前知识库完全缺失该评测集的原材料文档</div>
                     <div className="text-[11px] opacity-90 leading-relaxed">
-                      当前激活库「{currentProjectName}」未包含此评测集所需的任何文档（缺失：{readiness.missing_docs.join(', ') || '全部'}）。
-                      由于召回切片为空，强行打擂将全部失分。请在主界面右上角切换到「评测基准 (eval_benchmark)」知识库。
+                      当前激活库「{currentProjectName}」未包含此评测集所需的任何文档（缺失共 {readiness.missing_docs.length} 篇，如 {readiness.missing_docs.slice(0, 3).join(', ')}{readiness.missing_docs.length > 3 ? ' 等' : ''}）。
+                      由于召回切片为空，强行打擂将全部失分。请在主界面右上角切换到对应知识库或灌入文档后再评测。
                     </div>
                   </div>
                 </div>
@@ -1846,7 +1850,7 @@ export default function EvaluationStudio() {
                 <div className="p-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs flex items-start gap-2">
                   <AlertCircleIcon className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
                   <div className="text-[11px] leading-relaxed">
-                    <strong>部分原料就绪：</strong>当前库包含 {readiness.matched_docs.length}/{readiness.total_required} 篇文档，缺失 {readiness.missing_docs.length} 篇（{readiness.missing_docs.join(', ')}），打擂可能部分失分。
+                    <strong>部分原料就绪：</strong>当前库包含 {readiness.matched_docs.length}/{readiness.total_required} 篇文档，缺失 {readiness.missing_docs.length} 篇（{readiness.missing_docs.slice(0, 3).join(', ')}{readiness.missing_docs.length > 3 ? ` 等共 ${readiness.missing_docs.length} 篇` : ''}），打擂可能部分失分。
                   </div>
                 </div>
               )}

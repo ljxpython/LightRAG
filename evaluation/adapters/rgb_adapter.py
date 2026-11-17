@@ -276,7 +276,10 @@ class HuaweiRGBAdapter:
                 })
 
         logger.info(f"Created {len(documents_metadata)} physical documents in {self.output_docs_dir}")
-        return {"documents": documents_metadata}
+        return {
+            "documents": documents_metadata,
+            "source_docs": [d["file_name"] for d in documents_metadata],
+        }
 
     def _build_noise_dataset(
         self,

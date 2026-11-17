@@ -1,0 +1,43 @@
+# 主题报道：What is the codename for Google's AR headset project?
+
+> 来源：华为诺亚方舟 RGB 官方基准正向语料（ID: 16）
+
+## 关键证据节选 1
+
+12]  In January 2022, The Verge reported that Google was building an AR headset which used "outward-facing cameras to blend computer graphics with a video feed of the real world", internally codenamed Project Iris and being developed in a highly secretive and secure facility located in the San Francisco Bay Area. Overseen by Bavor, the headset was to be powered by the Android operating system as well as a custom system on a chip akin to Tensor, expected to launch in 2024 alongside Project Starline. Other key people named as part of the project include Shahram Izadi, Eddie Chung, Scott Huffman, Kurt Akeley, and Lucovsky.[13] An early prototype of the headset bore a close resemblance to the North Focals.[14] In March, The Information reported that Google would acquire Raxium, an AR hardware startup, for approximately $1 billion, and would continue to make further acquisitions to assist in their AR and mixed reality (MR) work.[15] The acquisition was completed a month later.[16]  In May 2022, Google unveiled a different version of Iris resembling eyeglasses with live translation capabilities during the 2022 Google I/O keynote.[14][17][18] The company began publicly testing these prototypes across the U.S. in August,[19] before expanding into Canada in October.[20] According to Business Insider, Google executives' constantly changing strategy for Project Iris frustrated employees.
+
+## 关键证据节选 2
+
+Project Iris headset is the next big thing from Google with Augmented Reality (AR) to compete with; Metaverse and upcoming tech from Microsoft and Apple. Previously, the tech giant was in the plan to bring the DayDream VR headsets as well as Google Glasses. Now, the boom of Augmented Reality might have changed the direction of the company to concentrate on the AR world making them join the league after Facebook, Microsoft, and Apple. The codename of these new AR headsets is Project Iris and Google may use a similar type of outer camera technology. The outward cameras on the headsets will blend computer graphics with a feed of the real world. The headset from Google will work wirelessly and doesn’t require any tethered connection as per the reports. Moreover, Project Iris will feature the Silicon technology chipset from the last year’s announced Pixel 6 smartphone.  This Augmented Reality headset from Google looks like a pair of “ski goggles” with cameras on them which doesn’t require external power. Furthermore, the specific chipset used on the headsets is the GS101 chipset; however, the graphic-intensive visuals are sourced from a different point. This means the headset requires an active internet connection; that receives the data from the data centers that remotely render graphics. Also Read: 9 Best PS5 Headsets For Amazing Gaming Experience As we have mentioned above the design of the prototype looks like the Ski Goggles; Google has revealed the team working behind the project.
+
+## 关键证据节选 3
+
+Project Iris is the codename for an unreleased augmented reality (AR) headset designed and developed by Google. Intended to resemble ordinary eyeglasses and for a 2024 release, it was canceled in early 2023.  Following the highly publicized failure of Google Glass smartglasses in 2013, Google executives were initially disinclined to re-enter the field of wearable AR technology. However, by 2021, work had begun on a new AR headset, later reported to be codenamed Project Iris. After going through numerous iterations, Google unveiled a version of Iris at the 2022 Google I/O keynote before publicly testing prototype models later that year. The following year, Google was reported to have abandoned the project in the midst of company-wide layoffs and internal turmoil.  Google first experimented with the prospect of smartglasses with the introduction of Google Glass in 2013.[1] The product was panned by critics due to privacy and ethical concerns,[2] leading Google to discontinue the consumer-facing model and focus on the enterprise model.
+
+## 关键证据节选 4
+
+Google has had its eye on the augmented reality (AR) space for a very long time. Its first effort, Google Glass, flopped. The execution wasn’t exactly ideal, giving rise to the “Glassholes” epithet, but perhaps its second try — Project Iris — will be better. Project Iris is the codename for Google’s latest foray into AR, according to a report from The Verge. Its existence isn’t a complete surprise. The search giant acquired North, a company specialising in smart glasses, in 2020. A new version of its smart headwear was always a possibility. The report cites two people “familiar with the project”, and claims that the target launch date for these glasses is 2024. There are no visuals accompanying this information, so we’ll have to use our imagination a little. While Google Glass looked like a Saiyan scouter designed by someone who can see Table Mountain from their office, these will be more like ski goggles in terms of design. Which might not be a bad thing. The additional screen space will allow for more information to be displayed at a time. Google Glass only had a very small screen over one eye. The proposed new design will carry loads more data, enhancing the AR headset’s potential functionality. But, the report says, Project Iris is still a secret one.
+
+## 关键证据节选 5
+
+If you’ve ever wanted to Google search with your eyes, we’ve got great news. The Verge reported on Thursday that Google is in the early stages of development on Project Iris, the codename for an upcoming augmented reality headset with a planned 2024 launch window. The report noted that the 2024 window isn’t set in stone and the device could launch later. As for what Project Iris can actually do, details are scarce for the moment. Google is apparently developing Iris in a building that requires special access privileges just to get inside. However, here are a few key points we know about Iris right now based on The Verge’s reporting: They look like ski goggles There isn’t an external power source Exterior cameras place virtual objects in the user’s real-life field of view It runs on Android It uses a custom processor like the Tensor chip in Pixel smartphones An internet connection may be required for some graphical elements Other details, such as whether it’ll use Google’s existing hardware brand names (i.e., Pixel or Nest) or a new name entirely, are still up in the air. It probably won’t share a name with Google Glass, which still exists but is a purely enterprise product now.  Mashable reached out to Google for comment on this report but has yet to receive a response at the time of writing. There are several obvious ways Google could integrate its services into an AR headset.
+
+## 关键证据节选 6
+
+Welcome to a new episode of the XR Week Peek! Today there will be a new list of curated XR news, and I’m sure you will love some of them… and one of them will even make you say “what the fuuuuu…”! You read all this post and then write to me and let me know if my prediction was correct!  But before delving into the news, let me wish a wonderful 4th of July to all my friends from the US! A big hug to all of you! Do you remember the name Project Iris? Various reports indicated it as the internal codename in Google for a project meant to build augmented reality glasses. It was our hope for Google entering the AR race together with Meta and Apple. Well, it seems that our hope has died.  According to Business Insider, Google has shut down the project, which so enters officially the very crowded Google Graveyard. It seems that more than 300 people worked on the project, which was headed by Clay Bavor, the head of AR/VR efforts at Google. After an internal restructuring and the departure of Bavor a few months ago, the project was shut down. The report claims that it could be resurrected if needed because some teams working on it have not been disbanded.
+
+## 关键证据节选 7
+
+Project Iris is the codename for an unreleased augmented reality (AR) headset designed and developed by Google. Intended to resemble ordinary eyeglasses and ...
+
+## 关键证据节选 8
+
+Jan 20, 2022 ... ... Thursday that Google is in the early stages of development on Project Iris, the codename for an upcoming augmented reality headset with ...
+
+## 关键证据节选 9
+
+Jan 21, 2022 ... Project Iris is the codename for Google's latest foray into AR, according to a report from The Verge. Its existence isn't a complete ...
+
+## 关键证据节选 10
+
+Jan 24, 2022 ... The codename of these new AR headsets is Project Iris and Google may use a similar type of outer camera technology. The outward cameras on the ...

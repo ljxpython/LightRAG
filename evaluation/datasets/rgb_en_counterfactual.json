@@ -1,0 +1,1458 @@
+{
+  "dataset_id": "rgb_en_counterfactual",
+  "dataset_name": "华为 RGB 反事实抗扰基准 (EN)",
+  "benchmark_source": "Huawei Noah RGB Benchmark (AAAI 2024)",
+  "timestamp": "2026-11-16T13:57:35.385489+00:00",
+  "total_cases": 30,
+  "corpus_manifest": {
+    "documents": [
+      {
+        "file_name": "rgb_pos_000_When_is_the_premiere_of_.md",
+        "doc_id": "rgb_pos_000",
+        "title": "主题报道：When is the premiere of 'Carole King & James Taylor: Just Call Out My Name'?",
+        "type": "positive",
+        "sample_id": 0,
+        "sha256": "35ff037b47097ae45c9a39263b94d23b07f34abfdf527be72701f470c9b6929c",
+        "char_count": 4889
+      },
+      {
+        "file_name": "rgb_noise_000_When_is_the_premiere_of_.md",
+        "doc_id": "rgb_noise_000",
+        "title": "背景参考资讯：When is the premiere of 'Carole King & James Taylor: Just Call Out My Name'?",
+        "type": "noise",
+        "sample_id": 0,
+        "sha256": "52455e6eb96e57f60de02124f403a16efb9f2a798e27d8fbb9b72adf05dd1b35",
+        "char_count": 5063
+      },
+      {
+        "file_name": "rgb_pos_001_The_genre_of_the_drama_G.md",
+        "doc_id": "rgb_pos_001",
+        "title": "主题报道：The genre of the drama \"Good Sam\" is what?",
+        "type": "positive",
+        "sample_id": 1,
+        "sha256": "bf435b8ba1313f57300528ab1da249c4e3e2ea0ef008b7e714dfc3ee4336582b",
+        "char_count": 12894
+      },
+      {
+        "file_name": "rgb_noise_001_The_genre_of_the_drama_G.md",
+        "doc_id": "rgb_noise_001",
+        "title": "背景参考资讯：The genre of the drama \"Good Sam\" is what?",
+        "type": "noise",
+        "sample_id": 1,
+        "sha256": "2d074668a965f219f4f62b28272fd7ff34628de0d3c40e21a199b81d9b87a878",
+        "char_count": 3984
+      },
+      {
+        "file_name": "rgb_pos_002_Who_won_the_2022_Citrus_.md",
+        "doc_id": "rgb_pos_002",
+        "title": "主题报道：Who won the 2022 Citrus Bowl?",
+        "type": "positive",
+        "sample_id": 2,
+        "sha256": "c7ddd9d4d890ae04182ec52b79d18b7800a45aa2154b4fc7f627d53bed212c10",
+        "char_count": 1259
+      },
+      {
+        "file_name": "rgb_noise_002_Who_won_the_2022_Citrus_.md",
+        "doc_id": "rgb_noise_002",
+        "title": "背景参考资讯：Who won the 2022 Citrus Bowl?",
+        "type": "noise",
+        "sample_id": 2,
+        "sha256": "abbd9989008b3268555208703234cc8a57511db27af618e9d514fb0ed4bdf7fd",
+        "char_count": 5141
+      },
+      {
+        "file_name": "rgb_pos_003_What_position_did_Jason_.md",
+        "doc_id": "rgb_pos_003",
+        "title": "主题报道：What position did Jason Semore hold at Valdosta State before returning to Georgia Tech?",
+        "type": "positive",
+        "sample_id": 3,
+        "sha256": "008be05a18950201bbef29e771242c0263a9bf9ed882d4ded5701d953e7ebca8",
+        "char_count": 8479
+      },
+      {
+        "file_name": "rgb_noise_003_What_position_did_Jason_.md",
+        "doc_id": "rgb_noise_003",
+        "title": "背景参考资讯：What position did Jason Semore hold at Valdosta State before returning to Georgia Tech?",
+        "type": "noise",
+        "sample_id": 3,
+        "sha256": "8edec35a3b57424447675bb7bcea106ba19d5a6c9d6318d6ef3c86641fa95ac2",
+        "char_count": 4983
+      },
+      {
+        "file_name": "rgb_pos_004_How_many_vehicles_did_Te.md",
+        "doc_id": "rgb_pos_004",
+        "title": "主题报道：How many vehicles did Tesla deliver in 2021?",
+        "type": "positive",
+        "sample_id": 4,
+        "sha256": "d76d7789f75cff21a568a63fa356d9615de92cbc2de9f68200b6ade62a1f2708",
+        "char_count": 5600
+      },
+      {
+        "file_name": "rgb_noise_004_How_many_vehicles_did_Te.md",
+        "doc_id": "rgb_noise_004",
+        "title": "背景参考资讯：How many vehicles did Tesla deliver in 2021?",
+        "type": "noise",
+        "sample_id": 4,
+        "sha256": "16d3a92e7478d7357edc899d416f87c0793585fed7fa1152309739cff4fc25c5",
+        "char_count": 2422
+      },
+      {
+        "file_name": "rgb_pos_005_Which_company_acquired_S.md",
+        "doc_id": "rgb_pos_005",
+        "title": "主题报道：Which company acquired ShowBiz Cinemas?",
+        "type": "positive",
+        "sample_id": 5,
+        "sha256": "0fd1a9e8f10aab3fa24e43d67c848dcb909176055cb98baac3a1c8df5a53eb46",
+        "char_count": 10321
+      },
+      {
+        "file_name": "rgb_noise_005_Which_company_acquired_S.md",
+        "doc_id": "rgb_noise_005",
+        "title": "背景参考资讯：Which company acquired ShowBiz Cinemas?",
+        "type": "noise",
+        "sample_id": 5,
+        "sha256": "1daa65df7f30ec842cd8856728b8522b6ba56121ab679f65a9f898c3ad4004f6",
+        "char_count": 5436
+      },
+      {
+        "file_name": "rgb_pos_006_Where_is_the_Super_Bowl_.md",
+        "doc_id": "rgb_pos_006",
+        "title": "主题报道：Where is the Super Bowl held in 2022?",
+        "type": "positive",
+        "sample_id": 6,
+        "sha256": "c57bb95e5ccca8e004ca94bfc435cd7ddf52988c71f2974a2d5f2184523c01b9",
+        "char_count": 5179
+      },
+      {
+        "file_name": "rgb_noise_006_Where_is_the_Super_Bowl_.md",
+        "doc_id": "rgb_noise_006",
+        "title": "背景参考资讯：Where is the Super Bowl held in 2022?",
+        "type": "noise",
+        "sample_id": 6,
+        "sha256": "cb5cb6cd0699bd22a198561b30a99f62d498976851757fbd9b3f9aa3713f51b9",
+        "char_count": 4825
+      },
+      {
+        "file_name": "rgb_pos_007_When_will_Truth_Social_l.md",
+        "doc_id": "rgb_pos_007",
+        "title": "主题报道：When will Truth Social launch on iOS?",
+        "type": "positive",
+        "sample_id": 7,
+        "sha256": "f35a6c95cc3926d17e5216640e58b47e788204bba740bfffefa6274dd906074b",
+        "char_count": 7339
+      },
+      {
+        "file_name": "rgb_noise_007_When_will_Truth_Social_l.md",
+        "doc_id": "rgb_noise_007",
+        "title": "背景参考资讯：When will Truth Social launch on iOS?",
+        "type": "noise",
+        "sample_id": 7,
+        "sha256": "dc3eb94919de9e026d553885b156b0d11bea14f294b1fe70190acad4c3b77863",
+        "char_count": 4241
+      },
+      {
+        "file_name": "rgb_pos_008_What_won_best_drama_at_7.md",
+        "doc_id": "rgb_pos_008",
+        "title": "主题报道：What won best drama at 79th Golden Globes?",
+        "type": "positive",
+        "sample_id": 8,
+        "sha256": "c32512c3aeaaa4db665778bbe2dad4209e4f8c4ac14d57d94b49296a861c70ec",
+        "char_count": 6260
+      },
+      {
+        "file_name": "rgb_noise_008_What_won_best_drama_at_7.md",
+        "doc_id": "rgb_noise_008",
+        "title": "背景参考资讯：What won best drama at 79th Golden Globes?",
+        "type": "noise",
+        "sample_id": 8,
+        "sha256": "85824e140b4d254bbf823532e62d9530ba75408074bd3a5ebc6e81fa21ffc626",
+        "char_count": 3145
+      },
+      {
+        "file_name": "rgb_pos_009_How_much_are_GA_Tech_sof.md",
+        "doc_id": "rgb_pos_009",
+        "title": "主题报道：How much are GA Tech softball 2022 season tickets?",
+        "type": "positive",
+        "sample_id": 9,
+        "sha256": "7eb6d9d3e4660888894f51de1920f2d1b9d0f083f33e2b64b4abea9ad2e02ee8",
+        "char_count": 7025
+      },
+      {
+        "file_name": "rgb_noise_009_How_much_are_GA_Tech_sof.md",
+        "doc_id": "rgb_noise_009",
+        "title": "背景参考资讯：How much are GA Tech softball 2022 season tickets?",
+        "type": "noise",
+        "sample_id": 9,
+        "sha256": "99e28c031f643f872787628e64fe279a6e38a4cb8a0b69476304106e8dbf84e4",
+        "char_count": 5644
+      },
+      {
+        "file_name": "rgb_pos_010_When_does_the_2022_Olymp.md",
+        "doc_id": "rgb_pos_010",
+        "title": "主题报道：When does the 2022 Olympic Winter Games end?",
+        "type": "positive",
+        "sample_id": 10,
+        "sha256": "858a529ea1fdcd5c5033fa196dd4eaad523c791df7d13c8ad195a8501fb1365d",
+        "char_count": 13642
+      },
+      {
+        "file_name": "rgb_noise_010_When_does_the_2022_Olymp.md",
+        "doc_id": "rgb_noise_010",
+        "title": "背景参考资讯：When does the 2022 Olympic Winter Games end?",
+        "type": "noise",
+        "sample_id": 10,
+        "sha256": "fa987570d074e91e2fbe5dcd745ab1abefb3c19cde9a11070798b8c9bf12e5f5",
+        "char_count": 5511
+      },
+      {
+        "file_name": "rgb_pos_011_Who_won_the_Spanish_Supe.md",
+        "doc_id": "rgb_pos_011",
+        "title": "主题报道：Who won the Spanish Super Cup 2022?",
+        "type": "positive",
+        "sample_id": 11,
+        "sha256": "afe52aae7f8a2cd8b1731edf8190ed8c7f68b9a51c40953bf338ed9d64a2583b",
+        "char_count": 3485
+      },
+      {
+        "file_name": "rgb_noise_011_Who_won_the_Spanish_Supe.md",
+        "doc_id": "rgb_noise_011",
+        "title": "背景参考资讯：Who won the Spanish Super Cup 2022?",
+        "type": "noise",
+        "sample_id": 11,
+        "sha256": "c67171105b54abca64c9c85c16899d4a6f6f2feeb2c2249ec4bb19416648a17c",
+        "char_count": 1532
+      },
+      {
+        "file_name": "rgb_pos_012_How_much_is_Microsoft_ac.md",
+        "doc_id": "rgb_pos_012",
+        "title": "主题报道：How much is Microsoft acquiring Activision Blizzard for?",
+        "type": "positive",
+        "sample_id": 12,
+        "sha256": "cc0f17798c7e4a328a32e7f8321b805beae8e2d3de8d09900189d997f684bc4a",
+        "char_count": 7908
+      },
+      {
+        "file_name": "rgb_noise_012_How_much_is_Microsoft_ac.md",
+        "doc_id": "rgb_noise_012",
+        "title": "背景参考资讯：How much is Microsoft acquiring Activision Blizzard for?",
+        "type": "noise",
+        "sample_id": 12,
+        "sha256": "2b17376989ec97f90507a35730f9144f8ae14a98fbf7d7aabcc41562315c87dd",
+        "char_count": 3172
+      },
+      {
+        "file_name": "rgb_pos_013_What_is_the_price_for_a_.md",
+        "doc_id": "rgb_pos_013",
+        "title": "主题报道：What is the price for a 30-second spot during the Super Bowl 2022?",
+        "type": "positive",
+        "sample_id": 13,
+        "sha256": "e6840413b7fdf0a5801b77d7760877345288894ee2870d1e5d1cf6aaa3afdf84",
+        "char_count": 4078
+      },
+      {
+        "file_name": "rgb_noise_013_What_is_the_price_for_a_.md",
+        "doc_id": "rgb_noise_013",
+        "title": "背景参考资讯：What is the price for a 30-second spot during the Super Bowl 2022?",
+        "type": "noise",
+        "sample_id": 13,
+        "sha256": "5e577baa03319656ec214daefc6a8189fb5abe2efacbf1b1174dd9ec8ba2c542",
+        "char_count": 3492
+      },
+      {
+        "file_name": "rgb_pos_014_When_is_the_Sports_Star_.md",
+        "doc_id": "rgb_pos_014",
+        "title": "主题报道：When is the Sports Star of the Year Awards Show 2022?",
+        "type": "positive",
+        "sample_id": 14,
+        "sha256": "07b153a7e8147f08cbf4afc19d494e4d0aee6814b1004ffc2833d59380704737",
+        "char_count": 5510
+      },
+      {
+        "file_name": "rgb_noise_014_When_is_the_Sports_Star_.md",
+        "doc_id": "rgb_noise_014",
+        "title": "背景参考资讯：When is the Sports Star of the Year Awards Show 2022?",
+        "type": "noise",
+        "sample_id": 14,
+        "sha256": "47130ade1211e011da4b776f668fc6759524276093f7bd552cdc58d7c66a4477",
+        "char_count": 3816
+      },
+      {
+        "file_name": "rgb_pos_015_Who_are_the_recipients_o.md",
+        "doc_id": "rgb_pos_015",
+        "title": "主题报道：Who are the recipients of the 2022 Ivan Allen Jr. Prize for Social Courage?",
+        "type": "positive",
+        "sample_id": 15,
+        "sha256": "3f44636b13558b809cfbaf56017d456b2834bcdc0f99f27038c30db57e1def14",
+        "char_count": 6394
+      },
+      {
+        "file_name": "rgb_noise_015_Who_are_the_recipients_o.md",
+        "doc_id": "rgb_noise_015",
+        "title": "背景参考资讯：Who are the recipients of the 2022 Ivan Allen Jr. Prize for Social Courage?",
+        "type": "noise",
+        "sample_id": 15,
+        "sha256": "56f04a363ef290616cdbb166adc2b9052e313d7bda1ac41312a11de24fe2d4eb",
+        "char_count": 4104
+      },
+      {
+        "file_name": "rgb_pos_016_What_is_the_codename_for.md",
+        "doc_id": "rgb_pos_016",
+        "title": "主题报道：What is the codename for Google's AR headset project?",
+        "type": "positive",
+        "sample_id": 16,
+        "sha256": "4ad7b54c33ddaa90b552da5904151500ad9142c207ecf520c6a594d1988ebd6a",
+        "char_count": 8673
+      },
+      {
+        "file_name": "rgb_noise_016_What_is_the_codename_for.md",
+        "doc_id": "rgb_noise_016",
+        "title": "背景参考资讯：What is the codename for Google's AR headset project?",
+        "type": "noise",
+        "sample_id": 16,
+        "sha256": "c1eccb40a6f96d0bf97992bc88b3d46ad76ad02ccbff117d4b7dfcc63915c4d4",
+        "char_count": 4196
+      },
+      {
+        "file_name": "rgb_pos_017_What_is_the_name_of_Meta.md",
+        "doc_id": "rgb_pos_017",
+        "title": "主题报道：What is the name of Meta's AI supercomputer?",
+        "type": "positive",
+        "sample_id": 17,
+        "sha256": "4956ed82f7b3725f701b5e480b95fc157af834afed8af27dbe28692144f6aef3",
+        "char_count": 22705
+      },
+      {
+        "file_name": "rgb_noise_017_What_is_the_name_of_Meta.md",
+        "doc_id": "rgb_noise_017",
+        "title": "背景参考资讯：What is the name of Meta's AI supercomputer?",
+        "type": "noise",
+        "sample_id": 17,
+        "sha256": "a485a44bf0111357d9959564e720d4c190a4f2f2b4e076a277cf4a3b4a8dedd2",
+        "char_count": 5401
+      },
+      {
+        "file_name": "rgb_pos_018_When_will_American_stude.md",
+        "doc_id": "rgb_pos_018",
+        "title": "主题报道：When will American students start taking digital SAT exams?",
+        "type": "positive",
+        "sample_id": 18,
+        "sha256": "4dfe118c0a2b5bffb4e0ba5c36138f490a6b45cf7503ff67f3bf955098b9d34d",
+        "char_count": 13853
+      },
+      {
+        "file_name": "rgb_noise_018_When_will_American_stude.md",
+        "doc_id": "rgb_noise_018",
+        "title": "背景参考资讯：When will American students start taking digital SAT exams?",
+        "type": "noise",
+        "sample_id": 18,
+        "sha256": "ef2c8a159c95bbe78ca6a7af2742557bd8a70d1b989de1ad2ba92f37c7af771a",
+        "char_count": 2164
+      },
+      {
+        "file_name": "rgb_pos_019_When_do_the_Paralympic_W.md",
+        "doc_id": "rgb_pos_019",
+        "title": "主题报道：When do the Paralympic Winter Games 2022 start?",
+        "type": "positive",
+        "sample_id": 19,
+        "sha256": "74929cab97ac15ee185144053f0dab56f7dd293964e972324a5b39b5f358a86d",
+        "char_count": 4159
+      },
+      {
+        "file_name": "rgb_noise_019_When_do_the_Paralympic_W.md",
+        "doc_id": "rgb_noise_019",
+        "title": "背景参考资讯：When do the Paralympic Winter Games 2022 start?",
+        "type": "noise",
+        "sample_id": 19,
+        "sha256": "6a045db738239ebf1bf46ec70fc45a71c1803dbd1b17faf614e04a8843782a24",
+        "char_count": 1499
+      },
+      {
+        "file_name": "rgb_pos_020_Super_Bowl_2022_date.md",
+        "doc_id": "rgb_pos_020",
+        "title": "主题报道：Super Bowl 2022 date",
+        "type": "positive",
+        "sample_id": 20,
+        "sha256": "0e7445e275ebd1435d943f6f589446dc56efba5f429c2f429e2e2e94d6622547",
+        "char_count": 7236
+      },
+      {
+        "file_name": "rgb_noise_020_Super_Bowl_2022_date.md",
+        "doc_id": "rgb_noise_020",
+        "title": "背景参考资讯：Super Bowl 2022 date",
+        "type": "noise",
+        "sample_id": 20,
+        "sha256": "83c79014238973dd485534966a48554c174df9b7ec9bbeb31d4b714f6abd3589",
+        "char_count": 3590
+      },
+      {
+        "file_name": "rgb_pos_021_Who_won_the_2022_Nobel_P.md",
+        "doc_id": "rgb_pos_021",
+        "title": "主题报道：Who won the 2022 Nobel Prize for chemistry?",
+        "type": "positive",
+        "sample_id": 21,
+        "sha256": "2b6259c5e59b84fd497b17e8616fbdf8073f3dd1a23cf757e0ddb7979b9f8389",
+        "char_count": 5852
+      },
+      {
+        "file_name": "rgb_noise_021_Who_won_the_2022_Nobel_P.md",
+        "doc_id": "rgb_noise_021",
+        "title": "背景参考资讯：Who won the 2022 Nobel Prize for chemistry?",
+        "type": "noise",
+        "sample_id": 21,
+        "sha256": "1d2cd37bc5c9e4cef4a8456becb8ec9b320f7a3a89e07f7b3d37d12dba590e14",
+        "char_count": 5614
+      },
+      {
+        "file_name": "rgb_pos_022_Who_won_the_Super_Bowl_2.md",
+        "doc_id": "rgb_pos_022",
+        "title": "主题报道：Who won the Super Bowl 2022?",
+        "type": "positive",
+        "sample_id": 22,
+        "sha256": "8589c3cd30b81b3ce8684eca247f9b1314013483bd57583ad4835fd2ede6ab85",
+        "char_count": 7139
+      },
+      {
+        "file_name": "rgb_noise_022_Who_won_the_Super_Bowl_2.md",
+        "doc_id": "rgb_noise_022",
+        "title": "背景参考资讯：Who won the Super Bowl 2022?",
+        "type": "noise",
+        "sample_id": 22,
+        "sha256": "c06b71ccdb168315fb50445cba61530f2c2602cda50e4042bca642b1a02f4b1a",
+        "char_count": 5293
+      },
+      {
+        "file_name": "rgb_pos_023_Who_won_women_s_500m_spe.md",
+        "doc_id": "rgb_pos_023",
+        "title": "主题报道：Who won women's 500m speed skating at the 2022 Winter Olympics?",
+        "type": "positive",
+        "sample_id": 23,
+        "sha256": "a04cff3d04f3fa15fc2e457040f8d8c0c7228dcd97b450edfe84acee36e6efe4",
+        "char_count": 8218
+      },
+      {
+        "file_name": "rgb_noise_023_Who_won_women_s_500m_spe.md",
+        "doc_id": "rgb_noise_023",
+        "title": "背景参考资讯：Who won women's 500m speed skating at the 2022 Winter Olympics?",
+        "type": "noise",
+        "sample_id": 23,
+        "sha256": "1bfc7f5afb4a158edf18ce42e410d085a869b2b3e162b51c689a28fffd45cf3b",
+        "char_count": 3608
+      },
+      {
+        "file_name": "rgb_pos_024_When_was_Lost_Ark_game_r.md",
+        "doc_id": "rgb_pos_024",
+        "title": "主题报道：When was Lost Ark game release on Steam?",
+        "type": "positive",
+        "sample_id": 24,
+        "sha256": "7fd04173ee47c1e705d83e536dc36e1ac8bdb097e8eddfd3c708eff24344552c",
+        "char_count": 2336
+      },
+      {
+        "file_name": "rgb_noise_024_When_was_Lost_Ark_game_r.md",
+        "doc_id": "rgb_noise_024",
+        "title": "背景参考资讯：When was Lost Ark game release on Steam?",
+        "type": "noise",
+        "sample_id": 24,
+        "sha256": "71ad4f7f0da14b955d116a6b4ce99724be24bc4c6109176e26b9636d9b06efab",
+        "char_count": 2276
+      },
+      {
+        "file_name": "rgb_pos_025_What_medals_did_Jessie_D.md",
+        "doc_id": "rgb_pos_025",
+        "title": "主题报道：What medals did Jessie Diggins win in the Beijing 2022 Olympic Games?",
+        "type": "positive",
+        "sample_id": 25,
+        "sha256": "535517a65220ee2bda74b1c8f90f8764d72eedf54b07b37b0f3910efa9b635b7",
+        "char_count": 7477
+      },
+      {
+        "file_name": "rgb_noise_025_What_medals_did_Jessie_D.md",
+        "doc_id": "rgb_noise_025",
+        "title": "背景参考资讯：What medals did Jessie Diggins win in the Beijing 2022 Olympic Games?",
+        "type": "noise",
+        "sample_id": 25,
+        "sha256": "234c281aef4d30ab607c591a941f37c7dc0eba2c73bb159685010f6f99a0e160",
+        "char_count": 3986
+      },
+      {
+        "file_name": "rgb_pos_026_What_is_the_genre_of_The.md",
+        "doc_id": "rgb_pos_026",
+        "title": "主题报道：What is the genre of The Endgame (TV show)?",
+        "type": "positive",
+        "sample_id": 26,
+        "sha256": "55bc6c4852b596811e8b9d7f62d5fa24a874f76b59b2572ba88e211b73177fd3",
+        "char_count": 5564
+      },
+      {
+        "file_name": "rgb_noise_026_What_is_the_genre_of_The.md",
+        "doc_id": "rgb_noise_026",
+        "title": "背景参考资讯：What is the genre of The Endgame (TV show)?",
+        "type": "noise",
+        "sample_id": 26,
+        "sha256": "6a4f692973022f003d4b436cf88ddc4a036658c9ba466f7b75e99b19744633d4",
+        "char_count": 4509
+      },
+      {
+        "file_name": "rgb_pos_027_When_did_Russia_invade_U.md",
+        "doc_id": "rgb_pos_027",
+        "title": "主题报道：When did Russia invade Ukraine?",
+        "type": "positive",
+        "sample_id": 27,
+        "sha256": "dadfb03b42e952d88dde626f2b53894cd9d1bbae2d37cc69dd527a0f72a4126e",
+        "char_count": 10418
+      },
+      {
+        "file_name": "rgb_noise_027_When_did_Russia_invade_U.md",
+        "doc_id": "rgb_noise_027",
+        "title": "背景参考资讯：When did Russia invade Ukraine?",
+        "type": "noise",
+        "sample_id": 27,
+        "sha256": "a0de3be13b1240da6cb34f0b9c83624a404ccd40a43d0aeb31c6b3d02a55fd28",
+        "char_count": 4453
+      },
+      {
+        "file_name": "rgb_pos_028_When_was_Elden_Ring_bein.md",
+        "doc_id": "rgb_pos_028",
+        "title": "主题报道：When was Elden Ring being released?",
+        "type": "positive",
+        "sample_id": 28,
+        "sha256": "f469db615c2b25156405e02a8db53b37847a5932bb039e4fed9562ea2b866767",
+        "char_count": 5357
+      },
+      {
+        "file_name": "rgb_noise_028_When_was_Elden_Ring_bein.md",
+        "doc_id": "rgb_noise_028",
+        "title": "背景参考资讯：When was Elden Ring being released?",
+        "type": "noise",
+        "sample_id": 28,
+        "sha256": "287f2b6848ddce22718816f790799cb321463072247ffa9e549e3f84d734dbc9",
+        "char_count": 5057
+      },
+      {
+        "file_name": "rgb_pos_029_Who_did_Iga_Swiatek_defe.md",
+        "doc_id": "rgb_pos_029",
+        "title": "主题报道：Who did Iga Swiatek defeat to win the Qatar Open 2022?",
+        "type": "positive",
+        "sample_id": 29,
+        "sha256": "ec0bda1948df6cfecb3f85140b47e5c79dc747cf2cff0a4eb596889afef0d5b6",
+        "char_count": 4253
+      },
+      {
+        "file_name": "rgb_noise_029_Who_did_Iga_Swiatek_defe.md",
+        "doc_id": "rgb_noise_029",
+        "title": "背景参考资讯：Who did Iga Swiatek defeat to win the Qatar Open 2022?",
+        "type": "noise",
+        "sample_id": 29,
+        "sha256": "6ba91d2f716a012e363f5042fe7ad51ba88f38b95c4ad35bac1b63e9cdc1f55a",
+        "char_count": 4715
+      },
+      {
+        "file_name": "rgb_int_000_Who_is_the_director_of_C.md",
+        "doc_id": "rgb_int_000",
+        "title": "跨事件综合分析档案：Who is the director of 'Carole King & James Taylor: Just Call Out My Name' and when is its premiere?",
+        "type": "integration",
+        "sample_id": 0,
+        "sha256": "1d7d4e9cef784012fe980bf7945475666bed3633b9d8e53ef0e2615544acdeb6",
+        "char_count": 1119
+      },
+      {
+        "file_name": "rgb_int_001_Who_won_the_2022_and_202.md",
+        "doc_id": "rgb_int_001",
+        "title": "跨事件综合分析档案：Who won the 2022 and 2023 Citrus Bowl?",
+        "type": "integration",
+        "sample_id": 1,
+        "sha256": "c2816a65363e36bbbf880d7c6b7db92faacf19834cef793216f05d93c9b2ccf4",
+        "char_count": 19912
+      },
+      {
+        "file_name": "rgb_int_002_Where_are_the_Super_Bowl.md",
+        "doc_id": "rgb_int_002",
+        "title": "跨事件综合分析档案：Where are the Super Bowl held in 2022 and 2023?",
+        "type": "integration",
+        "sample_id": 2,
+        "sha256": "797c1f5e2c0af0b7e2b6438a19dd1658e853bd08e0f6471be56f178b397feecb",
+        "char_count": 6614
+      },
+      {
+        "file_name": "rgb_int_003_What_won_best_drama_and_.md",
+        "doc_id": "rgb_int_003",
+        "title": "跨事件综合分析档案：What won best drama and best Musical/Comedy at 79th Golden Globes?",
+        "type": "integration",
+        "sample_id": 3,
+        "sha256": "12f3eec77d03eec9b1ba561bb595875f7dff1802998d656fa8e02d5cf5ff530a",
+        "char_count": 3809
+      },
+      {
+        "file_name": "rgb_int_004_When_does_the_2022_Olymp.md",
+        "doc_id": "rgb_int_004",
+        "title": "跨事件综合分析档案：When does the 2022 Olympic Winter Games start and end?",
+        "type": "integration",
+        "sample_id": 4,
+        "sha256": "d014f9a272d6c3e78678c98430a21809b59c6d1a4316cad0ff55e7b689021948",
+        "char_count": 22583
+      },
+      {
+        "file_name": "rgb_int_005_When_do_the_Paralympic_a.md",
+        "doc_id": "rgb_int_005",
+        "title": "跨事件综合分析档案：When do the Paralympic and Olympic Winter Games 2022 start?",
+        "type": "integration",
+        "sample_id": 5,
+        "sha256": "c64ac94cc409af7deefe75b811ff1148f89990b4d4e20c66dd66ae4c6172692a",
+        "char_count": 6747
+      },
+      {
+        "file_name": "rgb_int_006_Super_Bowl_2022_date_and.md",
+        "doc_id": "rgb_int_006",
+        "title": "跨事件综合分析档案：Super Bowl 2022 date and location?",
+        "type": "integration",
+        "sample_id": 6,
+        "sha256": "fb42fd9c6b94df9bfcb10b4f31c4e9a35f406cafa54444055a846c739e5f860f",
+        "char_count": 8224
+      },
+      {
+        "file_name": "rgb_int_007_Who_are_the_winners_of_t.md",
+        "doc_id": "rgb_int_007",
+        "title": "跨事件综合分析档案：Who are the winners of the 2022 Nobel Prizes for chemistry and physics?",
+        "type": "integration",
+        "sample_id": 7,
+        "sha256": "7888f1a5857729aae81110b56ae9c29a3e13cdd525d9d5c09404755b5d9b70f0",
+        "char_count": 6466
+      },
+      {
+        "file_name": "rgb_int_008_Who_won_the_Super_Bowl_2.md",
+        "doc_id": "rgb_int_008",
+        "title": "跨事件综合分析档案：Who won the Super Bowl 2022 and who was named the MVP?",
+        "type": "integration",
+        "sample_id": 8,
+        "sha256": "b549242ba76a58f0a5c2fe198343487977f9ddfb7694fb0931b596b47e13d036",
+        "char_count": 14127
+      },
+      {
+        "file_name": "rgb_int_009_Who_won_men_s_and_women_.md",
+        "doc_id": "rgb_int_009",
+        "title": "跨事件综合分析档案：Who won men's and women's 500m speed skating at the 2022 Winter Olympics?",
+        "type": "integration",
+        "sample_id": 9,
+        "sha256": "bae5405150c1bb2fe1f4d41d073d1ab5870a0c7421ab97018d22128f034c8611",
+        "char_count": 13906
+      },
+      {
+        "file_name": "rgb_int_010_When_were_Elden_Ring_and.md",
+        "doc_id": "rgb_int_010",
+        "title": "跨事件综合分析档案：When were Elden Ring and Splatoon 3 being released?",
+        "type": "integration",
+        "sample_id": 10,
+        "sha256": "cfb906973b9c39ab219ae7af65aa00a1f0efd39ca4299650adf495488b896c1b",
+        "char_count": 15894
+      },
+      {
+        "file_name": "rgb_int_011_Who_were_the_Male_and_Fe.md",
+        "doc_id": "rgb_int_011",
+        "title": "跨事件综合分析档案：Who were the Male and Female Vocalists of the Year at the 2022 CMA?",
+        "type": "integration",
+        "sample_id": 11,
+        "sha256": "23017c1dc9b77e3eb6022d686eab406d571eb416366a5cbadd1a2025b0c2c15c",
+        "char_count": 16257
+      },
+      {
+        "file_name": "rgb_int_012_What_chips_do_the_iPhone.md",
+        "doc_id": "rgb_int_012",
+        "title": "跨事件综合分析档案：What chips do the iPhone 14 and iPhone 14 pro have?",
+        "type": "integration",
+        "sample_id": 12,
+        "sha256": "12e46b4d5a810b7696578da3cf454cc0ec999acb74619df99980cc68027c5175",
+        "char_count": 8613
+      },
+      {
+        "file_name": "rgb_int_013_When_and_where_is_Google.md",
+        "doc_id": "rgb_int_013",
+        "title": "跨事件综合分析档案：When and where is Google I/O 2022 scheduled to take place?",
+        "type": "integration",
+        "sample_id": 13,
+        "sha256": "0d182d3bf4eb390a2434c227a1375d9011b25347fc21ca7c3097681568d1f10b",
+        "char_count": 4121
+      },
+      {
+        "file_name": "rgb_int_014_What_films_won_the_2022_.md",
+        "doc_id": "rgb_int_014",
+        "title": "跨事件综合分析档案：What films won the 2022 and 2023 Academy Awards for Best Picture?",
+        "type": "integration",
+        "sample_id": 14,
+        "sha256": "f058fa84b64d6209cfe709b4446486d7a65104effa13420adc5797933a56424b",
+        "char_count": 43304
+      },
+      {
+        "file_name": "rgb_int_015_When_will_the_95th_and_9.md",
+        "doc_id": "rgb_int_015",
+        "title": "跨事件综合分析档案：When will the 95th and 94th Academy Awards be held?",
+        "type": "integration",
+        "sample_id": 15,
+        "sha256": "3f0999cfe0bd290fe243481006d05ba08d01b95ef55c710540c897025d9a5421",
+        "char_count": 25937
+      },
+      {
+        "file_name": "rgb_int_016_What_won_Album_of_the_Ye.md",
+        "doc_id": "rgb_int_016",
+        "title": "跨事件综合分析档案：What won Album of the Year at the GRAMMYs 2022 and what was the song of the year?",
+        "type": "integration",
+        "sample_id": 16,
+        "sha256": "e1ee73b331a4cf4dfae046c53c033766a095e8a194ccb66827415b67961da478",
+        "char_count": 1108
+      },
+      {
+        "file_name": "rgb_int_017_Who_won_the_men_s_and_wo.md",
+        "doc_id": "rgb_int_017",
+        "title": "跨事件综合分析档案：Who won the men's and women's singles Australian Open 2022?",
+        "type": "integration",
+        "sample_id": 17,
+        "sha256": "881c4a3746b94c072a059ef13b244749cd46e87f2ea101c4fcedc21eef13787e",
+        "char_count": 14499
+      },
+      {
+        "file_name": "rgb_int_018_Who_won_the_men_s_and_wo.md",
+        "doc_id": "rgb_int_018",
+        "title": "跨事件综合分析档案：Who won the men's and women's singles Australian Open 2023?",
+        "type": "integration",
+        "sample_id": 18,
+        "sha256": "56a29458578c87972866af919227a8d9e25f3159111ca75d482793b1f0aa6d4a",
+        "char_count": 31223
+      },
+      {
+        "file_name": "rgb_int_019_Who_are_the_champions_of.md",
+        "doc_id": "rgb_int_019",
+        "title": "跨事件综合分析档案：Who are the champions of the French Open 2022 in men's and women's singles? ",
+        "type": "integration",
+        "sample_id": 19,
+        "sha256": "0a814dfb4d1939ec6062598814d4b830b2b8d77acecc1922e6296591d9c76304",
+        "char_count": 19485
+      },
+      {
+        "file_name": "rgb_int_020_Who_won_the_men_s_and_wo.md",
+        "doc_id": "rgb_int_020",
+        "title": "跨事件综合分析档案：Who won the men's and women's singles French Open 2023?",
+        "type": "integration",
+        "sample_id": 20,
+        "sha256": "f652a729bb7a2f4cf717643c05afdf45d269c7f8ab3fac090efa093f3ba6b8ae",
+        "char_count": 19093
+      },
+      {
+        "file_name": "rgb_int_021_Who_are_the_runners-up_i.md",
+        "doc_id": "rgb_int_021",
+        "title": "跨事件综合分析档案：Who are the runners-up in the men's and women's singles at the 2023 French Open?",
+        "type": "integration",
+        "sample_id": 21,
+        "sha256": "e99898f4a2e5145156a26c6f03bfd6b88fd1d6b7bc29374817ee594a63a1b62f",
+        "char_count": 18260
+      },
+      {
+        "file_name": "rgb_int_022_Who_are_the_champion_of_.md",
+        "doc_id": "rgb_int_022",
+        "title": "跨事件综合分析档案：Who are the champion of the men's and women's singles at Wimbledon 2022?",
+        "type": "integration",
+        "sample_id": 22,
+        "sha256": "ad5a7d17f8ade56eacd2a17429ba9d64efb39e0181574088a324d0648b26fce8",
+        "char_count": 16547
+      },
+      {
+        "file_name": "rgb_int_023_Who_are_the_champion_of_.md",
+        "doc_id": "rgb_int_023",
+        "title": "跨事件综合分析档案：Who are the champion of the men's and women's singles at Wimbledon 2023?",
+        "type": "integration",
+        "sample_id": 23,
+        "sha256": "ab3e8896279acc28c1d16618f70fdcac67ad0f8abf4f29264f9987f719ff78fd",
+        "char_count": 33575
+      },
+      {
+        "file_name": "rgb_int_024_How_many_titles_have_bot.md",
+        "doc_id": "rgb_int_024",
+        "title": "跨事件综合分析档案：How many titles have both Swiatek and Djokovic won in the 2022 season?",
+        "type": "integration",
+        "sample_id": 24,
+        "sha256": "871789d002b531d909e9207c0e27bee3e33d46a5aaf3cccf03a45bfe5262e570",
+        "char_count": 12400
+      },
+      {
+        "file_name": "rgb_int_025_Who_are_the_champions_of.md",
+        "doc_id": "rgb_int_025",
+        "title": "跨事件综合分析档案：Who are the champions of the U.S. Open 2022 men's and women's singles?",
+        "type": "integration",
+        "sample_id": 25,
+        "sha256": "18c55bdf0a13132521e07bb2460690f3efbe7a083d9d0f05a7637a2e5734f536",
+        "char_count": 15453
+      },
+      {
+        "file_name": "rgb_int_026_What_were_Tesla_s_revenu.md",
+        "doc_id": "rgb_int_026",
+        "title": "跨事件综合分析档案：What were Tesla's revenues in Q1 and Q2 of 2022 respectively?",
+        "type": "integration",
+        "sample_id": 26,
+        "sha256": "d9927876236c5429652e10b61c94d52be07e2d08eba377e0cdcfa8303367baa5",
+        "char_count": 592
+      },
+      {
+        "file_name": "rgb_int_027_Who_won_the_French_Presi.md",
+        "doc_id": "rgb_int_027",
+        "title": "跨事件综合分析档案：Who won the French Presidential Election 2022 and who were the candidates?",
+        "type": "integration",
+        "sample_id": 27,
+        "sha256": "c2c616ca86c493f7bb0834b3c2b3c66e5d728727327007b9d6f4f3a811231c05",
+        "char_count": 10148
+      },
+      {
+        "file_name": "rgb_int_028_Where_and_when_will_the_.md",
+        "doc_id": "rgb_int_028",
+        "title": "跨事件综合分析档案：Where and when will the 2022 Met Gala take place?",
+        "type": "integration",
+        "sample_id": 28,
+        "sha256": "6590b410693c9c84b4a59769ff3013dd1bac1849ac31fa2abf5cd24fd9b899d9",
+        "char_count": 16357
+      },
+      {
+        "file_name": "rgb_int_029_What_were_the_revenues_o.md",
+        "doc_id": "rgb_int_029",
+        "title": "跨事件综合分析档案：What were the revenues of Apple and Google in Q3 2022?",
+        "type": "integration",
+        "sample_id": 29,
+        "sha256": "d244ba9ee128d66326e27c2045ccbe0f42070cecf91d57e12266598fb6a4136c",
+        "char_count": 8980
+      }
+    ],
+    "source_docs": [
+      "rgb_pos_000_When_is_the_premiere_of_.md",
+      "rgb_noise_000_When_is_the_premiere_of_.md",
+      "rgb_pos_001_The_genre_of_the_drama_G.md",
+      "rgb_noise_001_The_genre_of_the_drama_G.md",
+      "rgb_pos_002_Who_won_the_2022_Citrus_.md",
+      "rgb_noise_002_Who_won_the_2022_Citrus_.md",
+      "rgb_pos_003_What_position_did_Jason_.md",
+      "rgb_noise_003_What_position_did_Jason_.md",
+      "rgb_pos_004_How_many_vehicles_did_Te.md",
+      "rgb_noise_004_How_many_vehicles_did_Te.md",
+      "rgb_pos_005_Which_company_acquired_S.md",
+      "rgb_noise_005_Which_company_acquired_S.md",
+      "rgb_pos_006_Where_is_the_Super_Bowl_.md",
+      "rgb_noise_006_Where_is_the_Super_Bowl_.md",
+      "rgb_pos_007_When_will_Truth_Social_l.md",
+      "rgb_noise_007_When_will_Truth_Social_l.md",
+      "rgb_pos_008_What_won_best_drama_at_7.md",
+      "rgb_noise_008_What_won_best_drama_at_7.md",
+      "rgb_pos_009_How_much_are_GA_Tech_sof.md",
+      "rgb_noise_009_How_much_are_GA_Tech_sof.md",
+      "rgb_pos_010_When_does_the_2022_Olymp.md",
+      "rgb_noise_010_When_does_the_2022_Olymp.md",
+      "rgb_pos_011_Who_won_the_Spanish_Supe.md",
+      "rgb_noise_011_Who_won_the_Spanish_Supe.md",
+      "rgb_pos_012_How_much_is_Microsoft_ac.md",
+      "rgb_noise_012_How_much_is_Microsoft_ac.md",
+      "rgb_pos_013_What_is_the_price_for_a_.md",
+      "rgb_noise_013_What_is_the_price_for_a_.md",
+      "rgb_pos_014_When_is_the_Sports_Star_.md",
+      "rgb_noise_014_When_is_the_Sports_Star_.md",
+      "rgb_pos_015_Who_are_the_recipients_o.md",
+      "rgb_noise_015_Who_are_the_recipients_o.md",
+      "rgb_pos_016_What_is_the_codename_for.md",
+      "rgb_noise_016_What_is_the_codename_for.md",
+      "rgb_pos_017_What_is_the_name_of_Meta.md",
+      "rgb_noise_017_What_is_the_name_of_Meta.md",
+      "rgb_pos_018_When_will_American_stude.md",
+      "rgb_noise_018_When_will_American_stude.md",
+      "rgb_pos_019_When_do_the_Paralympic_W.md",
+      "rgb_noise_019_When_do_the_Paralympic_W.md",
+      "rgb_pos_020_Super_Bowl_2022_date.md",
+      "rgb_noise_020_Super_Bowl_2022_date.md",
+      "rgb_pos_021_Who_won_the_2022_Nobel_P.md",
+      "rgb_noise_021_Who_won_the_2022_Nobel_P.md",
+      "rgb_pos_022_Who_won_the_Super_Bowl_2.md",
+      "rgb_noise_022_Who_won_the_Super_Bowl_2.md",
+      "rgb_pos_023_Who_won_women_s_500m_spe.md",
+      "rgb_noise_023_Who_won_women_s_500m_spe.md",
+      "rgb_pos_024_When_was_Lost_Ark_game_r.md",
+      "rgb_noise_024_When_was_Lost_Ark_game_r.md",
+      "rgb_pos_025_What_medals_did_Jessie_D.md",
+      "rgb_noise_025_What_medals_did_Jessie_D.md",
+      "rgb_pos_026_What_is_the_genre_of_The.md",
+      "rgb_noise_026_What_is_the_genre_of_The.md",
+      "rgb_pos_027_When_did_Russia_invade_U.md",
+      "rgb_noise_027_When_did_Russia_invade_U.md",
+      "rgb_pos_028_When_was_Elden_Ring_bein.md",
+      "rgb_noise_028_When_was_Elden_Ring_bein.md",
+      "rgb_pos_029_Who_did_Iga_Swiatek_defe.md",
+      "rgb_noise_029_Who_did_Iga_Swiatek_defe.md",
+      "rgb_int_000_Who_is_the_director_of_C.md",
+      "rgb_int_001_Who_won_the_2022_and_202.md",
+      "rgb_int_002_Where_are_the_Super_Bowl.md",
+      "rgb_int_003_What_won_best_drama_and_.md",
+      "rgb_int_004_When_does_the_2022_Olymp.md",
+      "rgb_int_005_When_do_the_Paralympic_a.md",
+      "rgb_int_006_Super_Bowl_2022_date_and.md",
+      "rgb_int_007_Who_are_the_winners_of_t.md",
+      "rgb_int_008_Who_won_the_Super_Bowl_2.md",
+      "rgb_int_009_Who_won_men_s_and_women_.md",
+      "rgb_int_010_When_were_Elden_Ring_and.md",
+      "rgb_int_011_Who_were_the_Male_and_Fe.md",
+      "rgb_int_012_What_chips_do_the_iPhone.md",
+      "rgb_int_013_When_and_where_is_Google.md",
+      "rgb_int_014_What_films_won_the_2022_.md",
+      "rgb_int_015_When_will_the_95th_and_9.md",
+      "rgb_int_016_What_won_Album_of_the_Ye.md",
+      "rgb_int_017_Who_won_the_men_s_and_wo.md",
+      "rgb_int_018_Who_won_the_men_s_and_wo.md",
+      "rgb_int_019_Who_are_the_champions_of.md",
+      "rgb_int_020_Who_won_the_men_s_and_wo.md",
+      "rgb_int_021_Who_are_the_runners-up_i.md",
+      "rgb_int_022_Who_are_the_champion_of_.md",
+      "rgb_int_023_Who_are_the_champion_of_.md",
+      "rgb_int_024_How_many_titles_have_bot.md",
+      "rgb_int_025_Who_are_the_champions_of.md",
+      "rgb_int_026_What_were_Tesla_s_revenu.md",
+      "rgb_int_027_Who_won_the_French_Presi.md",
+      "rgb_int_028_Where_and_when_will_the_.md",
+      "rgb_int_029_What_were_the_revenues_o.md"
+    ]
+  },
+  "test_cases": [
+    {
+      "id": 1,
+      "rgb_source_id": 0,
+      "question": "Super Bowl 2021 location",
+      "expected_output": "Tampa, Florida",
+      "ground_truth": "Tampa, Florida",
+      "counterfactual_fake_answer": "Glendale, Arizona",
+      "contexts": [
+        "The game was played on February 7, 2021, at Raymond James Stadium in Tampa, Florida, the home stadium of the Buccaneers, marking the first time a team played a ...",
+        "The NFL unanimously voted at the spring meeting in Chicago to move Super Bowl LV, which will take place in February 2021, from Los Angeles to Tampa, Florida ...",
+        "Feb 7, 2021 ... Super Bowl 2021 will take place at Raymond James Stadium in Tampa, Florida, with three of the four years beyond that also already determined ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 2,
+      "rgb_source_id": 1,
+      "question": "Which country won the most medals at the 2018 Winter Olympics?",
+      "expected_output": "Norway",
+      "ground_truth": "Norway",
+      "counterfactual_fake_answer": "U.S.",
+      "contexts": [
+        "Norway set the record for most total medals at a single Winter Olympics with 39, surpassing the 37 medals of the United States won at the 2010 Winter Olympics.",
+        "More than 90 nations competed for gold across 15 events in PyeongChang, South Korea. Norway came out on top with the most medals and tied with Germany for ...",
+        "Feb 25, 2018 ... After 19 days of competition at the 2018 Winter Olympics in PyeongChang, South Korea, Norway came out on top of the final medal count.",
+        "Feb 5, 2022 ... Norway collected 39 medals in 2018, the largest haul by any country in a single Winter Olympics. The overall performance included 14 gold medals ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 3,
+      "rgb_source_id": 2,
+      "question": "Who acquired Instagram?",
+      "expected_output": "Facebook",
+      "ground_truth": "Facebook",
+      "counterfactual_fake_answer": "Apple",
+      "contexts": [
+        "Jul 27, 2022 ... When Facebook made a bid to buy Instagram in 2012 for a record-setting $1 billion, many people thought Mark Zuckerberg was making a mistake.",
+        "Apr 9, 2012 ... “Facebook announced today that it has reached an agreement to acquire Instagram, a fun, popular photo-sharing app for mobile devices. “The total ...",
+        "Sep 24, 2019 ... Instagram has become a key fixture of Facebook 's growth. Facebook bought the photo-sharing start-up for $1 billion in 2012, paying what seemed ...",
+        "Aug 4, 2020 ... Facebook's $1 billion acquisition of Instagram was a watershed moment for Big Tech. It demonstrated just how much wealth and power the ...",
+        "Jul 29, 2020 ... Facebook bought Instagram for $1 billion in 2012, a shocking sum at that time for a company with 13 employees.",
+        "Apr 9, 2012 ... Last year, documents for a standalone Facebook mobile photo sharing app were attained by TechCrunch. Now it seems Facebook would rather buy ...",
+        "Mar 11, 2023 ... Instagram is owned by Meta Platform, an American company whose former name is Facebook. Meta acquired Instagram in April 2012 for the amount ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 4,
+      "rgb_source_id": 3,
+      "question": "Who acquired WhatsApp?",
+      "expected_output": "Facebook",
+      "ground_truth": "Facebook",
+      "counterfactual_fake_answer": "Apple",
+      "contexts": [
+        "Facebook purchased WhatsApp in 2014. · Facebook's bid price was astronomical, even for Silicon Valley, with a bid at $16 billion. · WhatsApp does not use wireless ...",
+        "The service was created by WhatsApp Inc. of Mountain View, California, which was acquired by Facebook in February 2014 for approximately US$19.3 billion.",
+        "Dec 5, 2018 ... In February 2014, Facebook purchased the messaging service WhatsApp for $19 billion. The acquisition price was staggering for an app that ...",
+        "Oct 6, 2014 ... Facebook says it has wrapped up its landmark $19 billion acquisition of WhatsApp, a deal that was hashed out in Mark Zuckerberg's house over ...",
+        "Feb 19, 2014 ... - WhatsApp co-founder and CEO Jan Koum to join Facebook Board of Directors. MENLO PARK, Calif. , Feb. 19, 2014 /PRNewswire/ -- Facebook today ...",
+        "Feb 19, 2014 ... Facebook announced the purchase of the mobile messaging service WhatsApp on Wednesday, in a $19bn deal that represents the social media ...",
+        "Jan 28, 2020 ... We kick off Season 6 with a long-awaited Acquired Classic: Facebook's $22B purchase of WhatsApp in 2014, which still ranks as the largest ...",
+        "Oct 17, 2022 ... In February 2014, Facebook bought the company for $19 billion, the largest buy Facebook had to date. By 2015, WhatsApp doubled in numbers and ...",
+        "WhatsApp Sold for Billions in 2014 — Who Owns the Networking App Now? · Facebook is now the proud owner of WhatsApp. · Here's how WhatsApp works. · WhatsApp makes ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 5,
+      "rgb_source_id": 4,
+      "question": "Who won the women's singles Wimbledon in 2019?",
+      "expected_output": "Simona Halep",
+      "ground_truth": "Simona Halep",
+      "counterfactual_fake_answer": "Angelique Kerber",
+      "contexts": [
+        "Simona Halep defeated Serena Williams in the final, 6–2, 6–2 to win the ladies' singles tennis title at the 2019 Wimbledon Championships.",
+        "Simona Halep won the ladies' singles title, her second major title after the French Open in 2018. This was the first edition of the tournament to feature a ...",
+        "Jul 13, 2019 ... Simona Halep (Rom) (7) bt Serena Williams (USA) (11) 6-2 6-2 · Simona Halep (Rom) (7) bt Elina Svitolina (Ukr) (8) 6-1 6-3 · Barbora Strycova (Cze) ...",
+        "Jul 13, 2019 ... But there was no changing the one-way flow of the Wimbledon women's singles final against Simona Halep, who was playing as if in a dream.",
+        "Jul 13, 2019 ... Romania's Simona Halep beats Serena Williams to win 2019 Wimbledon title in women's singles ...",
+        "Jul 13, 2019 ... Simona Halep defeated Serena Williams in the 2019 Wimbledon final on Saturday. The Romanian produced a world-class performance to win 6-2, ...",
+        "Jul 13, 2019 ... Wimbledon 2019 Highlights: Serena Williams vs Simona Halep Tennis Score: Simona Halep thrashed Serena Williams to win her maiden Wimbledon crown ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 6,
+      "rgb_source_id": 5,
+      "question": "Who won the women's singles Wimbledon in 2018?",
+      "expected_output": "Angelique Kerber",
+      "ground_truth": "Angelique Kerber",
+      "counterfactual_fake_answer": "Ashleigh Barty",
+      "contexts": [
+        "Angelique Kerber defeated Serena Williams in the final, 6–3, 6–3 to win the ladies' singles tennis title at the 2018 Wimbledon Championships.",
+        "Jul 14, 2018 ... Angelique Kerber has won the 2018 Wimbledon women's singles bracket, beating Serena Williams in the final. By James Brady@jamesbradyisme Updated ...",
+        "Novak Djokovic won the gentlemen's singles title and Angelique Kerber won the ladies' singles title. 2018 Wimbledon Championships. Date, 2–15 July. Edition ...",
+        "Jul 14, 2018 ... The full draw for the Ladies' Singles event at Wimbledon, as Angelique Kerber wins her first title at the All England Club. Final. Angelique ...",
+        "Here is the winners list of the Wimbledon Women's Singles event from each year it has ... 2018, Angelique Kerber (Germany), Serena Williams (USA), 6–3, 6–3."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 7,
+      "rgb_source_id": 6,
+      "question": "Who won the women's singles Wimbledon in 2021?",
+      "expected_output": "Ashleigh Barty",
+      "ground_truth": "Ashleigh Barty",
+      "counterfactual_fake_answer": "Simona Halep",
+      "contexts": [
+        "Ashleigh Barty defeated Karolína Plíšková in the final, 6–3, 6–7(4–7), 6–3 to win the ladies' singles tennis title at the 2021 Wimbledon Championships.",
+        "Jul 11, 2021 ... Ashleigh Barty claimed her first Wimbledon title - and second singles Grand Slam crown - beating Karolina Pliskova 6-3 6-7 (7-4) 6-3 in a ...",
+        "The Ladies' Singles title was won by Ashleigh Barty, who defeated Karolína Plíšková in the final. 2021 Wimbledon Championships. Date, 28 June – 11 ...",
+        "Jul 10, 2021 ... Ashleigh Barty Wins Wimbledon Women's Singles Title ... The world No. 1 and tournament favorite fended off Karolina Pliskova in three sets to win ...",
+        "Jul 10, 2021 ... W. orld No1 Ashleigh Barty beat Karolina Pliskova in three sets to win the women's singles title at Wimbledon. Barty won 6-3, 6-7, 6-3 in the ...",
+        "Jun 27, 2022 ... Australian star Ashleigh Barty lifted the trophy in the 2021 women's singles event, but has since retired from the sport. That means there will ...",
+        "Jul 9, 2022 ... In 2021, Ashleigh Barty took on Karolina Pliskova in the women's singles finals. Barty came out victorious taking two of three sets to win her ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 8,
+      "rgb_source_id": 7,
+      "question": "Who won the men's singles Wimbledon in 2013?",
+      "expected_output": "Andy Murray",
+      "ground_truth": "Andy Murray",
+      "counterfactual_fake_answer": "Dominic Thiem",
+      "contexts": [
+        "Andy Murray defeated Novak Djokovic in the final, 6–4, 7–5, 6–4 to win the gentlemen's singles tennis title at the 2013 Wimbledon Championships.",
+        "Andy Murray defeated Novak Djokovic in the final in straight sets to win the 2013 Wimbledon Men Singles title, becoming the first British man in 77 years to ...",
+        "Andy Murray won the men's singles at Wimbledon with a straight-sets victory over the world No1, Novak Djokovic. ... Sun 7 Jul 2013 12.41 EDT.",
+        "Jul 16, 2023 ... ... Wimbledon Winner Novak Djokovic in Thrilling Men's Singles Final ... Wimbledon since the 2013 men's singles final against Andy Murray.",
+        "Jul 7, 2013 ... 2013 Wimbledon men's final: Andy Murray plays steady tennis to become a champion · Wimbledon 2013: Andy Murray beats Novak Djokovic for Wimbledon ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 9,
+      "rgb_source_id": 8,
+      "question": "Who won the women's singles U.S. Open in 2021?",
+      "expected_output": "Emma Raducanu",
+      "ground_truth": "Emma Raducanu",
+      "counterfactual_fake_answer": "Bianca Andreescu",
+      "contexts": [
+        "Emma Raducanu defeated Leylah Fernandez in the final, 6–4, 6–3 to win the women's singles tennis title at the 2021 US Open. She became the first qualifier ...",
+        "Sep 11, 2021 ... Emma Raducanu won the 2021 US Open women's singles title by defeating Leylah Fernandez in Arthur Ashe Stadium, while Robin Montgomery swept ...",
+        "Sep 12, 2021 ... In the first US Open final between two unseeded players, 18-year-old Emma Raducanu took home her first Grand Slam championship when she ...",
+        "Sep 12, 2021 ... US Open 2021: Emma Raducanu beats Leylah Fernandez to win women's singles title in New York · Leylah Fernandez, US Open, (Darren Carroll/USTA via ...",
+        "Sep 11, 2021 ... Emma Raducanu arrived in New York City having played in only one previous Grand Slam event. She's leaving as the 2021 U.S. Open women's ...",
+        "Aug 29, 2022 ... The reigning women's singles champion is Emma Raducanu, and she's the No. 11 seed in this year's event. Raducanu took down Leylah Fernandez in ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 10,
+      "rgb_source_id": 9,
+      "question": "Who won the men's singles U.S. Open in 2020?",
+      "expected_output": "Dominic Thiem",
+      "ground_truth": "Dominic Thiem",
+      "counterfactual_fake_answer": "Andy Murray",
+      "contexts": [
+        "Dominic Thiem defeated Alexander Zverev in the final, 2–6, 4–6, 6–4, 6–3, 7–6(8–6) to win the men's singles tennis title at the 2020 US Open.",
+        "Sep 13, 2020 ... Dominic Thiem defeats Alexander Zverev in five-set comeback to win 2020 US Open title ... WHAT HAPPENED: Dominic Thiem used every bit of his Grand ...",
+        "Dominic Thiem won the men's singles title for his first Grand Slam title. He became the first new Grand Slam men's singles champion since 2014 with his ...",
+        "Us Open Men's Singles Winners ; 2021, Daniil Medvedev (RUS), Novak Djokovic (SRB) ; 2020, Dominic Thiem (AUT), Alexander Zverev (GER) ; 2019, Rafael Nadal (ESP) ...",
+        "List of Winners of the USA Open - Men's Singles ; 2020, Dominic Thiem (Austria), Alexander Zverev (Germany) ; 2019, Rafael Nadal (Spain), Daniil Medvedev (Russia) ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 11,
+      "rgb_source_id": 10,
+      "question": "Who won the women's singles U.S. Open in 2019?",
+      "expected_output": "Bianca Andreescu",
+      "ground_truth": "Bianca Andreescu",
+      "counterfactual_fake_answer": "Emma Raducanu",
+      "contexts": [
+        "Bianca Andreescu defeated Serena Williams in the final, 6–3, 7–5 to win the women's singles tennis title at the 2019 US Open. It was her first major title, ...",
+        "Bianca Andreescu won the women's singles title, defeating Serena Williams in straight sets in the final, becoming the first Canadian to win a Grand Slam ...",
+        "List of Winners of the USA Open - Women's Singles ; 2020, Naomi Osaka (Japan), Victoria Azarenka (Belarus) ; 2019, Bianca Andreescu (Canada), Serena Williams (USA) ...",
+        "Sep 7, 2019 ... Serena Williams lost to Bianca Andreescu on Saturday in the 2019 U.S. Open women's singles final. The 19-year-old Canadian tennis star won ...",
+        "Sep 7, 2019 ... Women's Final: Serena Williams (8) vs. Bianca Andreescu (15) ... Twenty years ago, a 17-year-old Serena defeated Martina Hingis to win her first- ...",
+        "Apr 19, 2023 ... Canadian tennis player Bianca Andreescu won her first Grand Slam trophy at the 2019 US Open. She defeated 23-time winner Serena Williams 6-3, 7- ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 12,
+      "rgb_source_id": 11,
+      "question": "Who won the men's singles U.S. Open 2021?",
+      "expected_output": "Daniil Medvedev",
+      "ground_truth": "Daniil Medvedev",
+      "counterfactual_fake_answer": "Rafael Nadal",
+      "contexts": [
+        "Daniil Medvedev defeated Novak Djokovic in the final, 6–4, 6–4, 6–4 to win the men's singles tennis title at the 2021 US Open. It was his first major title ...",
+        "Sep 14, 2021 ... Daniil Medvedev defeated Novak Djokovic in the final, 6–4, 6–4, 6–4 to win the Men's Singles tennis title at the 2021 US Open Men's tennis ...",
+        "Daniil Medvedev won the men's singles title. Emma Raducanu won the women's singles title, becoming the first qualifier, male or female, to reach a major ...",
+        "Sep 12, 2021 ... Daniil Medvedev defeated Novak Djokovic in dominant fashion, 6-4, 6-4, 6-4, to win the men's singles title at the 2021 US Open. With the win ...",
+        "Sep 12, 2021 ... Novak Djokovic hugged Daniil Medvedev after the Russian defeated him in straight sets, 6-4, 6-4, 6-4, to win the men's singles title at the 2021 ...",
+        "Apr 19, 2023 ... Russian tennis player Daniil Medvedev won his first major title at the 2021 US Open with a 6-4, 6-4, 6-4 victory against Novak Djokovic. He ...",
+        "Aug 27, 2022 ... Daniil Medvedev won his first major at the US Open in 2021, ... This is after he won the 2022 NCAA men's singles championship and helped ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 13,
+      "rgb_source_id": 12,
+      "question": "What was Tesla's revenue in Q1 2021?",
+      "expected_output": "$10.4 billion",
+      "ground_truth": "$10.4 billion",
+      "counterfactual_fake_answer": "$1.39 billion",
+      "contexts": [
+        "Apr 20, 2022 ... That represents an 81 percent increase year over year, compared to $10.4 billion in revenue in Q1 2021. The company logged $679 million in ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 14,
+      "rgb_source_id": 13,
+      "question": "What was Tesla's revenue in Q2 2020?",
+      "expected_output": "$6.04 billion",
+      "ground_truth": "$6.04 billion",
+      "counterfactual_fake_answer": "$1.04 billion",
+      "contexts": [
+        "Jul 22, 2020 ... Tesla reports fourth straight quarter of profits · Earnings: $2.18 (ex-items) vs. 3 cents per share, expected. · Revenue: $6.04 billion vs. $5.37 ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 15,
+      "rgb_source_id": 14,
+      "question": "What was Tesla's revenue in Q3 2019?",
+      "expected_output": "$6.3 billion",
+      "ground_truth": "$6.3 billion",
+      "counterfactual_fake_answer": "$1.30 billion",
+      "contexts": [
+        "Oct 23, 2019 ... Tesla shares soar after crushing third-quarter earnings · Tesla reported third-quarter revenue of $6.3 billion and earnings per share, adjusted, ...",
+        "Oct 23, 2019 ... Tesla's (NASDAQ:TSLA) third-quarter earnings for 2019 saw the electric car maker post $6.3 billion in revenue, meeting Wall Street estimates ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 16,
+      "rgb_source_id": 15,
+      "question": "When was Splatoon 2 released?",
+      "expected_output": "July 21 2017/Jul 21, 2017/Jul. 21, 2017/July 21, 2017/21 July 2017/21 Jul, 2017/21 Jul., 2017/21 July, 2017",
+      "ground_truth": "July 21 2017/Jul 21, 2017/Jul. 21, 2017/July 21, 2017/21 July 2017/21 Jul, 2017/21 Jul., 2017/21 July, 2017",
+      "counterfactual_fake_answer": "July 1, 2007",
+      "contexts": [
+        "Splatoon 2 is a 2017 third-person shooter game developed and published by Nintendo for the Nintendo Switch. It was released on July 21, 2017, ...",
+        "The game was first teased on 20 October 2016 during the reveal trailer for the Nintendo Switch and released worldwide on 21 July 2017. ... A physical version of ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 17,
+      "rgb_source_id": 16,
+      "question": "Who acquired 20th Century Fox?",
+      "expected_output": "Disney",
+      "ground_truth": "Disney",
+      "counterfactual_fake_answer": "Warner Bros",
+      "contexts": [
+        "On November 6, 2017, CNBC reported The Walt Disney Company was negotiating a deal with Rupert Murdoch to acquire 21st Century Fox's filmed entertainment, cable ...",
+        "Aug 12, 2020 ... Walt Disney has brought to an end one of the best-known names in the entertainment industry, 20th Century Fox. · It comes as the legendary House ...",
+        "Disney purchased most of 21st Century Fox's assets, which included 20th Century Fox, on March 20, 2019. The studio adopted its current name as a trade name on ...",
+        "Mar 20, 2019 ... Disney now owns Fox's entire film and TV libraries — which is to say every movie and TV show made by 20th Century Fox — and has thousands of ...",
+        "Dec 14, 2017 ... The Walt Disney Company To Acquire Twenty-First Century Fox, Inc., After Spinoff Of Certain Businesses, For $52.4 Billion In Stock.",
+        "Mar 20, 2019 ... One year after the Walt Disney Co. announced the $71.3 billion merger, it's official. The deal, which closed Wednesday at 12:02 a.m. Eastern ...",
+        "Mar 19, 2019 ... At 12:02 a.m. Eastern Time tomorrow, March 20, 2019, The Walt Disney Company's acquisition of 21st Century Fox will become effective.",
+        "Dec 14, 2017 ... The Walt Disney Co. has set a $52.4 billion, all-stock deal to acquire 20th Century Fox and other entertainment and sports assets from ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 18,
+      "rgb_source_id": 17,
+      "question": "Who won the French Presidential Election 2017?",
+      "expected_output": "Emmanuel Macron",
+      "ground_truth": "Emmanuel Macron",
+      "counterfactual_fake_answer": "Marine Le Pen",
+      "contexts": [
+        "May 7, 2017 ... Voters in France chose Emmanuel Macron to be their next president. Find out where his vote was strongest, and which regions favoured his ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 19,
+      "rgb_source_id": 18,
+      "question": "Who won the US Presidential Election 2020?",
+      "expected_output": "Joe Biden",
+      "ground_truth": "Joe Biden",
+      "counterfactual_fake_answer": "Donald Trump",
+      "contexts": [
+        "View maps and real-time presidential election results for the 2020 US election. For more information ... Joe Biden wins election to be the 46th US President.",
+        "The 2020 United States elections were held on Tuesday, November 3, 2020. Democratic presidential nominee, former vice president Joe Biden, ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 20,
+      "rgb_source_id": 19,
+      "question": "When was Diablo 3 released?",
+      "expected_output": "May 15 2012/May 15, 2012/May. 15, 2012/May 15, 2012/15 May 2012/15 May, 2012/15 May., 2012/15 May, 2012",
+      "ground_truth": "May 15 2012/May 15, 2012/May. 15, 2012/May 15, 2012/15 May 2012/15 May, 2012/15 May., 2012/15 May, 2012",
+      "counterfactual_fake_answer": "May 1, 2002",
+      "contexts": [
+        "The game was launched on May 15, 2012.12:01 AM PST. Console versions were released the following year. The PC version is only playable online and does not ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 21,
+      "rgb_source_id": 20,
+      "question": "Who won the 2021 Tour de France?",
+      "expected_output": "Tadej Pogačar",
+      "ground_truth": "Tadej Pogačar",
+      "counterfactual_fake_answer": "Egan Bernal",
+      "contexts": [
+        "The race was won for the second consecutive year by Tadej Pogačar of UAE Team Emirates, becoming the youngest rider to win the Tour twice. Pogačar began to ...",
+        "Jul 20, 2021 ... The 2021 Tour de France is in the books, and what a Tour it was! Won by Slovenia's Tadej Pogačar (UAE Team Emirates), this year's French ...",
+        "Jul 21, 2021 ... After 21 frantic stages that produced 13 stage winners in total, Tadej Pogačar stood atop the Paris podium as the 2021 Tour de France champion.",
+        "Jul 18, 2021 ... Slovenia's Tadej Pogačar (UAE Team Emirates) took home the yellow jersey as the overall winner of the 2021 Tour de France."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 22,
+      "rgb_source_id": 21,
+      "question": "Who won the 2019 Tour de France?",
+      "expected_output": "Egan Bernal",
+      "ground_truth": "Egan Bernal",
+      "counterfactual_fake_answer": "Tadej Pogačar",
+      "contexts": [
+        "Egan Bernal (Team Ineos) won the 2019 Tour de France in Paris – his and Colombia's first – while Lotto Soudal's Caleb Ewan won the final stage, ...",
+        "Jul 29, 2019 ... Egan Bernal won the 106th edition of the Tour de France. He is the first cyclist from Colombia to win the race and was the youngest rider in ...",
+        "Jul 28, 2019 ... Egan Bernal officially won the 2019 Tour de France on Sunday. Bernal—the first Colombian and first Latin American Tour champion, ...",
+        "Jul 29, 2019 ... Egan Bernal becomes first Colombian to win the Tour de France · Team Ineos rider crowned champion after ride to Paris · Caleb Ewan sprints to ...",
+        "Egan Bernal is the winner of Tour de France 2019, before Geraint Thomas and Steven Kruijswijk. Caleb Ewan is the winner of the final stage.",
+        "Egan Bernal won the 106th edition of the Tour de France, while Geraint Thomas and Steven Kruijswijk rounded out the podium in Paris. Caleb Ewan sprinted to ...",
+        "Jul 29, 2019 ... Commentary: Egan Bernal's improbable pathway to the 2019 Tour de France win · Egan Bernal's long journey to the 2019 Tour de France victory ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 23,
+      "rgb_source_id": 22,
+      "question": "When was xenoblade chronicles 2 released?",
+      "expected_output": "December 1 2017/Dec 1, 2017/Dec. 1, 2017/December 1, 2017/1 December 2017/1 Dec, 2017/1 Dec., 2017/1 December, 2017",
+      "ground_truth": "December 1 2017/Dec 1, 2017/Dec. 1, 2017/December 1, 2017/1 December 2017/1 Dec, 2017/1 Dec., 2017/1 December, 2017",
+      "counterfactual_fake_answer": "December 21, 2007",
+      "contexts": [
+        "The game was announced during the Nintendo Switch Presentation on January 12, 2017. The game was released on December 1, 2017 in Japan, North America, Europe, ...",
+        "Release date. December 1, 2017 ; No. of players. Single System (1) ; Genre. Role-Playing ; Publisher. Nintendo ; ESRB rating. Teen ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 24,
+      "rgb_source_id": 23,
+      "question": "When was xenoblade chronicles X released in Japan?",
+      "expected_output": "April 29 2015/Apr 29, 2015/Apr. 29, 2015/April 29, 2015/29 April 2015/29 Apr, 2015/29 Apr., 2015/29 April, 2015",
+      "ground_truth": "April 29 2015/Apr 29, 2015/Apr. 29, 2015/April 29, 2015/29 April 2015/29 Apr, 2015/29 Apr., 2015/29 April, 2015",
+      "counterfactual_fake_answer": "April 9, 2005",
+      "contexts": [
+        "Xenoblade Chronicles X was published in Japan by Nintendo on April 29, 2015. The Japanese version came with standard and a hardware bundle featuring a version ...",
+        "It was released on April 29, 2015 in Japan and on December 4, 2015 in North America and Europe. The game was announced under the tentative title of \"X\" in a ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 25,
+      "rgb_source_id": 24,
+      "question": "When was xenoblade chronicles Definite Edition released?",
+      "expected_output": "May 29 2020/May 29, 2020/May. 29, 2020/May 29, 2020/29 May 2020/29 May, 2020/29 May., 2020/29 May, 2020",
+      "ground_truth": "May 29 2020/May 29, 2020/May. 29, 2020/May 29, 2020/29 May 2020/29 May, 2020/29 May., 2020/29 May, 2020",
+      "counterfactual_fake_answer": "May 9, 2012",
+      "contexts": [
+        "Release date. May 29, 2020 ; No. of players. Single System (1) ; Genre. Role-Playing ; Publisher. Nintendo ; ESRB rating. Teen ...",
+        "The Definitive Edition was released worldwide for the Nintendo Switch on May 29, 2020. The character design of the game have been remade to look closer to the ...",
+        "This 5 disc original soundtrack features the music used in Xenoblade Chronicles: Definitive Edition, the video game released by Nintendo on May 29, 2020 for ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 26,
+      "rgb_source_id": 25,
+      "question": "When was GPT-3 released?",
+      "expected_output": "June 2020/Jun 2020/Jun. 2020/June, 2020/Jun, 2020/Jun., 2020",
+      "ground_truth": "June 2020/Jun 2020/Jun. 2020/June, 2020/Jun, 2020/Jun., 2020",
+      "counterfactual_fake_answer": "June 2010",
+      "contexts": [
+        "Nov 19, 2021 ... OpenAI released GPT-3 in June 2020, but in contrast to GPT-2 — and to the deception of most —, they decided to set up a private API to filter ...",
+        "Mar 16, 2023 ... GPT-3 is a language model developed by OpenAI. It was released in June 2020 and quickly gained attention for its remarkable language ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 27,
+      "rgb_source_id": 26,
+      "question": "When was OpenAI founded?",
+      "expected_output": "December 2015/Dec 2015/Dec. 2015/December, 2015/Dec, 2015/Dec., 2015",
+      "ground_truth": "December 2015/Dec 2015/Dec. 2015/December, 2015/Dec, 2015/Dec., 2015",
+      "counterfactual_fake_answer": "December 2005",
+      "contexts": [
+        "OpenAI Inc was founded in December 2015 by Elon Musk, Sam Altman, Greg Brockman, Ilya Sutskever, Wojciech Zaremba, and John Schulman as a non-profit research ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 28,
+      "rgb_source_id": 27,
+      "question": "Who is the Heisman Trophy winner in 2012?",
+      "expected_output": "Johnny Manziel",
+      "ground_truth": "Johnny Manziel",
+      "counterfactual_fake_answer": "Baker Mayfield",
+      "contexts": [
+        "Dec 8, 2012 ... Johnny Manziel won the 2012 Heisman Trophy. Here's how the voting broke down. By Ethan Rothstein@ethanrothstein Dec 8, 2012, 9:10pm ...",
+        "Dec 8, 2012 ... Texas A&M quarterback Johnny Manziel has won the Heisman Trophy, becoming the first freshman to win college football's most prized ...",
+        "Dec 4, 2012 ... Johnny Manziel, better known around Texas as Johnny Football, crashed the Heisman party after he led the Aggies to an upset win over then No.1- ...",
+        "Mar 26, 2021 ... Johnny Manziel won the Heisman Trophy at Texas A&M in 2012. A fake ID and some tequila might have actually played a role in him winning it.",
+        "Dec 3, 2012 ... Tracking the Candidates ; 1. Johnny Manziel. QB | Texas A&M ; 2. Manti Te'o. LB | Notre Dame ; 3. Collin Klein. QB | Kansas State ; 4. Marqise Lee.",
+        "Kansas State quarterback Collin Klein joined Notre Dame linebacker Manti Te'o and Texas A&M freshman quarterback Johnny Manziel on Monday as the 2012 ...",
+        "Dec 3, 2012 ... Joining Klein in New York will be Johnny Manziel (Texas A&M) and Manti Te'o (Notre Dame). The 2012 Heisman winner will be announced at 7 p.m. ( ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 29,
+      "rgb_source_id": 28,
+      "question": "Who is the Walter Camp Award winner in 2017?",
+      "expected_output": "Baker Mayfield",
+      "ground_truth": "Baker Mayfield",
+      "counterfactual_fake_answer": "Joe Burrow",
+      "contexts": [
+        "Dec 7, 2017 ... 2017 College Football Awards: Baker Mayfield takes Davey O'Brien, Maxwell Awards. play. Mayfield wins Walter Camp Award (1:18).",
+        "Dec 7, 2017 ... 2017 College Football Awards: Complete list of all this season's winners ; Walter Camp Award, Player of the Year, Baker Mayfield, Oklahoma ; Home ...",
+        "Dec 7, 2017 ... Oklahoma quarterback Baker Mayfield has won the Walter Camp Award, given to the college football player of the year.",
+        "Walter Camp Award for player of the year: Baker Mayfield, Oklahoma. Doak Walker Award for best running back: Bryce Love, Stanford. Chuck Bednarik Award best ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    },
+    {
+      "id": 30,
+      "rgb_source_id": 29,
+      "question": "Who is the Maxwell Award winner in 2019?",
+      "expected_output": "Joe Burrow",
+      "ground_truth": "Joe Burrow",
+      "counterfactual_fake_answer": "Johnny Manziel",
+      "contexts": [
+        "Maxwell Award Recipients. Since 1937 · 2020 - DeVonta Smith, University of Alabama · 2019 - Joe Burrow, Louisiana State University · 2018 - Tua Tagovailoa, ...",
+        "Dec 12, 2019 ... LSU QB Joe Burrow wins Camp, O'Brien, Maxwell awards. Atlanta, GA - December ..."
+      ],
+      "challenge_type": "counterfactual_robustness",
+      "difficulty": "extreme",
+      "assertion_rule": "detect_error_or_resist_counterfactual",
+      "source_docs": []
+    }
+  ]
+}

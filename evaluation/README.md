@@ -125,30 +125,52 @@ python evaluation/deepeval_runner.py --project eval_benchmark \
 
 ---
 
-## 🏆 权威基准评测：华为诺亚方舟 RGB 评测套件
+## 🏆 权威基准评测矩阵
+
+### 1. 华为诺亚方舟 RGB 评测套件 (中英双语)
 
 基于华为诺亚方舟经典基准（RGB: Retrieval-Augmented Generation Benchmark, AAAI 2024），工程化重构为端到端全链路物理质检套件。包含 4 大专项能力集：
 
 | 评测集文件 | 题目数 | 考察维度 | 核心断言指标 |
 |---|---|---|---|
-| `datasets/rgb_zh_noise.json` | 30 题 | **噪声鲁棒性 (Noise Robustness)** | Faithfulness, Contextual Recall & Precision (多负例干扰下的证据锁定) |
-| `datasets/rgb_zh_rejection.json` | 30 题 | **负面拒答 (Negative Rejection)** | `RefusalAssertionMetric` (未登录知识明确拒答率，杜绝幻觉妄断) |
-| `datasets/rgb_zh_integration.json` | 30 题 | **跨文档信息整合 (Multi-Hop)** | 上下文多跳实体召回率 (检验图谱相比传统向量检索的质的飞跃) |
-| `datasets/rgb_zh_counterfactual.json` | 30 题 | **反事实抗扰 (Counterfactual)** | `CounterfactualAssertionMetric` (事实错误检出率与抗扰率) |
-
-### 快速上手命令：
+| `datasets/rgb_{lang}_noise.json` | 30 题 | **噪声鲁棒性 (Noise Robustness)** | Faithfulness, Contextual Recall & Precision (多负例干扰下的证据锁定) |
+| `datasets/rgb_{lang}_rejection.json` | 30 题 | **负面拒答 (Negative Rejection)** | `RefusalAssertionMetric` (未登录知识明确拒答率，杜绝幻觉妄断) |
+| `datasets/rgb_{lang}_integration.json` | 30 题 | **跨文档信息整合 (Multi-Hop)** | 上下文多跳实体召回率 (检验图谱相比传统向量检索的质的飞跃) |
+| `datasets/rgb_{lang}_counterfactual.json` | 30 题 | **反事实抗扰 (Counterfactual)** | `CounterfactualAssertionMetric` (事实错误检出率与抗扰率) |
 
 ```bash
-# 1. 抽取语料并生成标准化评测集 (默认精选 30 题，带 90 篇物理文档 manifest)
+# 生成中文或英文 RGB 资产 (--lang zh 或 --lang en)
 python evaluation/adapters/rgb_adapter.py --lang zh --subset 30
+python evaluation/adapters/rgb_adapter.py --lang en --subset 30
+```
+
+---
+
+### 2. MultiHop-RAG 跨文档多跳推理权威基准 (COLM 2024)
+
+针对 RAG 跨多篇文档复杂多跳场景（2556 题 / 609 篇新闻），量化考核知识图谱相比纯向量单步检索的代际优势：
+
+| 评测集文件 | 题目数 | 题型 / 考察维度 | 核心断言指标 |
+|---|---|---|---|
+| `datasets/multihop_inference.json` | 25 题 | **逻辑推断多跳 (Inference)** | 上下文召回率与逻辑链条完整性 |
+| `datasets/multihop_comparison.json` | 25 题 | **跨文档实体比对 (Comparison)** | 实体属性与数值对比精确度 |
+| `datasets/multihop_temporal.json` | 25 题 | **时序演进分析 (Temporal)** | 时间元数据约束与先后因果追踪 |
+| `datasets/multihop_null.json` | 25 题 | **证据不足负面拒答 (Null Query)** | `RefusalAssertionMetric` (断言 Insufficient information 拒答) |
+| `datasets/multihop_benchmark.json` | 40 题 | **综合权威打擂集 (Comprehensive)** | 4 大类别均衡抽样，日常 CI/CD 打擂推荐基准 |
+
+#### 快速上手命令：
+
+```bash
+# 1. 抽取语料并生成标准化评测集 (默认精选 25 题/类，生成 129 篇关联物理文档)
+python evaluation/adapters/multihop_adapter.py --subset 25
 
 # 2. 为专属测试项目灌库构建图谱与向量索引
-python evaluation/ingest_samples.py --project eval_rgb_zh --docs-dir evaluation/documents/rgb_zh
+python evaluation/ingest_samples.py --project eval_multihop --docs-dir evaluation/documents/multihop
 
-# 3. 运行多跳整合打擂评测并上报 MLflow 生产大盘
+# 3. 运行 MultiHop 综合打擂评测并上报 MLflow 生产大盘
 evaluation/.eval_venv/bin/python evaluation/deepeval_runner.py \
-  --project eval_rgb_zh \
-  --dataset evaluation/datasets/rgb_zh_integration.json \
+  --project eval_multihop \
+  --dataset evaluation/datasets/multihop_benchmark.json \
   --mode mix \
   --mlflow
 ```

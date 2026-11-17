@@ -1,0 +1,19 @@
+# 背景参考资讯（干扰噪声）：When is the Sports Star of the Year Awards Show 2022?
+
+> 来源：华为诺亚方舟 RGB 官方基准对照背景切片
+
+## 相关资讯参考 1
+
+It was much different when I was growing up than it is now."When I was in college, I had an eating disorder and it took me five years to tell someone. And that's five years of my life I wish I had back." Player of the Year awards were announced for all 28 high school sports during the show. Here is a rundown of the night's award recipients.
+
+## 相关资讯参考 2
+
+Since the introduction of the category, Sports Star of the Year has worked to acknowledge and celebrate the vast array of powerful athletes throughout women's sports.  Sounders FC. Seattle Storm. UW Rowing. From the highest highs to the devastating losses, we feel each moment together as sports fans. This award celebrates the victories of our teams and the accolades of our athletes. Named for the creator of Sports Star, this award is given to one honoree each year, selected by committee as someone who has excelled in their sport and exemplifies the spirit of our state. Named after the Sports Star creator and Sports Editor of the Seattle P-I, Royal Brougham determined to create a permanent home and celebration of those legendary moments that make Washington sports what it is. About the Award Some of the most recognizable voices in Washington sports have received this award for excellence in communicating the sports stories of our state. The award pays homage to Keith Jackson, a WSU alum and beloved sports commentator. From hydroplane races to minor league baseball, Keith Jackson covered locally and as a celebrated national broadcaster for ABC Sports and ABC Radio. About the Award The recipient of this award is someone who has made an impact on the greater Seattle community through their philanthropic contributions or dedication to community. The award was given the moniker for lifelong sports fan and philanthropist, Paul G.
+
+## 相关资讯参考 3
+
+For his first full season in charge, Washington’s Kalen DeBoer was named Pac-12 Coach of the Year.  The Sports Star of the Year Awards Show acknowledges and celebrates the vast array of athletes throughout sports. Once an individual has won an award in a category, they cannot be nominated again.  #88SSY #SportsStar About the Nominees Sign up with your email address to receive news and updates from Seattle Sports Commission Our Office is Located:  1250 1st Ave South Seattle, WA 98134info@seattlesports.
+
+## 相关资讯参考 4
+
+*This award is presented in partnership with the King County Play Equity Coalition to highlight sports organizations committed to providing equitable access to all who want to play. Tiago Viernes Tiago Viernes was 2 years old when he was diagnosed with stage 4 neuroblastoma. His body was filled with cancer cells, and he was near death. At Seattle Children’s Hospital, he underwent chemotherapy, surgery, two stem-cell transplants, radiation treatment and immunotherapy. After 18 months of treatment, he was officially declared NED (no evidence of disease).  He has been cancer free for the past 6 years and can be found at the nearest baseball diamond or soccer pitch, thriving, and playing -- a true inspiration. Pete Carroll | Seattle Seahawks | Head Coach Kalen DeBoer | University of Washington | Head Coach, Football           Laura Harvey | OL Reign | Head Coach Noelle Quinn | Seattle Storm | Head Coach Scott Servais | Seattle Mariners | Manager Chris Victor | Seattle University | Head Coach, Men’s Basketball View the press release Ken Griffey Jr. Apolo Ohno. Russell Wilson. Washington athletes have been honored from a variety of sports over the last nine decades. The wonderful thing about Sports Star is the celebration of other key people in athletics, with the inaugural award going to referee Bobby Morris. Sue Bird. Hope Solo. Courtney Thompson.

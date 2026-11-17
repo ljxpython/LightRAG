@@ -1,0 +1,51 @@
+# 主题报道：Which company acquired ShowBiz Cinemas?
+
+> 来源：华为诺亚方舟 RGB 官方基准正向语料（ID: 5）
+
+## 关键证据节选 1
+
+Evo Entertainment Group has acquired 100 percent of the stock of Showbiz Cinemas in an all-cash deal. The companies did not disclose the full details of the acquisition. "Today is a monumental moment for our company and our industry,” said Mitch Roberts, founder and CEO of Evo Entertainment Group and 2022 Forbes 30 Under 30 honoree. “This transaction establishes Evo as the country’s largest operator of cinema-entertainment centers and paves the way for accelerated progress and innovation within a new era of cinema.” Roberts and Kevin Mitchell, CEO and founder of Showbiz Cinemas, represent multiple generations in the cinema business. Their pioneering of cinema entertainment centers has been a genuine success. Said Mitchell, "It is a wonderful time to entrust the company I started to a fourth-generation motion picture exhibitor and family member, because Showbiz Cinemas just had an all-time record-breaking holiday season! I am confident that Mitch’s leadership and Marbella’s capital strength will ensure a long and successful run for Showbiz, and I now look forward to exploring new ventures both in and out of the entertainment industry.
+
+## 关键证据节选 2
+
+EVO Entertainment Group has acquired ShowBiz Cinemas in an all-cash deal, it was announced Monday (Jan. 3). The acquisition is the first major transaction to arise under the partnership between EVO and Marbella Interests, the family office of Formentera Partners founder and former Parsley Energy founder and CEO Bryan Sheffield. The combined operation is comprised of 16 venues boasting 148 screens, 108 bowling lanes, nine full-service restaurants and bars, a 3,000-capacity live music space and over 30,000 square feet of gaming and attractions across Texas, Florida, Oklahoma and Wyoming. EVO will continue expanding in 2022 with additional locations currently under construction. “Today is a monumental moment for our company and our industry,” said Mitch Roberts, founder and CEO of EVO Entertainment Group. “This transaction establishes EVO as the country’s largest operator of cinema-entertainment centers and paves the way for accelerated progress and innovation within a new era of cinema.” ShowBiz Cinemas CEO and Founder Kevin Mitchell added, “It is a wonderful time to entrust the company I started to a fourth-generation motion picture exhibitor and family member, because Showbiz Cinemas just had an all-time record-breaking holiday season! I am confident that Mitch’s leadership and Marbella’s capital strength will ensure a long and successful run for Showbiz, and I now look forward to exploring new ventures both in and out of the entertainment industry.
+
+## 关键证据节选 3
+
+Searching for your content...  In-Language News   Contact Us    888-776-0942  from 8 AM - 10 PM ET  Acquisition Establishes EVO Entertainment Group as Largest Operator of Cinema-Entertainment Centers in the Country News provided by 03 Jan, 2022, 13:00 ET Share this article AUSTIN, Texas, Jan. 3, 2022 /PRNewswire/ -- EVO Entertainment Group ("EVO") and ShowBiz Cinemas ("ShowBiz"), two leading innovators in motion picture entertainment, announced today that they have closed a transaction under which EVO has acquired 100% of the stock of Showbiz Cinemas in an all-cash deal. "Today is a monumental moment for our company and our industry," said Mitch Roberts, Founder and CEO of EVO Entertainment Group and 2022 Forbes 30 under 30 honoree. "This transaction establishes EVO as the country's largest operator of cinema-entertainment centers and paves the way for accelerated progress and innovation within a new era of cinema." Kevin Mitchell, CEO & Founder of Showbiz Cinemas, along with Mitch Roberts represent multiple generations in the cinema business. Their pioneering of cinema entertainment centers has been a smashing success.
+
+## 关键证据节选 4
+
+ShowBiz Cinemas in Kingwood is one of four locations in the Houston area. The chain has been acquired by EVO Entertainment Group. Two Texas theater entertainment companies have combined in a deal that expands Austin-based EVO Entertainment Group’s footprint to Houston and other markets. EVO Entertainment acquired 100 percent of the stock of ShowBiz Cinemas of Dallas in an all-cash deal, the companies said. The acquisition price was not disclosed. The deal comes as the industry tries to navigate COVID-19, which has reduced the number of theater goers and changing consumer habits, such as streaming releases at home rather than going out. EVO’s expansion comes as nearly 12 percent of the nation’s 5,500 theaters operating just before the coronavirus pandemic have closed, according to Comscore, a market research firm. But Mitch Roberts, founder and CEO of EVO Entertainment, said reports of the death of movie theaters are greatly exaggerated. With the release of blockbusters such as "Spider-Man: No Way Home," ShowBiz Cinemas posted its strongest holiday season since being founded in 2007, the companies said. “The demand is still there,” Roberts said. “People still want to get out and experience movies on the big screen.” Roberts sees a bright outlook as a backlog of movies held back during the pandemic are released in the coming years. Plus, he said, the same-day release of movies at theaters and on streaming platforms during the pandemic is not something that will hold.
+
+## 关键证据节选 5
+
+businessLocal Companies By Paul O'Donnell 12:17 PM on Jan 6, 2022 CST Showbiz Cinemas, a Dallas-based chain with seven movie and entertainment locations, is being acquired by an Austin firm backed by oil wildcatter and Southern Methodist University graduate Bryan Sheffield. EVO Entertainment Group said Thursday that it acquired 100% of the stock of Showbiz Cinemas in an all-cash deal. Terms weren’t disclosed. “Today is a monumental moment for our company and our industry,” Evo Entertainment Group founder and CEO Mitch Roberts said in a statement. “This transaction establishes EVO as the country’s largest operator of cinema-entertainment centers and paves the way for accelerated progress and innovation within a new era of cinema.” Roberts, who co-founded EVO in 2014, is the grandson of Cinemark founder Lee Roy Mitchell and a fourth-generation movie exhibitor. Plano-based Cinemark is one of the nation’s largest movie theater chains. Become a business insider with the latest news. By signing up you agree to our Terms of Service and Privacy Policy EVO recently partnered with Marbella Interests, the Austin-based family office of Bryan Sheffield, to back its nationwide expansion plan. Sheffield is the founder of Parsley Energy, which sold last year for $4.5 billion to Irving-based Pioneer Natural Resources. He’s now a managing partner of energy-focused private equity firm Formentera Partners.
+
+## 关键证据节选 6
+
+The Austin-based EVO Entertainment Group captured headlines during the COVID pandemic by making the best out of a bad situation. The operator turned the parking lots of their family entertainment centers into popular drive-in movie theatres and concert venues. The exhibitor even offered up its San Antonio, Texas locations to high schools for drive-in graduation ceremonies in May of 2020. We even covered their phased approach to reopening in April of that year, back when we all naive enough to think the pandemic would be over by August. Who knew we had to clarify August of which year. Well, since then EVO has continued to grow, adding more screens, bowling lanes and video games. At the end of last year EVO was operating 71 screens across nine locations as well as 38 bowling lanes and full service restaurants in three of its sites. In the first week of this year, EVO acquired 100% of ShowBiz Cinemas, a Texas-based chain with 89 screens and 79 bowling lanes across nine locations in Texas, Oklahoma, Florida, and Wyoming. The founders of both circuits are related to Lee Roy Mitchell, founder and Executive Chairman of Cinemark; Kevin Mitchell of ShowBiz Cinemas is his son and Mitch Roberts of EVO is his grandson. This has led to some speculation that the all-cash deal was a way for Mr. Mitchell to shift money around or pay himself.
+
+## 关键证据节选 7
+
+Partly cloudy skies. Hot. High around 105F. Winds S at 10 to 15 mph..                                  Partly cloudy. Low 78F. Winds S at 10 to 20 mph.  Updated: August 8, 2023 @ 2:56 am                              Now, more than ever, the world needs trustworthy reporting—but good journalism isn’t free. Please support us by subscribing or making a contribution.                           Evo Entertainment Group and ShowBiz Cinemas, two leading innovators in motion picture entertainment, announced Monday, Jan. 3, they have closed a transaction under which Evo has acquired 100% of the stock of Showbiz Cinemas in an all-cash deal. “Today is a monumental moment for our company and our industry,” said Mitch Roberts, founder and CEO of Evo Entertainment Group and 2022 Forbes 30 Under 30 honoree. “This transaction establishes Evo as the country’s largest operator of cinema-entertainment centers and paves the way for accelerated progress and innovation within a new era of cinema.” Javascript is required for you to be able to read premium content. Please enable it in your browser settings.      Log In  Keep it Clean. Please avoid obscene, vulgar, lewd, racist or sexually-oriented language. PLEASE TURN OFF YOUR CAPS LOCK. Don't Threaten. Threats of harming another person will not be tolerated. Be Truthful. Don't knowingly lie about anyone
+
+## 关键证据节选 8
+
+Jan 6, 2022 ... EVO Entertainment Group said Thursday that it acquired 100% of the stock of Showbiz Cinemas in an all-cash deal. Terms weren't disclosed.
+
+## 关键证据节选 9
+
+Jan 4, 2022 ... Evo Entertainment Group has acquired 100 percent of the stock of Showbiz Cinemas in an all-cash deal. The companies did not disclose the ...
+
+## 关键证据节选 10
+
+EVO ENTERTAINMENT GROUP ACQUIRES SHOWBIZ CINEMAS. Acquisition Establishes EVO ... ShowBiz Seeing Uptick in Business as People Return to Theaters.
+
+## 关键证据节选 11
+
+Jan 5, 2022 ... EVO Entertainment Group has acquired ShowBiz Cinemas in an all-cash deal, it was announced Monday (Jan. 3). The acquisition is the first ...
+
+## 关键证据节选 12
+
+Showbiz Cinemas was acquired by EVO Entertainment Group on Jan 3, 2022 . Transaction Name.
