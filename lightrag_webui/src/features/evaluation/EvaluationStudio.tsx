@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react'
 import {
   ActivityIcon,
   SparklesIcon,
@@ -31,6 +31,9 @@ import { useWorkspaceStore } from '@/stores/workspace'
 import { toast } from 'sonner'
 import EvaluationTaskCenter from './EvaluationTaskCenter'
 import Button from '@/components/ui/Button'
+
+// 动态惰性加载全景资产子大屏，避免膨胀首屏 bundle 体积
+const DatasetPanoramaView = React.lazy(() => import('./DatasetPanoramaView'))
 import { Card, CardContent } from '@/components/ui/Card'
 import {
   Dialog,
@@ -111,6 +114,11 @@ interface ReadinessReport {
   status: 'ready' | 'partial' | 'missing' | 'unknown'
   dataset_name: string
   project_id: string
+  target_project_id?: string
+  target_tenant_id?: string
+  target_project_name?: string
+  is_mismatched?: boolean
+  is_benchmark?: boolean
   coverage_rate: number
   total_required: number
   matched_docs: string[]
@@ -134,8 +142,8 @@ function getCaseContexts(c: TestCase | null | undefined): string[] {
 export default function EvaluationStudio() {
   const { currentTenantId, currentProjectId } = useWorkspaceStore()
 
-  // 顶层子视图切换：'cases' (考题表格) | 'tasks' (打擂任务大厅) | 'mlflow' (内嵌评测大屏)
-  const [activeSubTab, setActiveSubTab] = useState<'cases' | 'tasks' | 'mlflow'>('cases')
+  // 顶层子视图切换：'panorama' (题库全景与关系) | 'cases' (考题表格与打擂) | 'tasks' (打擂任务大厅) | 'mlflow' (内嵌评测大屏)
+  const [activeSubTab, setActiveSubTab] = useState<'panorama' | 'cases' | 'tasks' | 'mlflow'>('panorama')
 
   // MLflow 评测平台接入地址（默认直连生产真实端口 9128，支持用户持久化微调）
   const [mlflowUrl, setMlflowUrl] = useState<string>(() => {
@@ -155,6 +163,75 @@ export default function EvaluationStudio() {
   // 原材料就绪度检测状态 (Readiness Guard)
   const [readiness, setReadiness] = useState<ReadinessReport | null>(null)
   const [checkingReadiness, setCheckingReadiness] = useState(false)
+
+  // 从全景视图跳转到打擂现场
+  const handleNavigateToBattle = async (
+    datasetName: string,
+    targetProjectId: string,
+    targetTenantId?: string
+  ) => {
+    try {
+      // 1. 如果题库归属非全局且与当前激活知识库不一致，自动对齐切库
+      if (
+        targetProjectId &&
+        targetProjectId !== 'all' &&
+        targetProjectId !== currentProjectId
+      ) {
+        const tId = targetTenantId || currentTenantId || '__default'
+        const res = await fetch('/ops/workspaces/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tenant_id: tId,
+            project_id: targetProjectId
+          })
+        })
+        if (res.ok) {
+          useWorkspaceStore.getState().setCurrentWorkspace(tId, targetProjectId)
+          toast.success(`已自动对齐切换至归属知识库「${targetProjectId}」！`)
+        } else {
+          console.warn('Auto switch workspace returned non-ok status')
+        }
+      }
+
+      // 2. 预置当前选中的评测集
+      setSelectedDatasetName(datasetName)
+      await fetchDatasetDetail(datasetName)
+      await fetchReadiness(datasetName, targetProjectId !== 'all' ? targetProjectId : currentProjectId)
+
+      // 3. 切换 SubTab 到 'cases' (矩阵打擂台)
+      setActiveSubTab('cases')
+    } catch (err) {
+      console.error('Failed to navigate to battle:', err)
+      toast.error('跳转打擂现场失败')
+    }
+  }
+
+  // 手动快速切库（用于契约拦截横幅上的脱困按钮）
+  const handleQuickSwitchProject = async (targetProjectId: string, targetTenantId?: string) => {
+    try {
+      const tId = targetTenantId || currentTenantId || '__default'
+      const res = await fetch('/ops/workspaces/select', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenant_id: tId,
+          project_id: targetProjectId
+        })
+      })
+      if (res.ok) {
+        useWorkspaceStore.getState().setCurrentWorkspace(tId, targetProjectId)
+        toast.success(`已成功切换至知识库「${targetProjectId}」！`)
+        if (selectedDatasetName) {
+          await fetchReadiness(selectedDatasetName, targetProjectId)
+        }
+      } else {
+        toast.error('切换知识库失败')
+      }
+    } catch (err) {
+      toast.error(`切换知识库异常: ${err}`)
+    }
+  }
 
   // 考题在线编辑与脏状态
   const [cases, setCases] = useState<TestCase[]>([])
@@ -692,8 +769,21 @@ export default function EvaluationStudio() {
 
         {/* 顶部右侧：子视图切换 + 动作按钮 (响应式分组排版，杜绝断崖式单独折行) */}
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between xl:justify-end gap-2 shrink-0">
-          {/* 切换 Tab：表格视图 vs 打擂任务大厅 vs MLflow 嵌入大屏 */}
+          {/* 切换 Tab：全景资产 vs 表格打擂 vs 打擂任务大厅 vs MLflow 嵌入大屏 */}
           <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 text-xs font-medium shrink-0">
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('panorama')}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
+                activeSubTab === 'panorama'
+                  ? 'bg-background text-foreground shadow-xs text-indigo-600 dark:text-indigo-400 font-semibold'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <LayersIcon className="size-3.5 text-indigo-500" />
+              <span>题库资产全景</span>
+            </button>
             <button
               type="button"
               onClick={() => setActiveSubTab('cases')}
@@ -808,7 +898,28 @@ export default function EvaluationStudio() {
       </div>
 
       {/* 2. 核心内容区域：按 activeSubTab 渲染 */}
-      {activeSubTab === 'tasks' ? (
+      {activeSubTab === 'panorama' ? (
+        /* ----------------------------------------------------------------- */
+        /* 视图 A：题库与知识库资产全景大屏 (三层依赖、指标画像与直达打擂) */
+        /* ----------------------------------------------------------------- */
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <Suspense
+            fallback={
+              <div className="h-64 flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Loader2Icon className="size-6 animate-spin text-indigo-500" />
+                <span>正在载入资产全景看板...</span>
+              </div>
+            }
+          >
+            <DatasetPanoramaView
+              currentProjectId={currentProjectId}
+              currentTenantId={currentTenantId}
+              onNavigateToBattle={handleNavigateToBattle}
+              onOpenSynthModal={() => setSynthOpen(true)}
+            />
+          </Suspense>
+        </div>
+      ) : activeSubTab === 'tasks' ? (
         /* ----------------------------------------------------------------- */
         /* 视图 C：评测任务大厅与成果总览看板 */
         /* ----------------------------------------------------------------- */
@@ -1120,16 +1231,36 @@ export default function EvaluationStudio() {
 
           {/* 原料缺失置顶告警横幅 (Readiness Missing Warning) */}
           {readiness && readiness.status === 'missing' && (
-            <div className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs shrink-0 animate-in fade-in duration-200">
-              <div className="flex items-center gap-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs shrink-0 animate-in fade-in duration-200">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <AlertTriangleIcon className="size-4 shrink-0 text-rose-600 dark:text-rose-400" />
-                <div>
-                  <span className="font-semibold">【契约拦截】当前知识库完全缺失该评测集所需的全部原材料文档！</span>
+                <div className="min-w-0">
+                  <span className="font-semibold">
+                    {readiness.is_mismatched ? '【契约拦截】检测到知识库不匹配！' : '【契约拦截】当前知识库完全缺失该评测集所需的全部原材料文档！'}
+                  </span>
                   <span className="text-[11px] opacity-90 block mt-0.5">
-                    所需原材料文档缺失共 {readiness.missing_docs.length} 篇（如 {readiness.missing_docs.slice(0, 3).join(', ')}{readiness.missing_docs.length > 3 ? ' 等' : ''}）不在当前知识库中。已主动拦截矩阵打擂，请在右上角切换到对应知识库或先灌入文档！
+                    {readiness.message ||
+                      `所需原材料文档缺失共 ${readiness.missing_docs.length} 篇（如 ${readiness.missing_docs.slice(0, 3).join(', ')}${readiness.missing_docs.length > 3 ? ' 等' : ''}）不在当前知识库中。已主动拦截矩阵打擂！`}
                   </span>
                 </div>
               </div>
+
+              {readiness.target_project_id &&
+                readiness.target_project_id !== 'all' &&
+                readiness.target_project_id !== currentProjectId && (
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      handleQuickSwitchProject(
+                        readiness.target_project_id!,
+                        readiness.target_tenant_id
+                      )
+                    }
+                    className="h-7 px-3 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shrink-0 self-end sm:self-center gap-1 shadow-xs"
+                  >
+                    <span>👉 一键切换至知识库「{readiness.target_project_name || readiness.target_project_id}」</span>
+                  </Button>
+                )}
             </div>
           )}
 

@@ -73,6 +73,8 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
     t('login.consentLabel', { documents: CONSENT_LABEL_MARKER })
   )
 
+  const customLogoActive = Boolean(content.logoUrl && failedLogoUrl !== content.logoUrl)
+
   useEffect(() => {
     document.title = '登录 - OmniRAG Enterprise Studio'
   }, [])
@@ -147,10 +149,10 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
 
   if (checkingAuth || content.loading) {
     return (
-      <div className="flex min-h-dvh w-full items-center justify-center bg-[#070b14] text-slate-300">
+      <div className="flex min-h-dvh w-full items-center justify-center bg-slate-50 text-slate-600 transition-colors duration-200 dark:bg-[#070b14] dark:text-slate-300">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-          <p className="text-xs text-slate-400">正在初始化系统环境…</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">正在初始化系统环境…</p>
         </div>
       </div>
     )
@@ -204,7 +206,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
 
   return (
     <div
-      className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-[#070b14] text-slate-100"
+      className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-[#070b14] dark:text-slate-100"
       style={{
         padding: 'calc(env(safe-area-inset-top) + 1.5rem) calc(env(safe-area-inset-right) + 1.5rem) calc(env(safe-area-inset-bottom) + 1.5rem) calc(env(safe-area-inset-left) + 1.5rem)'
       }}
@@ -212,17 +214,17 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
       {/* Ambient Radial Glowing Lights */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]"
+        className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/[0.07] blur-[120px] dark:bg-emerald-500/10"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-32 right-1/4 h-[450px] w-[450px] rounded-full bg-teal-500/10 blur-[130px]"
+        className="pointer-events-none absolute -bottom-32 right-1/4 h-[450px] w-[450px] rounded-full bg-teal-500/[0.07] blur-[130px] dark:bg-teal-500/10"
       />
 
       {/* Cyber Dot Grid Pattern Overlay */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]"
+        className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-20 [background-image:radial-gradient(rgba(100,116,139,0.18)_1px,transparent_1px)] dark:[background-image:radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_80%)]"
       />
 
       {/* Top Right Controls */}
@@ -233,7 +235,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
           right: 'calc(env(safe-area-inset-right) + 1.25rem)'
         }}
       >
-        <AppSettings className="rounded-lg border border-white/10 bg-slate-900/60 p-1.5 backdrop-blur-md transition-colors hover:bg-slate-800/80" />
+        <AppSettings className="rounded-lg border border-slate-200/90 bg-white/80 p-1.5 text-slate-700 shadow-xs backdrop-blur-md transition-colors hover:bg-slate-100 hover:text-slate-900 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white" />
       </div>
 
       {/* Main Dual-Panel Layout Container */}
@@ -242,12 +244,21 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
         <div className="flex flex-col gap-6 lg:col-span-7">
           {/* Brand Header */}
           <div className="flex items-center gap-3">
-            <EnterpriseLogo size={38} withText={false} />
+            {customLogoActive ? (
+              <img
+                src={content.logoUrl!}
+                alt={content.logoAlt || content.brandTitle || 'Logo'}
+                className="h-10 w-auto max-w-[160px] object-contain"
+                onError={() => setFailedLogoUrl(content.logoUrl)}
+              />
+            ) : (
+              <EnterpriseLogo size={38} withText={false} />
+            )}
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold tracking-tight text-white">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {content.brandTitle && content.brandTitle !== 'LightRAG' ? content.brandTitle : 'OmniRAG'}
-              </span>
-              <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-emerald-400">
+              </h1>
+              <span className="rounded-md border border-emerald-600/30 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400">
                 PRO V1.5.8
               </span>
             </div>
@@ -255,10 +266,10 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
 
           {/* Hero Headline */}
           <div className="space-y-2.5">
-            <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400 sm:text-4xl">
+            <p className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-100 dark:to-slate-400 sm:text-4xl">
               企业级知识图谱增强检索平台
-            </h1>
-            <p className="max-w-xl text-sm leading-relaxed text-slate-400">
+            </p>
+            <p className="max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               融合双层实体图谱拓扑与向量语义空间，突破传统 RAG 检索视野限制，
               提供高可信、精准溯源、低幻觉的企业专家知识库服务。
             </p>
@@ -292,14 +303,14 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
               return (
                 <div
                   key={feat.title}
-                  className="group flex items-start gap-3 rounded-xl border border-white/5 bg-slate-900/40 p-3.5 backdrop-blur-sm transition-all duration-200 hover:border-emerald-500/30 hover:bg-slate-800/50"
+                  className="group flex items-start gap-3 rounded-xl border border-slate-200/90 bg-white/80 p-3.5 shadow-xs backdrop-blur-sm transition-all duration-200 hover:border-emerald-500/40 hover:bg-white hover:shadow-md dark:border-white/5 dark:bg-slate-900/40 dark:shadow-none dark:hover:border-emerald-500/30 dark:hover:bg-slate-800/50"
                 >
-                  <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400 group-hover:bg-emerald-500/20">
+                  <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 group-hover:bg-emerald-500/20 dark:text-emerald-400">
                     <IconComp className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-semibold text-slate-200">{feat.title}</h3>
-                    <p className="mt-0.5 text-[11px] text-slate-400">{feat.desc}</p>
+                    <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200">{feat.title}</h3>
+                    <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{feat.desc}</p>
                   </div>
                 </div>
               )
@@ -307,18 +318,18 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
           </div>
 
           {/* System Cluster Status */}
-          <div className="flex items-center gap-2 pt-1 text-xs text-slate-500">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+          <div className="flex items-center gap-2 pt-1 text-xs text-slate-500 dark:text-slate-400">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] dark:bg-emerald-400 dark:shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
             <span>OmniRAG 集群正常运行 · 存储引擎: NanoVectorDB · 版本 v1.5.8</span>
           </div>
         </div>
 
         {/* Right Side: Modern Glassmorphism Login Card */}
         <div className="w-full lg:col-span-5">
-          <Card className="mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-slate-900/70 p-2 shadow-2xl backdrop-blur-2xl">
+          <Card className="mx-auto w-full max-w-md rounded-2xl border border-slate-200/90 bg-white/90 p-2 shadow-2xl shadow-slate-200/60 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/70 dark:shadow-black/60">
             <CardHeader className="space-y-1.5 pb-6 pt-6 text-center">
-              <h2 className="text-xl font-bold tracking-tight text-white">OmniRAG 身份认证</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">OmniRAG 身份认证</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 使用 Agent 平台账号或 OmniRAG 专属凭据直通登入
               </p>
             </CardHeader>
@@ -327,35 +338,35 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                 <CustomizedMarkdown
                   content={content.loginMarkdown}
                   dir={content.direction}
-                  className="mb-4 text-xs text-slate-300"
+                  className="mb-4 text-xs text-slate-600 dark:text-slate-300"
                 />
               )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Username Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="username-input" className="text-xs font-medium text-slate-300">
+                  <label htmlFor="username-input" className="text-xs font-medium text-slate-700 dark:text-slate-300">
                     {t('login.username')}
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <Input
                       id="username-input"
                       placeholder={t('login.usernamePlaceholder', '请输入用户名')}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
-                      className="h-11 rounded-lg border-white/10 bg-slate-950/50 pl-10 text-sm text-white placeholder:text-slate-500 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                      className="h-11 rounded-lg border-slate-200 bg-slate-50/80 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
                     />
                   </div>
                 </div>
 
                 {/* Password Input with Show/Hide Toggle */}
                 <div className="space-y-1.5">
-                  <label htmlFor="password-input" className="text-xs font-medium text-slate-300">
+                  <label htmlFor="password-input" className="text-xs font-medium text-slate-700 dark:text-slate-300">
                     {t('login.password')}
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                     <Input
                       id="password-input"
                       type={showPassword ? 'text' : 'password'}
@@ -363,12 +374,12 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-11 rounded-lg border-white/10 bg-slate-950/50 pl-10 pr-10 text-sm text-white placeholder:text-slate-500 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                      className="h-11 rounded-lg border-slate-200 bg-slate-50/80 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -388,9 +399,9 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                         })
                       }
                       aria-label={consentLabelText}
-                      className="mt-0.5 border-slate-600 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                      className="mt-0.5 border-slate-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 dark:border-slate-600 dark:data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:border-emerald-500"
                     />
-                    <span className="text-xs leading-relaxed text-slate-400">
+                    <span className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                       {consentLabelParts.before && (
                         <label htmlFor="login-consent" className="cursor-pointer">
                           {consentLabelParts.before}
@@ -398,7 +409,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                       )}
                       <button
                         type="button"
-                        className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+                        className="text-emerald-600 underline underline-offset-2 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
                         onClick={() => setAgreementsOpen(true)}
                       >
                         {consentDocuments}
@@ -415,7 +426,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="h-11 w-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-200 hover:from-emerald-600 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-[0.99] disabled:opacity-50"
+                  className="h-11 w-full rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 font-semibold text-white shadow-lg shadow-emerald-600/25 transition-all duration-200 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-600/40 active:scale-[0.99] disabled:opacity-50"
                   disabled={loading || consentBlocked}
                 >
                   {loading ? (
@@ -430,8 +441,8 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
               </form>
 
               {/* Bottom Security Info */}
-              <div className="mt-5 border-t border-white/5 pt-4 text-center">
-                <p className="text-[11px] text-slate-500">
+              <div className="mt-5 border-t border-slate-200/80 pt-4 text-center dark:border-white/5">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
                   OmniRAG Enterprise Studio · 统一认证与访问控制保护中
                 </p>
               </div>
@@ -441,7 +452,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
           <CustomizedCopyright
             copyright={content.copyright}
             direction={content.direction}
-            className="pt-3 text-center text-xs text-slate-500"
+            className="pt-3 text-center text-xs text-slate-500 dark:text-slate-500"
           />
         </div>
       </div>
@@ -449,7 +460,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
       {/* Consent Dialog */}
       {showConsent && content.agreementsMarkdown && (
         <Dialog open={agreementsOpen} onOpenChange={setAgreementsOpen}>
-          <DialogContent className="max-h-[85vh] max-w-2xl bg-slate-900 text-slate-100 border-white/10" dir={content.direction}>
+          <DialogContent className="max-h-[85vh] max-w-2xl bg-white text-slate-900 border-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:border-white/10" dir={content.direction}>
             <DialogHeader className="sr-only">
               <DialogTitle>{consentDocuments}</DialogTitle>
             </DialogHeader>

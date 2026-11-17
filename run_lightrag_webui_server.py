@@ -676,6 +676,61 @@ async def rollback_snapshot(payload: RollbackRequest):
     }
 
 
+@ops_router.get("/documents/{doc_name:path}/raw")
+async def get_document_raw(
+    doc_name: str,
+    tenant_id: Optional[str] = None,
+    project_id: Optional[str] = None
+):
+    """Returns the raw physical file (images, PDFs, SVGs, etc.) safely from eval_data or storage."""
+    clean_name = Path(doc_name).name
+    if not clean_name or clean_name in (".", ".."):
+        raise HTTPException(status_code=400, detail="Invalid document name")
+
+    curr_tenant, curr_project = current_workspace_ctx.get()
+    t_id = tenant_id or curr_tenant
+    p_id = project_id or curr_project
+    target_dir = resolve_project_working_dir(t_id, p_id)
+
+    candidate_paths = [
+        repo_root / "eval_data" / "__parsed__" / clean_name,
+        repo_root / "eval_data" / clean_name,
+        target_dir / clean_name,
+        target_dir / "__parsed__" / clean_name,
+    ]
+
+    found_file = None
+    for cand in candidate_paths:
+        if cand.is_file():
+            found_file = cand
+            break
+
+    if not found_file:
+        for cand in storage_root.glob(f"**/{clean_name}"):
+            if cand.is_file() and ".trash" not in str(cand):
+                found_file = cand
+                break
+
+    if not found_file:
+        raise HTTPException(status_code=404, detail=f"Physical document {clean_name} not found")
+
+    suffix = found_file.suffix.lower()
+    content_types = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".svg": "image/svg+xml",
+        ".webp": "image/webp",
+        ".gif": "image/gif",
+        ".pdf": "application/pdf",
+        ".md": "text/markdown; charset=utf-8",
+        ".txt": "text/plain; charset=utf-8",
+        ".json": "application/json",
+    }
+    media_type = content_types.get(suffix, "application/octet-stream")
+    return FileResponse(found_file, media_type=media_type)
+
+
 @ops_router.get("/documents/{doc_id}/content")
 async def get_document_content(
     doc_id: str,
@@ -688,10 +743,12 @@ async def get_document_content(
     p_id = project_id or curr_project
     target_dir = resolve_project_working_dir(t_id, p_id)
 
-    # Pre-clean doc_id: handle composite <SEP> and chunk suffixes gracefully
     clean_id = doc_id.split("<SEP>")[0].split(",")[0].strip()
     if "-chunk-" in clean_id:
         clean_id = re.sub(r"-chunk-\d+$", "", clean_id)
+
+    clean_name = Path(clean_id).name
+    is_media = bool(re.search(r"\.(png|jpe?g|svg|webp|gif|pdf)$", clean_name, re.I))
 
     def load_from_dir(d: Path):
         full_content = ""
@@ -702,7 +759,6 @@ async def get_document_content(
         full_docs_file = d / "kv_store_full_docs.json"
         chunks_file = d / "kv_store_text_chunks.json"
 
-        # If clean_id is a chunk ID directly, try to reverse-lookup its full_doc_id
         if chunks_file.exists():
             try:
                 with open(chunks_file, "r", encoding="utf-8") as f:
@@ -719,6 +775,14 @@ async def get_document_content(
                 with open(full_docs_file, "r", encoding="utf-8") as f:
                     full_docs = json.load(f)
                     target_rec = full_docs.get(resolved_doc_id) or full_docs.get(clean_id)
+                    if not target_rec:
+                        for did, dval in full_docs.items():
+                            if isinstance(dval, dict):
+                                fp = dval.get("file_path") or dval.get("title") or ""
+                                if Path(fp).name == clean_id or fp == clean_id:
+                                    target_rec = dval
+                                    resolved_doc_id = did
+                                    break
                     if target_rec:
                         found = True
                         if isinstance(target_rec, dict):
@@ -757,7 +821,6 @@ async def get_document_content(
             except Exception as e:
                 logger.warning(f"Failed to read text_chunks in {d}: {e}")
 
-        # Try to resolve title from doc_status if available
         status_file = d / "kv_store_doc_status.json"
         if status_file.exists() and not doc_name:
             try:
@@ -776,7 +839,7 @@ async def get_document_content(
     found, full_content, chunks, doc_name = load_from_dir(target_dir)
     source_dir = str(target_dir)
 
-    # 2. If not found in target_dir, search across all candidate workspace revisions under storage_root
+    # 2. Search other workspaces
     if not found:
         logger.info(f"Doc {clean_id} not found in {target_dir}, searching other workspaces...")
         for cand_dir in storage_root.glob("**/kv_store_full_docs.json"):
@@ -790,28 +853,23 @@ async def get_document_content(
                 source_dir = str(wdir)
                 break
 
-    # 3. Model-parsed resolution: strictly resolve from system-parsed data (chunks or __parsed__ store), NEVER live re-extract with pypdf
+    # 3. Model-parsed resolution from parsed artifacts
     parsed_dir = target_dir / "__parsed__"
     if not parsed_dir.exists():
-        # Check parent workspace directories for __parsed__
-        for cand in [target_dir.parent / "__parsed__", target_dir.parent.parent / "__parsed__", Path("eval_data/__parsed__")]:
+        for cand in [target_dir.parent / "__parsed__", target_dir.parent.parent / "__parsed__", repo_root / "eval_data" / "__parsed__"]:
             if cand.exists():
                 parsed_dir = cand
                 break
 
-    # If full_content is empty or a pure ingest-stub but we have parsed chunks, assemble from chunks
     if (not full_content or (full_content.startswith("Title:") and "Original Path:" in full_content)) and chunks:
-        # Check if chunks contain richer parsed body than the stub
         chunk_texts = [c["content"] for c in chunks if c.get("content")]
         assembled_chunks = "\n\n".join(chunk_texts)
         if len(assembled_chunks) > len(full_content):
             full_content = assembled_chunks
 
-    # If parsed directory exists, check if model parser saved the markdown artifact
-    if parsed_dir and parsed_dir.exists() and doc_name:
-        clean_name = Path(doc_name).name
-        # Match by base name (e.g. operations.md, api.md)
-        for cand_file in parsed_dir.glob(f"{Path(clean_name).stem}*"):
+    if parsed_dir and parsed_dir.exists() and (doc_name or clean_name):
+        c_name = Path(doc_name or clean_name).name
+        for cand_file in parsed_dir.glob(f"{Path(c_name).stem}*"):
             if cand_file.is_file() and cand_file.suffix in [".md", ".txt", ".json"]:
                 try:
                     parsed_text = cand_file.read_text(encoding="utf-8")
@@ -822,16 +880,54 @@ async def get_document_content(
                 except Exception as ex:
                     logger.warning(f"Failed to read parsed artifact {cand_file}: {ex}")
 
-    # Fallback to Title if doc_name is still "unknown_source"
     if (not doc_name or doc_name == "unknown_source") and full_content.startswith("Title:"):
         title_match = re.search(r"Title:\s*([^\n\r]+)", full_content)
         if title_match:
             doc_name = title_match.group(1).strip()
 
+    # 4. 智能回退：若知识库无物理文件，但题库中包含引用该文档的支撑上下文切片，自动聚合呈现
+    is_synthetic_context = False
+    notice = ""
+    if not found or (not full_content and len(chunks) == 0):
+        datasets_dir = repo_root / "evaluation" / "datasets"
+        synth_contexts = []
+        if datasets_dir.exists():
+            for p in datasets_dir.glob("*.json"):
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        djson = json.load(f)
+                        items = []
+                        if isinstance(djson, list):
+                            items = djson
+                        elif isinstance(djson, dict):
+                            items = djson.get("test_cases") or djson.get("data") or djson.get("cases") or []
+                        for it in items:
+                            sdocs = it.get("source_docs", [])
+                            if clean_name in sdocs or any(clean_name in str(s) for s in sdocs):
+                                for ctx in it.get("contexts", []):
+                                    if ctx and ctx not in synth_contexts:
+                                        synth_contexts.append(ctx)
+                except Exception:
+                    pass
+        if synth_contexts:
+            found = True
+            is_synthetic_context = True
+            chunks = [{
+                "chunk_id": f"dataset-ctx-{i+1:03d}",
+                "tokens": len(c.split()),
+                "content": c,
+                "chunk_order_index": i
+            } for i, c in enumerate(synth_contexts)]
+            full_content = "\n\n---\n\n".join(synth_contexts)
+            notice = f"该文档尚未在当前知识库中灌库物理原件，以下切片内容提取自题库中引用该文档的 {len(chunks)} 条支撑上下文。"
+            logger.info(f"Synthesized {len(chunks)} contexts for uningested doc {clean_name}")
+
+    raw_url = f"/ops/documents/{clean_name}/raw"
+
     return {
         "status": "success",
         "doc_id": clean_id,
-        "doc_name": doc_name or clean_id,
+        "doc_name": doc_name or clean_name,
         "tenant_id": t_id,
         "project_id": p_id,
         "found": found,
@@ -839,9 +935,11 @@ async def get_document_content(
         "full_content": full_content,
         "chunks_count": len(chunks),
         "chunks": chunks,
+        "is_media": is_media,
+        "raw_url": raw_url,
+        "is_synthetic_context": is_synthetic_context,
+        "notice": notice,
     }
-
-
 # -------------------------------------------------------------
 # Evaluation & Dataset Operations Router Extension
 # -------------------------------------------------------------
@@ -917,13 +1015,35 @@ class EvalTaskManager:
         return self._tasks.get(task_id)
 
 
+def _get_project_name_map() -> Dict[str, Tuple[str, str]]:
+    """Returns mapping from project_id to (tenant_id, display_name)."""
+    mapping = {
+        "11111111-1111-4111-8111-111111111111": ("__default", "平台默认项目"),
+        "eval_benchmark": ("__default", "评测基准"),
+    }
+    try:
+        for tenant_dir in storage_root.iterdir():
+            if not tenant_dir.is_dir() or tenant_dir.name.startswith("."):
+                continue
+            for proj_dir in tenant_dir.iterdir():
+                if not proj_dir.is_dir() or proj_dir.name.startswith("."):
+                    continue
+                meta = workspace_mgr.get_project_meta(tenant_dir.name, proj_dir.name)
+                display_name = meta.get("name") or proj_dir.name
+                mapping[proj_dir.name] = (tenant_dir.name, display_name)
+    except Exception as ex:
+        logger.warning(f"Failed to scan project name map: {ex}")
+    return mapping
+
+
 eval_task_mgr = EvalTaskManager()
 
 
 @ops_router.get("/evaluation/datasets")
 async def list_evaluation_datasets():
-    """Lists all available benchmark testset datasets."""
+    """Lists all available benchmark testset datasets with project and raw material lineage."""
     datasets_dir.mkdir(parents=True, exist_ok=True)
+    proj_map = _get_project_name_map()
     results = []
     for f in sorted(datasets_dir.glob("*.json")):
         try:
@@ -932,11 +1052,86 @@ async def list_evaluation_datasets():
                 data = json.load(jf)
             manifest = data.get("corpus_manifest", {})
             cases = data.get("cases") or data.get("test_cases") or []
+            
+            # 提取题库依赖的原始文档清单
+            source_docs = manifest.get("source_docs", [])
+            if not source_docs:
+                manifest_docs = manifest.get("docs", [])
+                if manifest_docs and isinstance(manifest_docs, list):
+                    source_docs = [d.get("file_name") or d.get("file_path") for d in manifest_docs if isinstance(d, dict)]
+            if not source_docs:
+                req_set = set()
+                for c in cases:
+                    if isinstance(c, dict):
+                        for sd in c.get("source_docs", []):
+                            req_set.add(Path(sd).name)
+                source_docs = list(req_set)
+            else:
+                source_docs = [Path(d).name for d in source_docs if d]
+
+            raw_proj_id = manifest.get("project_id") or data.get("project_id")
+            
+            # 精准判断所属知识库项目：
+            # 1. multihop_* 专属对应 eval_multihop 项目
+            # 2. rgb_zh_* 专属对应 eval_rgb_zh (华为 RGB 评测基准 (中文)) 项目
+            # 3. lineage_benchmark_* 对应 eval_benchmark
+            # 4. 其他有明确 raw_proj_id 的优先采用 raw_proj_id
+            target_project_id = "all"
+            target_tenant_id = "__default"
+            target_project_name = "全局通用基准 (Cross-Project)"
+            is_benchmark = False
+
+            if f.name.startswith("multihop_"):
+                target_project_id = "eval_multihop"
+                target_tenant_id = "__default"
+                target_project_name = proj_map.get("eval_multihop", ("__default", "eval_multihop"))[1]
+                is_benchmark = False
+            elif f.name.startswith("rgb_zh_"):
+                target_project_id = "eval_rgb_zh"
+                target_tenant_id = "__default"
+                target_project_name = proj_map.get("eval_rgb_zh", ("__default", "华为 RGB 评测基准 (中文)"))[1]
+                is_benchmark = False
+            elif f.name.startswith("lineage_benchmark_") or raw_proj_id == "eval_benchmark":
+                target_project_id = "eval_benchmark"
+                target_tenant_id = "__default"
+                target_project_name = proj_map.get("eval_benchmark", ("__default", "评测基准"))[1]
+                is_benchmark = False
+            elif raw_proj_id and raw_proj_id not in ["unknown", "all", "*", "common"]:
+                target_project_id = raw_proj_id
+                target_tenant_id, target_project_name = proj_map.get(raw_proj_id, ("__default", raw_proj_id))
+                is_benchmark = False
+            else:
+                is_benchmark = True
+
+            # 抽取前 3 个用例预览
+            sample_cases = []
+            for idx, c in enumerate(cases[:3]):
+                if isinstance(c, dict):
+                    q = c.get("query") or c.get("question") or ""
+                    a = c.get("answer") or c.get("ground_truth") or c.get("expected_output") or ""
+                    ctx = c.get("context") or c.get("contexts") or []
+                    sample_cases.append({
+                        "id": c.get("id") or f"case_{idx+1}",
+                        "question": q[:200] if len(q) > 200 else q,
+                        "ground_truth": a[:200] if len(a) > 200 else a,
+                        "context_count": len(ctx) if isinstance(ctx, list) else 1 if ctx else 0,
+                    })
+
             results.append({
                 "name": f.name,
-                "project_id": manifest.get("project_id", data.get("project_id", "unknown")),
+                "project_id": target_project_id,
+                "tenant_id": target_tenant_id,
+                "project_name": target_project_name,
+                "target_project_id": target_project_id,
+                "target_project_name": target_project_name,
+                "is_benchmark": is_benchmark,
                 "revision_id": manifest.get("revision_id", "rev_1"),
                 "cases_count": len(cases),
+                "source_docs": source_docs,
+                "corpus_docs_count": len(source_docs),
+                "sample_cases": sample_cases,
+                "engine": data.get("engine", "DeepEval/DocpIvuL"),
+                "model": data.get("model", ""),
                 "size_bytes": stat.st_size,
                 "updated_at": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
             })
@@ -1025,6 +1220,40 @@ async def check_evaluation_readiness(dataset_name: str, project_id: Optional[str
     missing = [d for d in required_docs if d not in current_docs]
     total_req = len(required_docs)
 
+    proj_map = _get_project_name_map()
+    raw_proj_id = manifest.get("project_id") or data.get("project_id")
+    is_benchmark = False
+    if safe_name in ["business_qa.json", "sample_lightrag.json", "synthesized_benchmark.json"] or \
+       safe_name.startswith("multihop_") or safe_name.startswith("rgb_") or safe_name.startswith("lineage_benchmark_"):
+        is_benchmark = True
+
+    target_proj_id = "all"
+    target_tenant_id = "__default"
+    target_proj_name = "全局通用基准"
+    is_benchmark = False
+
+    if safe_name.startswith("multihop_"):
+        target_proj_id = "eval_multihop"
+        target_tenant_id = "__default"
+        target_proj_name = proj_map.get("eval_multihop", ("__default", "eval_multihop"))[1]
+    elif safe_name.startswith("rgb_zh_"):
+        target_proj_id = "eval_rgb_zh"
+        target_tenant_id = "__default"
+        target_proj_name = proj_map.get("eval_rgb_zh", ("__default", "华为 RGB 评测基准 (中文)"))[1]
+    elif safe_name.startswith("lineage_benchmark_") or raw_proj_id == "eval_benchmark":
+        target_proj_id = "eval_benchmark"
+        target_tenant_id = "__default"
+        target_proj_name = proj_map.get("eval_benchmark", ("__default", "评测基准"))[1]
+    elif raw_proj_id and raw_proj_id not in ["unknown", "all", "*", "common"]:
+        target_proj_id = raw_proj_id
+        target_tenant_id, target_proj_name = proj_map.get(raw_proj_id, ("__default", raw_proj_id))
+    else:
+        is_benchmark = True
+
+    is_mismatched = (target_proj_id != "all" and target_proj_id != proj_id)
+
+    curr_proj_name = proj_map.get(proj_id, ("__default", proj_id))[1]
+
     if total_req == 0:
         coverage = 1.0
         status = "ready"
@@ -1036,7 +1265,10 @@ async def check_evaluation_readiness(dataset_name: str, project_id: Optional[str
     elif len(matched) == 0:
         coverage = 0.0
         status = "missing"
-        message = f"原材料完全缺失！当前知识库缺少题库所需的全部 {total_req} 篇文档，强行运行必然全部失分！"
+        if is_mismatched:
+            message = f"【知识库不匹配】该评测集归属于「{target_proj_name}」，当前处于「{curr_proj_name}」（缺少全部 {total_req} 篇原材料）。点击一键切换至对应知识库即可完美就绪！"
+        else:
+            message = f"原材料完全缺失！当前知识库缺少题库所需的全部 {total_req} 篇文档，强行运行必然全部失分！"
     else:
         coverage = round(len(matched) / total_req, 2)
         status = "partial"
@@ -1046,6 +1278,11 @@ async def check_evaluation_readiness(dataset_name: str, project_id: Optional[str
         "status": status,
         "dataset_name": safe_name,
         "project_id": proj_id,
+        "target_project_id": target_proj_id,
+        "target_tenant_id": target_tenant_id,
+        "target_project_name": target_proj_name,
+        "is_mismatched": is_mismatched,
+        "is_benchmark": is_benchmark,
         "coverage_rate": coverage,
         "total_required": total_req,
         "matched_docs": matched,
