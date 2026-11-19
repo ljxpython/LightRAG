@@ -56,6 +56,7 @@ from locator_resolver import LocatorResolver
 from workspace_manager import TenantWorkspaceManager, apply_workspace_namespace_patch
 apply_workspace_namespace_patch()
 from image_vlm_parser import register_image_vlm_engine
+from telemetry_tracer import trace_mcp_tool
 
 register_image_vlm_engine()
 
@@ -223,6 +224,7 @@ def create_mcp_server(
 
     # 1. Query Tool (Enhanced with mode, document filtering, history)
     @server.tool(annotations={"readOnlyHint": True})
+    @trace_mcp_tool(tool_name="mcp_query_project_knowledge", span_type="RETRIEVER")
     async def mcp_query_project_knowledge(
         query: str,
         top_k: int = 8,
@@ -470,6 +472,7 @@ def create_mcp_server(
 
     # 6. Knowledge Graph Exploration Tool [NEW]
     @server.tool(annotations={"readOnlyHint": True})
+    @trace_mcp_tool(tool_name="mcp_query_knowledge_graph", span_type="RETRIEVER")
     async def mcp_query_knowledge_graph(
         entity_name: str,
         depth: int = 1,
