@@ -375,6 +375,11 @@ class CatalogManager:
                         )
                     except Exception as ex:
                         logger.warning(f"Failed to index dataset {f.name}: {ex}")
+
+            # 3. Clean up orphaned running eval runs from prior crashes/restarts
+            with self._get_conn() as conn:
+                conn.execute("UPDATE eval_runs SET status = 'aborted', progress = 0 WHERE status = 'running';")
+                conn.commit()
         except Exception as e:
             logger.error(f"Catalog sync from filesystem encountered error: {e}", exc_info=True)
 

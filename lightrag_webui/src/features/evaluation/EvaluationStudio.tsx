@@ -352,9 +352,37 @@ export default function EvaluationStudio() {
         setDatasets(list)
 
         if (list.length > 0) {
-          const nextName =
-            targetToSelect ||
-            (list.some((d) => d.name === selectedDatasetName) ? selectedDatasetName : list[0].name)
+          // 智能感知：优先匹配当前知识库的专属题库
+          const currentProjectList = list.filter(
+            (d) =>
+              Boolean(currentProjectId) &&
+              (d.project_id === currentProjectId ||
+                (currentProjectId.length >= 8 && d.name.includes(currentProjectId.slice(0, 8))))
+          )
+
+          let nextName = targetToSelect || ''
+          if (!nextName) {
+            // 检查当前选中的题库是否依然属于当前知识库
+            const isSelectedBelongToCurrent =
+              Boolean(selectedDatasetName) &&
+              currentProjectList.some((d) => d.name === selectedDatasetName)
+
+            if (isSelectedBelongToCurrent) {
+              nextName = selectedDatasetName
+            } else if (currentProjectList.length > 0) {
+              // 优先切换到当前项目的专属题库
+              nextName = currentProjectList[0].name
+            } else {
+              // 当前项目无专属题库时，优先选通用基准题库，最后才回退到 list[0]
+              const benchItem = list.find(
+                (d) =>
+                  d.project_id === 'eval_benchmark' ||
+                  d.name.toLowerCase().includes('benchmark') ||
+                  d.name === 'business_qa.json'
+              )
+              nextName = benchItem ? benchItem.name : list[0].name
+            }
+          }
           setSelectedDatasetName(nextName)
         } else {
           setSelectedDatasetName('')
@@ -881,25 +909,27 @@ export default function EvaluationStudio() {
               variant="outline"
               size="sm"
               onClick={() => {
-                if (readiness?.status === 'missing') {
-                  toast.error(
-                    `当前知识库完全缺失该题库所需的原材料文档！强行打擂将全部失分。\n请在右上角切换到【评测基准】知识库再运行打擂。`
-                  )
-                  return
-                }
                 setMatrixOpen(true)
               }}
-              disabled={!datasetDetail || cases.length === 0}
+              disabled={loadingDatasets || datasets.length === 0}
               className={cn(
                 'h-8 gap-1.5 text-xs transition-colors px-2.5 sm:px-3 whitespace-nowrap',
-                readiness?.status === 'missing'
+                readiness?.status === 'missing' && activeSubTab === 'cases'
                   ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10'
                   : 'border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10'
               )}
-              tooltip={readiness?.status === 'missing' ? '原材料缺失不可打擂，点击查看提示' : undefined}
+              tooltip={
+                readiness?.status === 'missing' && activeSubTab === 'cases'
+                  ? '当前选定题库原料缺失，点击可切换题库或排查'
+                  : '发起多参数矩阵并发打擂'
+              }
             >
               <SwordsIcon className="size-3.5" />
-              <span>{readiness?.status === 'missing' ? '原料缺失(禁止打擂)' : '矩阵参数打擂'}</span>
+              <span>
+                {readiness?.status === 'missing' && activeSubTab === 'cases'
+                  ? '原料缺失(点击排查)'
+                  : '矩阵参数打擂'}
+              </span>
             </Button>
 
             {/* 新窗口直达 MLflow 外部链接 */}
@@ -1977,10 +2007,51 @@ export default function EvaluationStudio() {
           ) : (
             <form onSubmit={handleTriggerMatrix} className="space-y-4 py-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">当前参评题库</label>
-                <div className="w-full px-3 py-1.5 text-xs font-mono rounded-md bg-muted text-foreground border border-input">
-                  {selectedDatasetName} ({cases.length} 道考题)
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground">选择参评题库</label>
+                  <span className="text-[11px] text-muted-foreground font-mono">
+                    {cases.length} 道考题
+                  </span>
                 </div>
+                <select
+                  value={selectedDatasetName}
+                  onChange={(e) => setSelectedDatasetName(e.target.value)}
+                  className="w-full text-xs h-9 px-2.5 rounded-md bg-background text-foreground border border-input focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                >
+                  {datasets.length === 0 ? (
+                    <option value="">暂无评测题库</option>
+                  ) : (
+                    <>
+                      {projectDatasets.length > 0 && (
+                        <optgroup label="【当前知识库专属题库 (推荐)】">
+                          {projectDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              🎯 {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {benchmarkDatasets.length > 0 && (
+                        <optgroup label="【平台通用基准题库】">
+                          {benchmarkDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              🏛️ {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {otherDatasets.length > 0 && (
+                        <optgroup label="【其他项目题库 (可能缺失原料)】">
+                          {otherDatasets.map((d) => (
+                            <option key={d.name} value={d.name}>
+                              📦 {d.name} ({d.cases_count} 题)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </>
+                  )}
+                </select>
               </div>
 
               {/* 原材料就绪度契约校验与告警 (Readiness Status Alert) */}
@@ -2139,19 +2210,21 @@ export default function EvaluationStudio() {
                 <Button
                   type="submit"
                   size="sm"
-                  disabled={selectedModes.length === 0 || readiness?.status === 'missing'}
+                  disabled={selectedModes.length === 0 || readiness?.status === 'missing' || !selectedDatasetName || cases.length === 0}
                   className={cn(
                     'text-white transition-all',
-                    readiness?.status === 'missing'
+                    readiness?.status === 'missing' || !selectedDatasetName || cases.length === 0
                       ? 'bg-muted text-muted-foreground border border-border cursor-not-allowed'
                       : 'bg-indigo-600 hover:bg-indigo-700'
                   )}
                 >
                   {readiness?.status === 'missing'
-                    ? '❌ 原料缺失无法打擂 (请切换基准库)'
-                    : matrixLimitMode === 'quick'
-                      ? '🚀 启动极速打擂 (抽样 5 题)'
-                      : '📊 启动全量深度打擂'}
+                    ? '❌ 原料缺失无法打擂 (请切换题库或知识库)'
+                    : !selectedDatasetName || cases.length === 0
+                      ? '题库为空无法打擂'
+                      : matrixLimitMode === 'quick'
+                        ? '🚀 启动极速打擂 (抽样 5 题)'
+                        : '📊 启动全量深度打擂'}
                 </Button>
               </DialogFooter>
             </form>
