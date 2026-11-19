@@ -143,7 +143,27 @@ export default function EvaluationStudio() {
   const { currentTenantId, currentProjectId } = useWorkspaceStore()
 
   // 顶层子视图切换：'panorama' (题库全景与关系) | 'cases' (考题表格与打擂) | 'tasks' (打擂任务大厅) | 'mlflow' (内嵌评测大屏)
-  const [activeSubTab, setActiveSubTab] = useState<'panorama' | 'cases' | 'tasks' | 'mlflow'>('panorama')
+  type SubTabType = 'panorama' | 'cases' | 'tasks' | 'mlflow'
+  const [activeSubTab, setActiveSubTab] = useState<SubTabType>(() => {
+    try {
+      const saved = localStorage.getItem('eval_studio_active_subtab')
+      if (saved && ['panorama', 'cases', 'tasks', 'mlflow'].includes(saved)) {
+        return saved as SubTabType
+      }
+    } catch {
+      // ignore
+    }
+    return 'panorama'
+  })
+
+  const handleSubTabChange = (tab: SubTabType) => {
+    setActiveSubTab(tab)
+    try {
+      localStorage.setItem('eval_studio_active_subtab', tab)
+    } catch {
+      // ignore
+    }
+  }
 
   // MLflow 评测平台接入地址（默认直连生产真实端口 9128，支持用户持久化微调）
   const [mlflowUrl, setMlflowUrl] = useState<string>(() => {
@@ -200,7 +220,7 @@ export default function EvaluationStudio() {
       await fetchReadiness(datasetName, targetProjectId !== 'all' ? targetProjectId : currentProjectId)
 
       // 3. 切换 SubTab 到 'cases' (矩阵打擂台)
-      setActiveSubTab('cases')
+      handleSubTabChange('cases')
     } catch (err) {
       console.error('Failed to navigate to battle:', err)
       toast.error('跳转打擂现场失败')
@@ -773,7 +793,7 @@ export default function EvaluationStudio() {
           <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/50 text-xs font-medium shrink-0">
             <button
               type="button"
-              onClick={() => setActiveSubTab('panorama')}
+              onClick={() => handleSubTabChange('panorama')}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
                 activeSubTab === 'panorama'
@@ -786,7 +806,7 @@ export default function EvaluationStudio() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveSubTab('cases')}
+              onClick={() => handleSubTabChange('cases')}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
                 activeSubTab === 'cases'
@@ -799,7 +819,7 @@ export default function EvaluationStudio() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveSubTab('tasks')}
+              onClick={() => handleSubTabChange('tasks')}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer relative whitespace-nowrap',
                 activeSubTab === 'tasks'
@@ -815,7 +835,7 @@ export default function EvaluationStudio() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveSubTab('mlflow')}
+              onClick={() => handleSubTabChange('mlflow')}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap',
                 activeSubTab === 'mlflow'
@@ -926,7 +946,7 @@ export default function EvaluationStudio() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <EvaluationTaskCenter
             currentProjectId={currentProjectId}
-            onSwitchToTestsets={() => setActiveSubTab('cases')}
+            onSwitchToTestsets={() => handleSubTabChange('cases')}
             onTriggerNewBattle={() => setMatrixOpen(true)}
           />
         </div>
@@ -1935,7 +1955,7 @@ export default function EvaluationStudio() {
                     size="sm"
                     onClick={() => {
                       setMatrixOpen(false)
-                      setActiveSubTab('mlflow')
+                      handleSubTabChange('mlflow')
                     }}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
                   >

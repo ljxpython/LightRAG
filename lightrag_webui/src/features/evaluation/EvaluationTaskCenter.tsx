@@ -6,6 +6,7 @@ import {
   ClockIcon,
   ExternalLinkIcon,
   RefreshCwIcon,
+  RotateCwIcon,
   TerminalIcon,
   StopCircleIcon,
   AlertTriangleIcon,
@@ -208,6 +209,52 @@ export default function EvaluationTaskCenter({
       toast.error('网络请求失败，无法中止任务')
     } finally {
       setAbortingId(null)
+    }
+  }
+
+  // 4.1 一键重跑打擂任务（带确认弹窗保护）
+  const [rerunConfirmItem, setRerunConfirmItem] = useState<EvalRunItem | null>(null)
+  const [rerunningTaskId, setRerunningTaskId] = useState<string | null>(null)
+
+  const executeRerunTask = async (item: EvalRunItem) => {
+    if (!item.dataset_name) {
+      toast.error('历史记录中未包含题库信息，无法重跑')
+      return
+    }
+
+    setRerunningTaskId(item.task_id)
+    try {
+      const payload = {
+        project_id: item.project_id || currentProjectId,
+        dataset: item.dataset_name,
+        dataset_name: item.dataset_name,
+        matrix_mode: item.modes && item.modes.length > 0 ? item.modes : ['mix'],
+        modes: item.modes && item.modes.length > 0 ? item.modes : ['mix'],
+        top_k: item.top_k || 40,
+        limit: item.limit_count || null,
+        eval_engine: 'deepeval',
+        mlflow: true
+      }
+
+      const res = await fetch('/ops/evaluation/matrix-run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        toast.success(`打擂任务已重新发起！任务 ID: ${data.task_id || ''}`)
+        setRerunConfirmItem(null)
+        await fetchRuns(true)
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(`重跑打擂失败: ${err.detail || '未知错误'}`)
+      }
+    } catch (e: any) {
+      toast.error(`网络请求异常: ${e?.message || '无法连接服务器'}`)
+    } finally {
+      setRerunningTaskId(null)
     }
   }
 
@@ -495,266 +542,328 @@ export default function EvaluationTaskCenter({
             </CardContent>
           </Card>
         ) : (
-          <div className="border border-border/60 rounded-lg overflow-hidden bg-card/60 shadow-xs">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/30">
-                  <TableHead className="w-8"></TableHead>
-                  <TableHead className="w-36 text-xs">执行时间</TableHead>
-                  <TableHead className="text-xs">评测题库</TableHead>
-                  <TableHead className="w-28 text-xs">检索模式</TableHead>
-                  <TableHead className="w-24 text-xs text-center">综合分</TableHead>
-                  <TableHead className="w-24 text-xs text-center">通过率</TableHead>
-                  <TableHead className="w-24 text-xs text-center">状态</TableHead>
-                  <TableHead className="w-40 text-xs text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {historyRuns.map((r) => {
-                  const isExpanded = expandedTaskId === r.task_id
-                  const score = r.overall_score
-                  const passRate = r.pass_rate
+          <div className="space-y-3">
+            {historyRuns.map((r) => {
+              const isExpanded = expandedTaskId === r.task_id
+              const score = r.overall_score
+              const passRate = r.pass_rate
 
-                  return (
-                    <React.Fragment key={r.task_id}>
-                      <TableRow
-                        className={cn(
-                          'cursor-pointer transition-colors hover:bg-muted/20',
-                          isExpanded && 'bg-muted/30 font-medium'
+              return (
+                <div
+                  key={r.task_id}
+                  className={cn(
+                    'rounded-xl border transition-all duration-200 overflow-hidden',
+                    isExpanded
+                      ? 'border-indigo-500/50 bg-card shadow-xs'
+                      : 'border-border/70 bg-card/60 hover:border-border hover:bg-card/90'
+                  )}
+                >
+                  {/* 卡片主信息栏：信息层次分明，自适应宽屏与窄屏 */}
+                  <div
+                    className="p-3.5 sm:p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 cursor-pointer select-none"
+                    onClick={() => handleToggleExpandTask(r.task_id)}
+                  >
+                    {/* 左半区：展开指示器 + 题库信息 + 时间参数 + 模式标签群 */}
+                    <div className="flex items-start sm:items-center gap-3 min-w-0">
+                      <div className="p-1 rounded-md bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0 shrink-0">
+                        {isExpanded ? (
+                          <ChevronDownIcon className="size-4 text-indigo-500" />
+                        ) : (
+                          <ChevronRightIcon className="size-4" />
                         )}
-                        onClick={() => handleToggleExpandTask(r.task_id)}
-                      >
-                        <TableCell className="p-2 text-center text-muted-foreground">
-                          {isExpanded ? (
-                            <ChevronDownIcon className="size-4 text-indigo-500" />
-                          ) : (
-                            <ChevronRightIcon className="size-4" />
-                          )}
-                        </TableCell>
-                        <TableCell className="text-xs font-mono text-muted-foreground">
-                          {new Date(r.created_at).toLocaleString('zh-CN', {
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
-                            <FileTextIcon className="size-3.5 text-indigo-500" />
-                            <span>{r.dataset_name}</span>
-                            {r.limit_count && (
-                              <span className="text-[10px] text-muted-foreground px-1.5 py-0.2 rounded bg-muted">
-                                抽取 {r.limit_count} 题
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs font-mono text-muted-foreground">
-                          {r.modes.join(', ')}
-                        </TableCell>
-                        <TableCell className="text-center font-mono">
-                          {typeof score === 'number' ? (
-                            <span
-                              className={cn(
-                                'px-2 py-0.5 rounded text-xs font-bold',
-                                score >= 0.8
-                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                  : score >= 0.5
-                                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                              )}
-                            >
-                              {(score * 100).toFixed(1)}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-muted-foreground">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center font-mono">
-                          {typeof passRate === 'number' ? (
-                            <span
-                              className={cn(
-                                'text-xs font-semibold',
-                                passRate > 0.5
-                                  ? 'text-emerald-500'
-                                  : passRate > 0
-                                    ? 'text-amber-500'
-                                    : 'text-muted-foreground'
-                              )}
-                            >
-                              {(passRate * 100).toFixed(0)}%
-                            </span>
-                          ) : (
-                            <span className="text-xs text-muted-foreground">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
+                      </div>
+
+                      <div className="space-y-1.5 min-w-0">
+                        {/* 第一行：题库文件名 + 状态彩色徽标 + 抽题数标签 */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <FileTextIcon className="size-4 text-indigo-500 shrink-0" />
+                          <span className="font-semibold text-sm text-foreground tracking-tight truncate max-w-md">
+                            {r.dataset_name}
+                          </span>
                           {r.status === 'completed' ? (
-                            <span className="px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                               已完成
                             </span>
                           ) : r.status === 'aborted' ? (
-                            <span className="px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                               已中止
                             </span>
                           ) : (
-                            <span className="px-1.5 py-0.5 rounded text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
                               异常失败
                             </span>
                           )}
-                        </TableCell>
-                        <TableCell className="text-right space-x-1.5" onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleToggleExpandTask(r.task_id)}
-                            className="h-7 px-2 text-xs text-indigo-600 dark:text-indigo-400"
-                          >
-                            {isExpanded ? '收起详情' : '指标明细'}
-                          </Button>
-
-                          {r.result_url && (
-                            <a
-                              href={r.result_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1 h-7 px-2 text-xs rounded border border-border/80 hover:bg-muted/50 text-foreground transition-colors"
-                              title="在新窗口打开 MLflow 深度比对大屏"
-                            >
-                              <span>MLflow</span>
-                              <ExternalLinkIcon className="size-3 text-muted-foreground" />
-                            </a>
+                          {r.limit_count && (
+                            <span className="text-[11px] font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                              抽测 {r.limit_count} 题
+                            </span>
                           )}
-                        </TableCell>
-                      </TableRow>
+                        </div>
 
-                      {/* 展开面板：5 大指标卡片 + 用例扣分诊断 */}
-                      {isExpanded && (
-                        <TableRow className="bg-muted/20 hover:bg-muted/20">
-                          <TableCell colSpan={8} className="p-4 space-y-4">
-                            {detailLoading ? (
-                              <div className="py-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                                <Loader2Icon className="size-4 animate-spin text-indigo-500" />
-                                <span>正在解密打擂用例报告与多维证据链...</span>
+                        {/* 第二行：执行时间 + Top-K + 模式徽标组 */}
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                          <div className="flex items-center gap-1 font-mono">
+                            <ClockIcon className="size-3 text-muted-foreground/70" />
+                            <span>
+                              {new Date(r.created_at).toLocaleString('zh-CN', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <span>•</span>
+                          <span>Top-K: {r.top_k}</span>
+                          <span>•</span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-muted-foreground/80">检索模式:</span>
+                            {r.modes.map((m) => (
+                              <span
+                                key={m}
+                                className="px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40"
+                              >
+                                {m}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 右半区：评分胶囊板 + 永不折叠的操作按钮组 */}
+                    <div
+                      className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-border/40"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* 综合分与通过率评分面板 */}
+                      <div className="flex items-center gap-3 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/60">
+                        <div className="text-right">
+                          <div className="text-[10px] text-muted-foreground font-medium">综合分</div>
+                          <div className="text-sm font-bold font-mono">
+                            {typeof score === 'number' ? (
+                              <span
+                                className={
+                                  score >= 0.8
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : score >= 0.5
+                                      ? 'text-blue-600 dark:text-blue-400'
+                                      : 'text-rose-600 dark:text-rose-400'
+                                }
+                              >
+                                {(score * 100).toFixed(1)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">--</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="w-px h-6 bg-border/70" />
+                        <div className="text-right">
+                          <div className="text-[10px] text-muted-foreground font-medium">通过率</div>
+                          <div className="text-sm font-semibold font-mono">
+                            {typeof passRate === 'number' ? (
+                              <span
+                                className={
+                                  passRate > 0.5
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : passRate > 0
+                                      ? 'text-amber-600 dark:text-amber-400'
+                                      : 'text-muted-foreground'
+                                }
+                              >
+                                {(passRate * 100).toFixed(0)}%
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">--</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 按钮群：水平紧凑排列，whitespace-nowrap，绝对不换行 */}
+                      <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={rerunningTaskId === r.task_id}
+                          onClick={() => setRerunConfirmItem(r)}
+                          className="h-8 px-2.5 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-medium"
+                          title="重新执行此场打擂评测"
+                        >
+                          <RotateCwIcon className={cn('size-3.5', rerunningTaskId === r.task_id && 'animate-spin')} />
+                          <span>{rerunningTaskId === r.task_id ? '重跑中' : '重跑'}</span>
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleExpandTask(r.task_id)}
+                          className="h-8 px-2.5 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
+                        >
+                          {isExpanded ? '收起详情' : '指标明细'}
+                        </Button>
+
+                        {r.result_url && (
+                          <a
+                            href={r.result_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 h-8 px-2.5 text-xs rounded-md border border-border/80 hover:bg-muted text-foreground transition-colors"
+                            title="在新窗口打开 MLflow 深度比对大屏"
+                          >
+                            <span>MLflow</span>
+                            <ExternalLinkIcon className="size-3 text-muted-foreground" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 展开面板：5 大指标卡片 + 用例扣分诊断 */}
+                  {isExpanded && (
+                    <div className="p-4 bg-muted/20 border-t border-border/60 space-y-4">
+                      {detailLoading ? (
+                        <div className="py-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                          <Loader2Icon className="size-4 animate-spin text-indigo-500" />
+                          <span>正在解密打擂用例报告与多维证据链...</span>
+                        </div>
+                      ) : taskDetail ? (
+                        <div className="space-y-4">
+                          {/* 1. 五大指标雷达评分卡 */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                <BrainCircuitIcon className="size-3.5 text-indigo-500" />
+                                <span>核心维度指标得分卡 (Metrics Breakdown)</span>
                               </div>
-                            ) : taskDetail ? (
-                              <div className="space-y-4">
-                                {/* 1. 五大指标雷达评分卡 */}
-                                <div>
-                                  <div className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                                    <BrainCircuitIcon className="size-3.5 text-indigo-500" />
-                                    <span>核心维度指标得分卡 (Metrics Breakdown)</span>
-                                  </div>
-                                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
-                                    {[
-                                      {
-                                        key: 'faithfulness',
-                                        label: '忠实度 (Faithfulness)',
-                                        desc: '防幻觉·材料实证支撑'
-                                      },
-                                      {
-                                        key: 'answer_relevancy',
-                                        label: '回答相关性 (Relevancy)',
-                                        desc: '紧扣提问·无废话'
-                                      },
-                                      {
-                                        key: 'contextual_recall',
-                                        label: '检索召回率 (Recall)',
-                                        desc: '黄金标准答案覆盖率'
-                                      },
-                                      {
-                                        key: 'contextual_precision',
-                                        label: '检索精确度 (Precision)',
-                                        desc: '有效切片排序靠前度'
-                                      },
-                                      {
-                                        key: 'counterfactual_assertion',
-                                        label: '反事实抗扰度 (Counterfactual)',
-                                        desc: '抵御伪造事实诱导'
-                                      }
-                                    ].map((m) => {
-                                      const val = taskDetail.metrics_summary?.[m.key]
-                                      const hasVal = typeof val === 'number'
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={rerunningTaskId === r.task_id}
+                                onClick={() => setRerunConfirmItem(r)}
+                                className="h-6 px-2 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400"
+                                title="以相同题库与检索模式重新打擂"
+                              >
+                                <RotateCwIcon className={cn('size-3', rerunningTaskId === r.task_id && 'animate-spin')} />
+                                <span>{rerunningTaskId === r.task_id ? '正在重跑...' : '重跑本次打擂'}</span>
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
+                              {[
+                                {
+                                  key: 'faithfulness',
+                                  label: '忠实度 (Faithfulness)',
+                                  desc: '防幻觉·材料实证支撑'
+                                },
+                                {
+                                  key: 'answer_relevancy',
+                                  label: '回答相关性 (Relevancy)',
+                                  desc: '紧扣提问·无废话'
+                                },
+                                {
+                                  key: 'contextual_recall',
+                                  label: '检索召回率 (Recall)',
+                                  desc: '黄金标准答案覆盖率'
+                                },
+                                {
+                                  key: 'contextual_precision',
+                                  label: '检索精确度 (Precision)',
+                                  desc: '有效切片排序靠前度'
+                                },
+                                {
+                                  key: 'counterfactual_assertion',
+                                  label: '反事实抗扰度 (Counterfactual)',
+                                  desc: '抵御伪造事实诱导'
+                                }
+                              ].map((m) => {
+                                const val = taskDetail.metrics_summary?.[m.key]
+                                const hasVal = typeof val === 'number'
 
-                                      return (
-                                        <div
-                                          key={m.key}
-                                          className="p-3 rounded-lg bg-card border border-border/70 space-y-1.5 shadow-2xs"
-                                        >
-                                          <div className="text-[11px] font-medium text-muted-foreground truncate">
-                                            {m.label}
-                                          </div>
-                                          <div className="flex items-baseline justify-between">
-                                            <div
-                                              className={cn(
-                                                'text-lg font-bold font-mono',
-                                                hasVal
-                                                  ? val >= 0.8
-                                                    ? 'text-emerald-500'
-                                                    : val >= 0.5
-                                                      ? 'text-blue-500'
-                                                      : 'text-amber-500'
-                                                  : 'text-muted-foreground'
-                                              )}
-                                            >
-                                              {hasVal ? (val * 100).toFixed(1) : 'N/A'}
-                                            </div>
-                                            <div className="text-[10px] text-muted-foreground">
-                                              {m.desc}
-                                            </div>
-                                          </div>
-                                          <Progress
-                                            value={hasVal ? val * 100 : 0}
-                                            className="h-1 bg-muted"
-                                          />
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-
-                                {/* 2. 用例扣分诊断清单 */}
-                                <div className="space-y-2 pt-2 border-t border-border/40">
-                                  <div className="flex items-center justify-between">
-                                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                                      <TargetIcon className="size-3.5 text-rose-500" />
-                                      <span>用例扣分诊断与裁判判词 ({filteredCases.length} 题)</span>
+                                return (
+                                  <div
+                                    key={m.key}
+                                    className="p-3 rounded-lg bg-card border border-border/70 space-y-1.5 shadow-2xs"
+                                  >
+                                    <div className="text-[11px] font-medium text-muted-foreground truncate">
+                                      {m.label}
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setFailedOnlyFilter(!failedOnlyFilter)}
+                                    <div className="flex items-baseline justify-between">
+                                      <div
                                         className={cn(
-                                          'h-6 text-[11px] px-2',
-                                          failedOnlyFilter
-                                            ? 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-400 font-semibold'
+                                          'text-lg font-bold font-mono',
+                                          hasVal
+                                            ? val >= 0.8
+                                              ? 'text-emerald-500'
+                                              : val >= 0.5
+                                                ? 'text-blue-500'
+                                                : 'text-amber-500'
                                             : 'text-muted-foreground'
                                         )}
                                       >
-                                        仅看扣分/未通过题目
-                                      </Button>
+                                        {hasVal ? (val * 100).toFixed(1) : 'N/A'}
+                                      </div>
+                                      <span className="text-[10px] text-muted-foreground">
+                                        {hasVal ? (val >= 0.7 ? '达标' : '未达标') : '无数据'}
+                                      </span>
+                                    </div>
+                                    <div className="text-[10px] text-muted-foreground/70 truncate">
+                                      {m.desc}
                                     </div>
                                   </div>
+                                )
+                              })}
+                            </div>
+                          </div>
 
-                                  <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
-                                    {filteredCases.map((c) => (
-                                      <TestCaseCard key={c.test_number} c={c} />
-                                    ))}
-                                  </div>
-                                </div>
+                          {/* 2. 用例扣分诊断与背靠背问答分析 */}
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                <SwordsIcon className="size-3.5 text-indigo-500" />
+                                <span>背靠背诊断与裁判问询 ({taskDetail.cases?.length || 0} 题)</span>
                               </div>
-                            ) : null}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
-                  )
-                })}
-              </TableBody>
-            </Table>
+
+                              <div className="flex items-center gap-2">
+                                <div className="relative">
+                                  <SearchIcon className="size-3 absolute left-2 top-2 text-muted-foreground" />
+                                  <input
+                                    type="text"
+                                    value={caseSearch}
+                                    onChange={(e) => setCaseSearch(e.target.value)}
+                                    placeholder="搜索考题或答案..."
+                                    className="h-7 pl-6 pr-2 text-xs rounded-md border border-border/80 bg-background focus:outline-none w-36 lg:w-48"
+                                  />
+                                </div>
+                                <Button
+                                  variant={failedOnlyFilter ? 'default' : 'outline'}
+                                  size="sm"
+                                  onClick={() => setFailedOnlyFilter(!failedOnlyFilter)}
+                                  className={cn(
+                                    'h-7 text-xs gap-1',
+                                    failedOnlyFilter && 'bg-rose-600 hover:bg-rose-700 text-white'
+                                  )}
+                                >
+                                  <span>仅看扣分/未通过题</span>
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+                              {filteredCases.map((c) => (
+                                <TestCaseCard key={c.test_number} c={c} />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
@@ -797,6 +906,89 @@ export default function EvaluationTaskCenter({
             </div>
             <Button variant="secondary" size="sm" onClick={handleCloseLogs} className="text-xs">
               关闭终端
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 模块 4：确认重跑打擂弹窗 (Rerun Confirmation Dialog) */}
+      <Dialog open={!!rerunConfirmItem} onOpenChange={(open) => !open && setRerunConfirmItem(null)}>
+        <DialogContent className="sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base text-foreground">
+              <div className="size-7 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <RotateCwIcon className="size-4" />
+              </div>
+              <span>确认重新执行打擂评测？</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground pt-1">
+              系统将使用该场次的相同考题与检索模式配置，重新在后台排队进行全量评测。
+            </DialogDescription>
+          </DialogHeader>
+
+          {rerunConfirmItem && (
+            <div className="p-3.5 rounded-lg bg-muted/40 border border-border/70 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">评测题库:</span>
+                <span className="font-semibold text-foreground font-mono flex items-center gap-1">
+                  <FileTextIcon className="size-3 text-indigo-500" />
+                  {rerunConfirmItem.dataset_name}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">打擂模式:</span>
+                <div className="flex items-center gap-1">
+                  {rerunConfirmItem.modes.map((m) => (
+                    <span
+                      key={m}
+                      className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/40"
+                    >
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">检索阈值:</span>
+                <span className="font-mono text-foreground">Top-K: {rerunConfirmItem.top_k}</span>
+              </div>
+              {rerunConfirmItem.limit_count ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">抽考数量:</span>
+                  <span className="font-mono text-amber-600 dark:text-amber-400 font-medium">
+                    快速抽测 {rerunConfirmItem.limit_count} 题
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">抽考数量:</span>
+                  <span className="text-foreground">全部考题全量打擂</span>
+                </div>
+              )}
+              <div className="pt-2 border-t border-border/50 text-[11px] text-muted-foreground/80 leading-relaxed">
+                💡 提示：重新打擂将产生新的独立评测记录并推流至 MLflow，不会覆盖或删除本条历史数据。
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex items-center justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRerunConfirmItem(null)}
+              className="text-xs h-8 px-3"
+            >
+              取消
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              disabled={!!rerunningTaskId}
+              onClick={() => rerunConfirmItem && executeRerunTask(rerunConfirmItem)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-8 px-3 gap-1.5"
+            >
+              <RotateCwIcon className={cn('size-3.5', !!rerunningTaskId && 'animate-spin')} />
+              <span>{rerunningTaskId ? '正在排队发起...' : '确认重跑'}</span>
             </Button>
           </DialogFooter>
         </DialogContent>
