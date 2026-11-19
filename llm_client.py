@@ -1,9 +1,12 @@
 import asyncio
+import logging
 import os
-from typing import Any, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 import numpy as np
 import openai
 from lightrag.utils import EmbeddingFunc
+
+logger = logging.getLogger("llm_client")
 
 
 def get_llm_client() -> openai.AsyncOpenAI:
@@ -99,3 +102,79 @@ def create_lightrag_embedding_func() -> EmbeddingFunc:
         max_token_size=max_token_size,
         func=unified_embed_func,
     )
+
+
+def create_lightrag_rerank_func() -> Optional[Callable[..., Any]]:
+    """Factory creating an asynchronous reranking function aligned with LightRAG and DashScope."""
+    binding = os.environ.get("RERANK_BINDING", "null").lower().strip()
+    if not binding or binding in ("null", "none", "false"):
+        return None
+
+    if binding == "aliyun":
+        from lightrag.rerank import ali_rerank
+
+        model = os.environ.get("RERANK_MODEL", "gte-rerank-v2")
+        base_url = os.environ.get(
+            "RERANK_BINDING_HOST",
+            "https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank",
+        )
+        api_key = (
+            os.environ.get("RERANK_BINDING_API_KEY")
+            or os.environ.get("DASHSCOPE_API_KEY")
+            or os.environ.get("EMBEDDING_API_KEY")
+        )
+
+        async def _aliyun_rerank(
+            query: str,
+            documents: List[str],
+            top_n: Optional[int] = None,
+            extra_body: Optional[Dict[str, Any]] = None,
+            **kwargs: Any,
+        ) -> List[Dict[str, Any]]:
+            return await ali_rerank(
+                query=query,
+                documents=documents,
+                top_n=top_n,
+                api_key=api_key,
+                model=model,
+                base_url=base_url,
+                extra_body=extra_body,
+            )
+
+        return _aliyun_rerank
+
+    elif binding == "cohere":
+        from lightrag.rerank import cohere_rerank
+
+        model = os.environ.get("RERANK_MODEL", "qwen3-rerank")
+        base_url = os.environ.get(
+            "RERANK_BINDING_HOST",
+            "https://api.cohere.com/v2/rerank",
+        )
+        api_key = (
+            os.environ.get("RERANK_BINDING_API_KEY")
+            or os.environ.get("COHERE_API_KEY")
+            or os.environ.get("EMBEDDING_API_KEY")
+        )
+
+        async def _cohere_rerank(
+            query: str,
+            documents: List[str],
+            top_n: Optional[int] = None,
+            extra_body: Optional[Dict[str, Any]] = None,
+            **kwargs: Any,
+        ) -> List[Dict[str, Any]]:
+            return await cohere_rerank(
+                query=query,
+                documents=documents,
+                top_n=top_n,
+                api_key=api_key,
+                model=model,
+                base_url=base_url,
+                extra_body=extra_body,
+            )
+
+        return _cohere_rerank
+
+    logger.warning(f"Unsupported RERANK_BINDING: '{binding}', falling back to None.")
+    return None

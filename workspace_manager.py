@@ -14,6 +14,7 @@ from lightrag import LightRAG
 from lease_manager import ReaderLeaseManager
 from llm_client import (
     create_lightrag_embedding_func,
+    create_lightrag_rerank_func,
     unified_llm_func,
 )
 
@@ -220,6 +221,7 @@ class TenantWorkspaceManager:
                 working_dir=str(active_dir),
                 llm_model_func=unified_llm_func,
                 embedding_func=create_lightrag_embedding_func(),
+                rerank_model_func=create_lightrag_rerank_func(),
                 addon_params={"language": "简体中文"},
             )
             await rag.initialize_storages()
