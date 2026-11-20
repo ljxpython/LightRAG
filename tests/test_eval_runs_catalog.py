@@ -50,3 +50,10 @@ def test_eval_runs_crud_and_migration():
         runs2 = cm2.list_eval_runs(project_id="proj_alpha")
         assert len(runs2) == 1
         assert runs2[0]["overall_score"] == 0.885
+
+        # 4. 删除评测任务并验证物理清理
+        deleted = cm2.delete_eval_run("task_test_001")
+        assert deleted is True
+        assert cm2.get_eval_run("task_test_001") is None
+        assert len(cm2.list_eval_runs(project_id="proj_alpha")) == 0
+        assert cm2.delete_eval_run("task_test_001") is False

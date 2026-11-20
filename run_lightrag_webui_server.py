@@ -498,13 +498,12 @@ async def update_workspace_meta(
 
 @ops_router.post("/workspaces/select")
 async def select_workspace(payload: WorkspaceSelectRequest, response: Response):
-    """Sets active tenant & project cookies and primes the RAG engine."""
+    """Sets active tenant & project cookies immediately with zero blocking."""
     tenant_id = payload.tenant_id.strip() or "__default"
     project_id = payload.project_id.strip()
     if not project_id:
         raise HTTPException(status_code=400, detail="project_id cannot be empty")
 
-    await dynamic_rag_proxy.ensure_instance(tenant_id, project_id)
     response.set_cookie("x_tenant_id", tenant_id, path="/", samesite="lax")
     response.set_cookie("x_project_id", project_id, path="/", samesite="lax")
     return {
@@ -1574,6 +1573,26 @@ async def get_evaluation_run_detail(task_id: str):
     return base
 
 
+@ops_router.delete("/evaluation/runs/{task_id}")
+async def delete_evaluation_run(task_id: str):
+    """Deletes an evaluation run record and cleans up associated artifacts."""
+    from catalog_manager import catalog_mgr
+
+    # If currently in memory task manager, remove it
+    mem_task = eval_task_mgr.get_task(task_id)
+    if mem_task:
+        if mem_task.get("status") == "running":
+            await eval_task_mgr.abort_task(task_id)
+        eval_task_mgr._tasks.pop(task_id, None)
+
+    # Delete from sqlite & disk report
+    deleted = catalog_mgr.delete_eval_run(task_id)
+    if not deleted and not mem_task:
+        raise HTTPException(status_code=404, detail=f"Eval run {task_id} not found")
+
+    return {"status": "deleted", "task_id": task_id, "message": "打擂成果记录已成功删除"}
+
+
 @ops_router.post("/evaluation/tasks/{task_id}/abort")
 async def abort_evaluation_task(task_id: str):
     """Aborts a currently running evaluation task."""
@@ -1918,8 +1937,19 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
             except Exception as e:
                 logger.warning(f"Failed to auto-heal project meta for {tenant_id}:{project_id}: {e}")
 
-        # 3. Warm up engine for current workspace
-        await dynamic_rag_proxy.ensure_instance(tenant_id, project_id)
+        # 3. Warm up engine only for core RAG engine routes that actually query/mutate storage
+        path = request.url.path
+        is_ops_or_static = (
+            path.startswith("/ops/")
+            or path.startswith("/assets/")
+            or path.startswith("/static/")
+            or path in ("/webui", "/webui/", "/webui/index.html", "/", "/favicon.ico", "/favicon.png", "/favicon.svg")
+            or path.startswith("/eval-studio")
+            or path.startswith("/evalflow")
+            or path.startswith("/auth/")
+        )
+        if not is_ops_or_static:
+            await dynamic_rag_proxy.ensure_instance(tenant_id, project_id)
 
         # 4. Bind contextvar
         token_ctx = current_workspace_ctx.set((tenant_id, project_id))

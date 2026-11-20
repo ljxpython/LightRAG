@@ -976,6 +976,7 @@ export default function EvaluationStudio() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <EvaluationTaskCenter
             currentProjectId={currentProjectId}
+            workspaceList={workspaceList}
             onSwitchToTestsets={() => handleSubTabChange('cases')}
             onTriggerNewBattle={() => setMatrixOpen(true)}
           />

@@ -304,6 +304,26 @@ class CatalogManager:
                 "completed_at": r[15],
             }
 
+    def delete_eval_run(self, task_id: str) -> bool:
+        """Deletes an evaluation run record and cleans up associated report file."""
+        run_item = self.get_eval_run(task_id)
+        if not run_item:
+            return False
+
+        report_file = run_item.get("report_file")
+        if report_file:
+            try:
+                rf_path = Path(report_file)
+                if rf_path.is_file() and rf_path.exists():
+                    rf_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+        with self._get_conn() as conn:
+            cursor = conn.execute("DELETE FROM eval_runs WHERE task_id = ?;", (task_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+
     def sync_from_filesystem(self, storage_root: Path, datasets_dir: Path):
         """Self-healing scan: populates catalog.sqlite from existing physical files."""
         try:

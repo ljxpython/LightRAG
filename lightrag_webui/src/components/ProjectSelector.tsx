@@ -117,6 +117,22 @@ export default function ProjectSelector() {
 
   const handleSelect = async (ws: Workspace) => {
     if (ws.is_current || switching || editingKey) return
+
+    // 1. Snapshot previous state for rollback on error
+    const previousWorkspaces = [...workspaces]
+    const previousWorkspace = workspaces.find((w) => w.is_current)
+
+    // 2. 0ms Optimistic UI update: close popup immediately and flip active state
+    setIsOpen(false)
+    setWorkspaces((prev) =>
+      prev.map((item) => ({
+        ...item,
+        is_current: item.tenant_id === ws.tenant_id && item.project_id === ws.project_id
+      }))
+    )
+    useWorkspaceStore.getState().setCurrentWorkspace(ws.tenant_id, ws.project_id)
+
+    // 3. Background asynchronous sync
     try {
       setSwitching(true)
       const res = await fetch('/ops/workspaces/select', {
@@ -127,22 +143,22 @@ export default function ProjectSelector() {
           project_id: ws.project_id
         })
       })
-      if (res.ok) {
-        // Optimistically update workspace list without full-page reload
-        setWorkspaces((prev) =>
-          prev.map((item) => ({
-            ...item,
-            is_current: item.tenant_id === ws.tenant_id && item.project_id === ws.project_id
-          }))
-        )
-        useWorkspaceStore.getState().setCurrentWorkspace(ws.tenant_id, ws.project_id)
-        setIsOpen(false)
-      } else {
-        alert('切换工作区失败，请查看控制台日志')
+      if (!res.ok) {
+        // Rollback on HTTP failure
+        setWorkspaces(previousWorkspaces)
+        if (previousWorkspace) {
+          useWorkspaceStore.getState().setCurrentWorkspace(previousWorkspace.tenant_id, previousWorkspace.project_id)
+        }
+        toast.error('切换知识库失败，已恢复原工作区')
       }
     } catch (err) {
       console.error('Error selecting workspace:', err)
-      alert('切换工作区网络异常')
+      // Rollback on network failure
+      setWorkspaces(previousWorkspaces)
+      if (previousWorkspace) {
+        useWorkspaceStore.getState().setCurrentWorkspace(previousWorkspace.tenant_id, previousWorkspace.project_id)
+      }
+      toast.error('网络异常，切换知识库失败')
     } finally {
       setSwitching(false)
     }

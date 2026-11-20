@@ -22,7 +22,13 @@ import {
   ArrowUpRightIcon,
   SparklesIcon,
   SearchIcon,
-  InfoIcon
+  InfoIcon,
+  TrophyIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  MinusIcon,
+  FolderGit2Icon,
+  Trash2Icon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -86,14 +92,35 @@ export interface EvalRunDetail extends EvalRunItem {
   cases?: TestCaseResult[]
 }
 
+export interface DatasetRunGroup {
+  datasetName: string
+  projectIds: string[]
+  runs: EvalRunItem[]
+  completedRuns: EvalRunItem[]
+  totalCount: number
+  bestRun: EvalRunItem | null
+  bestScore: number | null
+  bestPassRate: number | null
+  bestModes: string[]
+  latestRun: EvalRunItem | null
+  latestScore: number | null
+  previousRun: EvalRunItem | null
+  previousScore: number | null
+  scoreDelta: number | null
+  allModes: string[]
+  latestCreatedAt: string
+}
+
 interface EvaluationTaskCenterProps {
   currentProjectId: string
+  workspaceList?: Array<{ project_id: string; name?: string }>
   onSwitchToTestsets?: () => void
   onTriggerNewBattle?: () => void
 }
 
 export default function EvaluationTaskCenter({
   currentProjectId,
+  workspaceList,
   onSwitchToTestsets,
   onTriggerNewBattle
 }: EvaluationTaskCenterProps) {
@@ -111,14 +138,35 @@ export default function EvaluationTaskCenter({
   const [failedOnlyFilter, setFailedOnlyFilter] = useState(false)
   const [caseSearch, setCaseSearch] = useState('')
 
+  // 删除打擂成果状态
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null)
+  const [deleteConfirmItem, setDeleteConfirmItem] = useState<EvalRunItem | null>(null)
+
+  // 多维筛选与聚类视图状态
+  const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>(currentProjectId)
+  const [selectedDatasetFilter, setSelectedDatasetFilter] = useState<string>('all')
+  const [datasetSearch, setDatasetSearch] = useState<string>('')
+  const [viewMode, setViewMode] = useState<'dataset' | 'timeline'>('dataset')
+  const [expandedDatasets, setExpandedDatasets] = useState<Set<string>>(new Set())
+
+  // 同步当前项目变更到筛选器
+  useEffect(() => {
+    setSelectedProjectFilter(currentProjectId)
+  }, [currentProjectId])
+
   const pollTimerRef = useRef<number | null>(null)
   const logPollTimerRef = useRef<number | null>(null)
 
-  // 1. 获取打擂任务列表
+  // 1. 获取打擂任务列表（支持指定项目或全量 cross-project 查询）
   const fetchRuns = async (silent = false) => {
     if (!silent) setLoading(true)
     try {
-      const res = await fetch(`/ops/evaluation/runs?project_id=${currentProjectId}`)
+      const targetProject = selectedProjectFilter || currentProjectId
+      const url =
+        targetProject === 'all'
+          ? '/ops/evaluation/runs?project_id=all&limit=100'
+          : `/ops/evaluation/runs?project_id=${targetProject}&limit=100`
+      const res = await fetch(url)
       if (res.ok) {
         const data: EvalRunItem[] = await res.json()
         setRuns(data)
@@ -132,7 +180,7 @@ export default function EvaluationTaskCenter({
 
   useEffect(() => {
     fetchRuns()
-  }, [currentProjectId])
+  }, [selectedProjectFilter, currentProjectId])
 
   // 2. 智能轮询：若存在 running 任务，每 2.5 秒刷新列表
   const hasRunning = useMemo(() => {
@@ -282,15 +330,171 @@ export default function EvaluationTaskCenter({
     }
   }
 
+  // 6. 删除单次打擂成果
+  const handleDeleteRun = async (taskId: string) => {
+    setDeletingTaskId(taskId)
+    try {
+      const res = await fetch(`/ops/evaluation/runs/${taskId}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        toast.success(`打擂成果已彻底删除`)
+        setDeleteConfirmItem(null)
+        if (expandedTaskId === taskId) {
+          setExpandedTaskId(null)
+          setTaskDetail(null)
+        }
+        // 乐观更新：本地直接过滤掉
+        setRuns((prev) => prev.filter((r) => r.task_id !== taskId))
+        await fetchRuns(true)
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(`删除打擂记录失败: ${err.detail || '未知错误'}`)
+      }
+    } catch (e: any) {
+      toast.error(`网络请求异常: ${e?.message || '无法连接服务器'}`)
+    } finally {
+      setDeletingTaskId(null)
+    }
+  }
+
+  // 项目友好名称映射
+  const getProjectName = (pid: string) => {
+    if (!pid || pid === 'common') return '通用公共'
+    const found = workspaceList?.find((w) => w.project_id === pid)
+    if (found?.name && found.name !== found.project_id) return found.name
+    if (pid === '11111111-1111-4111-8111-111111111111') return '平台默认项目'
+    if (pid === 'eval_benchmark') return '评测基准'
+    return pid.length > 16 ? `${pid.slice(0, 8)}...` : pid
+  }
+
   // 运行中任务列表
   const runningRuns = useMemo(() => runs.filter((r) => r.status === 'running'), [runs])
   // 历史完成/失败任务列表
   const historyRuns = useMemo(() => runs.filter((r) => r.status !== 'running'), [runs])
 
-  // 统计指标
+  // 当前可选的所有评测集名称列表（供下拉快速筛选）
+  const availableDatasets = useMemo(() => {
+    const set = new Set<string>()
+    historyRuns.forEach((r) => {
+      if (r.dataset_name) set.add(r.dataset_name)
+    })
+    return Array.from(set).sort()
+  }, [historyRuns])
+
+  // 经过评测集与关键词过滤后的历史打擂列表
+  const filteredHistoryRuns = useMemo(() => {
+    return historyRuns.filter((r) => {
+      if (selectedDatasetFilter !== 'all' && r.dataset_name !== selectedDatasetFilter) {
+        return false
+      }
+      if (datasetSearch.trim()) {
+        const q = datasetSearch.trim().toLowerCase()
+        const matchName = r.dataset_name?.toLowerCase().includes(q)
+        const matchModes = r.modes?.some((m) => m.toLowerCase().includes(q))
+        const matchProj = getProjectName(r.project_id).toLowerCase().includes(q)
+        if (!matchName && !matchModes && !matchProj) return false
+      }
+      return true
+    })
+  }, [historyRuns, selectedDatasetFilter, datasetSearch, workspaceList])
+
+  // 核心聚合引擎：按评测集聚类并计算最优得分、最新战绩与质量涨跌幅
+  const datasetGroups = useMemo<DatasetRunGroup[]>(() => {
+    const map = new Map<string, EvalRunItem[]>()
+    filteredHistoryRuns.forEach((r) => {
+      const name = r.dataset_name || '未知评测集'
+      if (!map.has(name)) {
+        map.set(name, [])
+      }
+      map.get(name)!.push(r)
+    })
+
+    const groups: DatasetRunGroup[] = []
+    map.forEach((runsList, datasetName) => {
+      // 1. 按创建时间倒序排
+      const sortedRuns = [...runsList].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+      const completedRuns = sortedRuns.filter((r) => r.status === 'completed')
+
+      // 2. 历史最优打擂记录（按 overall_score 降序）
+      const sortedByScore = [...completedRuns].sort((a, b) => {
+        const sa = typeof a.overall_score === 'number' ? a.overall_score : -1
+        const sb = typeof b.overall_score === 'number' ? b.overall_score : -1
+        return sb - sa
+      })
+      const bestRun = sortedByScore.length > 0 ? sortedByScore[0] : null
+      const bestScore = bestRun ? bestRun.overall_score ?? null : null
+      const bestPassRate = bestRun ? bestRun.pass_rate ?? null : null
+      const bestModes = bestRun ? bestRun.modes : []
+
+      // 3. 最新与次新打擂（用于计算迭代涨跌走势 Quality Delta）
+      const latestRun = completedRuns.length > 0 ? completedRuns[0] : null
+      const previousRun = completedRuns.length > 1 ? completedRuns[1] : null
+      const latestScore = latestRun ? latestRun.overall_score ?? null : null
+      const previousScore = previousRun ? previousRun.overall_score ?? null : null
+
+      let scoreDelta: number | null = null
+      if (typeof latestScore === 'number' && typeof previousScore === 'number') {
+        scoreDelta = latestScore - previousScore
+      }
+
+      // 4. 模式并集与项目并集
+      const modeSet = new Set<string>()
+      sortedRuns.forEach((r) => r.modes?.forEach((m) => modeSet.add(m)))
+      const projSet = new Set<string>()
+      sortedRuns.forEach((r) => r.project_id && projSet.add(r.project_id))
+
+      groups.push({
+        datasetName,
+        projectIds: Array.from(projSet),
+        runs: sortedRuns,
+        completedRuns,
+        totalCount: sortedRuns.length,
+        bestRun,
+        bestScore,
+        bestPassRate,
+        bestModes,
+        latestRun,
+        latestScore,
+        previousRun,
+        previousScore,
+        scoreDelta,
+        allModes: Array.from(modeSet),
+        latestCreatedAt: sortedRuns[0]?.created_at || ''
+      })
+    })
+
+    // 按最新一次打擂时间倒序排列题库
+    return groups.sort(
+      (a, b) => new Date(b.latestCreatedAt).getTime() - new Date(a.latestCreatedAt).getTime()
+    )
+  }, [filteredHistoryRuns, workspaceList])
+
+  // 默认自动展开第 1 个题库聚类卡片
+  useEffect(() => {
+    if (datasetGroups.length > 0 && expandedDatasets.size === 0) {
+      setExpandedDatasets(new Set([datasetGroups[0].datasetName]))
+    }
+  }, [datasetGroups])
+
+  const handleToggleExpandDataset = (name: string) => {
+    setExpandedDatasets((prev) => {
+      const next = new Set(prev)
+      if (next.has(name)) {
+        next.delete(name)
+      } else {
+        next.add(name)
+      }
+      return next
+    })
+  }
+
+  // 统计指标（动态响应筛选结果）
   const summaryStats = useMemo(() => {
-    const completed = historyRuns.filter((r) => r.status === 'completed')
-    const totalCount = runs.length
+    const completed = filteredHistoryRuns.filter((r) => r.status === 'completed')
+    const totalCount = filteredHistoryRuns.length
     const scores = completed
       .map((r) => r.overall_score)
       .filter((s): s is number => typeof s === 'number')
@@ -306,7 +510,7 @@ export default function EvaluationTaskCenter({
       avgScore,
       maxPassRate
     }
-  }, [runs, historyRuns, runningRuns])
+  }, [filteredHistoryRuns, runningRuns])
 
   // 过滤用例明细
   const filteredCases = useMemo(() => {
@@ -326,6 +530,361 @@ export default function EvaluationTaskCenter({
     }
     return list
   }, [taskDetail, failedOnlyFilter, caseSearch])
+
+  // 渲染单场打擂卡片（供时间流水与评测集内层时序复用）
+  const renderRunCard = (r: EvalRunItem, showDatasetName = false) => {
+    const isExpanded = expandedTaskId === r.task_id
+    const score = r.overall_score
+    const passRate = r.pass_rate
+
+    return (
+      <div
+        key={r.task_id}
+        className={cn(
+          'rounded-xl border transition-all duration-200 overflow-hidden',
+          isExpanded
+            ? 'border-indigo-500/50 bg-card shadow-xs'
+            : 'border-border/70 bg-card/60 hover:border-border hover:bg-card/90'
+        )}
+      >
+        {/* 卡片主信息栏：自适应宽屏与窄屏 */}
+        <div
+          className="p-3.5 sm:p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 cursor-pointer select-none"
+          onClick={() => handleToggleExpandTask(r.task_id)}
+        >
+          {/* 左半区：展开指示器 + 题库信息 + 时间参数 + 模式标签群 */}
+          <div className="flex items-start sm:items-center gap-3 min-w-0">
+            <div className="p-1 rounded-md bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0 shrink-0">
+              {isExpanded ? (
+                <ChevronDownIcon className="size-4 text-indigo-500" />
+              ) : (
+                <ChevronRightIcon className="size-4" />
+              )}
+            </div>
+
+            <div className="space-y-1.5 min-w-0">
+              {/* 第一行：题库文件名 / 场次编号 + 知识库项目徽标 + 状态彩色徽标 + 抽题数标签 */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {showDatasetName ? (
+                  <>
+                    <FileTextIcon className="size-4 text-indigo-500 shrink-0" />
+                    <span className="font-semibold text-sm text-foreground tracking-tight truncate max-w-md">
+                      {r.dataset_name}
+                    </span>
+                  </>
+                ) : (
+                  <span className="font-mono text-xs font-semibold text-foreground px-2 py-0.5 rounded bg-muted/80 border border-border/50">
+                    打擂 #{r.task_id.replace('task_', '').slice(0, 8)}
+                  </span>
+                )}
+
+                {/* 归属知识库徽标 */}
+                {(showDatasetName || selectedProjectFilter === 'all') && r.project_id && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border/50 flex items-center gap-1">
+                    <FolderGit2Icon className="size-2.5 text-indigo-500" />
+                    <span>{getProjectName(r.project_id)}</span>
+                  </span>
+                )}
+
+                {r.status === 'completed' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    已完成
+                  </span>
+                ) : r.status === 'aborted' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                    已中止
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                    异常失败
+                  </span>
+                )}
+                {r.limit_count && (
+                  <span className="text-[11px] font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                    抽测 {r.limit_count} 题
+                  </span>
+                )}
+              </div>
+
+              {/* 第二行：执行时间 + Top-K + 模式徽标组 */}
+              <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                <div className="flex items-center gap-1 font-mono">
+                  <ClockIcon className="size-3 text-muted-foreground/70" />
+                  <span>
+                    {new Date(r.created_at).toLocaleString('zh-CN', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    })}
+                  </span>
+                </div>
+                <span>•</span>
+                <span>Top-K: {r.top_k}</span>
+                <span>•</span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-muted-foreground/80">检索模式:</span>
+                  {r.modes.map((m) => (
+                    <span
+                      key={m}
+                      className="px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40"
+                    >
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 右半区：评分胶囊板 + 操作按钮组 */}
+          <div
+            className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-border/40"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 综合分与通过率评分面板 */}
+            <div className="flex items-center gap-3 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/60">
+              <div className="text-right">
+                <div className="text-[10px] text-muted-foreground font-medium">综合分</div>
+                <div className="text-sm font-bold font-mono">
+                  {typeof score === 'number' ? (
+                    <span
+                      className={
+                        score >= 0.8
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : score >= 0.5
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : 'text-rose-600 dark:text-rose-400'
+                      }
+                    >
+                      {(score * 100).toFixed(1)}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">--</span>
+                  )}
+                </div>
+              </div>
+              <div className="w-px h-6 bg-border/70" />
+              <div className="text-right">
+                <div className="text-[10px] text-muted-foreground font-medium">通过率</div>
+                <div className="text-sm font-semibold font-mono">
+                  {typeof passRate === 'number' ? (
+                    <span
+                      className={
+                        passRate > 0.5
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : passRate > 0
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-muted-foreground'
+                      }
+                    >
+                      {(passRate * 100).toFixed(0)}%
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">--</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 按钮群 */}
+            <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={rerunningTaskId === r.task_id}
+                onClick={() => setRerunConfirmItem(r)}
+                className="h-8 px-2.5 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-medium"
+                title="重新执行此场打擂评测"
+              >
+                <RotateCwIcon className={cn('size-3.5', rerunningTaskId === r.task_id && 'animate-spin')} />
+                <span>{rerunningTaskId === r.task_id ? '重跑中' : '重跑'}</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleToggleExpandTask(r.task_id)}
+                className="h-8 px-2.5 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
+              >
+                {isExpanded ? '收起详情' : '指标明细'}
+              </Button>
+
+              {r.result_url && (
+                <a
+                  href={r.result_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 h-8 px-2.5 text-xs rounded-md border border-border/80 hover:bg-muted text-foreground transition-colors"
+                  title="在新窗口打开 MLflow 深度比对大屏"
+                >
+                  <span>MLflow</span>
+                  <ExternalLinkIcon className="size-3 text-muted-foreground" />
+                </a>
+              )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={deletingTaskId === r.task_id}
+                onClick={() => setDeleteConfirmItem(r)}
+                className="h-8 px-2 text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-500/10"
+                title="删除此场打擂评测成果"
+              >
+                {deletingTaskId === r.task_id ? (
+                  <Loader2Icon className="size-3.5 animate-spin" />
+                ) : (
+                  <Trash2Icon className="size-3.5" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* 展开面板：5 大指标卡片 + 用例扣分诊断 */}
+        {isExpanded && (
+          <div className="p-4 bg-muted/20 border-t border-border/60 space-y-4">
+            {detailLoading ? (
+              <div className="py-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Loader2Icon className="size-4 animate-spin text-indigo-500" />
+                <span>正在解密打擂用例报告与多维证据链...</span>
+              </div>
+            ) : taskDetail ? (
+              <div className="space-y-4">
+                {/* 1. 五大指标雷达评分卡 */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <BrainCircuitIcon className="size-3.5 text-indigo-500" />
+                      <span>核心维度指标得分卡 (Metrics Breakdown)</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={rerunningTaskId === r.task_id}
+                      onClick={() => setRerunConfirmItem(r)}
+                      className="h-6 px-2 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400"
+                      title="以相同题库与检索模式重新打擂"
+                    >
+                      <RotateCwIcon className={cn('size-3', rerunningTaskId === r.task_id && 'animate-spin')} />
+                      <span>{rerunningTaskId === r.task_id ? '正在重跑...' : '重跑本次打擂'}</span>
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
+                    {[
+                      {
+                        key: 'faithfulness',
+                        label: '忠实度 (Faithfulness)',
+                        desc: '防幻觉·材料实证支撑'
+                      },
+                      {
+                        key: 'answer_relevancy',
+                        label: '回答相关性 (Relevancy)',
+                        desc: '紧扣提问·无废话'
+                      },
+                      {
+                        key: 'contextual_recall',
+                        label: '检索召回率 (Recall)',
+                        desc: '黄金标准答案覆盖率'
+                      },
+                      {
+                        key: 'contextual_precision',
+                        label: '检索精确度 (Precision)',
+                        desc: '有效切片排序靠前度'
+                      },
+                      {
+                        key: 'counterfactual_assertion',
+                        label: '反事实抗扰度 (Counterfactual)',
+                        desc: '抵御伪造事实诱导'
+                      }
+                    ].map((m) => {
+                      const val = taskDetail.metrics_summary?.[m.key]
+                      const hasVal = typeof val === 'number'
+
+                      return (
+                        <div
+                          key={m.key}
+                          className="p-3 rounded-lg bg-card border border-border/70 space-y-1.5 shadow-2xs"
+                        >
+                          <div className="text-[11px] font-medium text-muted-foreground truncate">
+                            {m.label}
+                          </div>
+                          <div className="flex items-baseline justify-between">
+                            <div
+                              className={cn(
+                                'text-lg font-bold font-mono',
+                                hasVal
+                                  ? val >= 0.8
+                                    ? 'text-emerald-500'
+                                    : val >= 0.5
+                                      ? 'text-blue-500'
+                                      : 'text-amber-500'
+                                  : 'text-muted-foreground'
+                              )}
+                            >
+                              {hasVal ? (val * 100).toFixed(1) : 'N/A'}
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">
+                              {hasVal ? (val >= 0.7 ? '达标' : '未达标') : '无数据'}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-muted-foreground/70 truncate">
+                            {m.desc}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. 用例扣分诊断与背靠背问答分析 */}
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <SwordsIcon className="size-3.5 text-indigo-500" />
+                      <span>背靠背诊断与裁判问询 ({taskDetail.cases?.length || 0} 题)</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <SearchIcon className="size-3 absolute left-2 top-2 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={caseSearch}
+                          onChange={(e) => setCaseSearch(e.target.value)}
+                          placeholder="搜索考题或答案..."
+                          className="h-7 pl-6 pr-2 text-xs rounded-md border border-border/80 bg-background focus:outline-none w-36 lg:w-48"
+                        />
+                      </div>
+                      <Button
+                        variant={failedOnlyFilter ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setFailedOnlyFilter(!failedOnlyFilter)}
+                        className={cn(
+                          'h-7 text-xs gap-1',
+                          failedOnlyFilter && 'bg-rose-600 hover:bg-rose-700 text-white'
+                        )}
+                      >
+                        <span>仅看扣分/未通过题</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+                    {filteredCases.map((c) => (
+                      <TestCaseCard key={c.test_number} c={c} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -487,86 +1046,199 @@ export default function EvaluationTaskCenter({
       )}
 
       {/* 模块 2：🏆 历史打擂成果表与指标总览 */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="space-y-3.5">
+        {/* 多维控制工具栏：标题、项目选择、题库过滤、搜索、双视图切换 */}
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-card/60 p-3 sm:p-3.5 rounded-xl border border-border/70 shadow-2xs">
+          {/* 左侧：标题与成果数量指示 */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="size-7 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+              <TrophyIcon className="size-4" />
+            </div>
             <h3 className="text-sm font-semibold text-foreground">
-              历史打擂成果归档 ({historyRuns.length})
+              历史打擂成果归档 ({filteredHistoryRuns.length})
             </h3>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground hidden lg:inline">
               （包含全量多参数打擂得分、5 大指标雷达均值及用例判词）
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchRuns(false)}
-              className="h-7 text-xs gap-1"
-            >
-              <RefreshCwIcon className={cn('size-3', loading && 'animate-spin')} />
-              <span>刷新成果</span>
-            </Button>
-            {onTriggerNewBattle && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={onTriggerNewBattle}
-                className="h-7 bg-indigo-600 hover:bg-indigo-700 text-white text-xs gap-1"
+          {/* 右侧：多维过滤器与视图切换控制器 */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            {/* 1. 知识库项目范围筛选 */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2 py-1 rounded-lg border border-border/60">
+              <FolderGit2Icon className="size-3.5 text-indigo-500 shrink-0" />
+              <select
+                value={selectedProjectFilter}
+                onChange={(e) => setSelectedProjectFilter(e.target.value)}
+                className="bg-transparent text-foreground text-xs font-medium focus:outline-none cursor-pointer max-w-[150px] truncate"
+                title="切换查看指定知识库项目或全部项目的评测成果"
               >
-                <SwordsIcon className="size-3" />
-                <span>发起新打擂</span>
-              </Button>
+                <option value={currentProjectId}>当前项目: {getProjectName(currentProjectId)}</option>
+                <option value="all">🌐 全部知识库全景 (All Projects)</option>
+                {workspaceList
+                  ?.filter((w) => w.project_id !== currentProjectId)
+                  .map((w) => (
+                    <option key={w.project_id} value={w.project_id}>
+                      🏢 {w.name || w.project_id}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* 2. 评测集快速过滤 */}
+            {availableDatasets.length > 1 && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2 py-1 rounded-lg border border-border/60">
+                <FileTextIcon className="size-3.5 text-indigo-500 shrink-0" />
+                <select
+                  value={selectedDatasetFilter}
+                  onChange={(e) => setSelectedDatasetFilter(e.target.value)}
+                  className="bg-transparent text-foreground text-xs font-medium focus:outline-none cursor-pointer max-w-[130px] truncate"
+                  title="按评测集快速筛选"
+                >
+                  <option value="all">全部评测集 ({availableDatasets.length})</option>
+                  {availableDatasets.map((ds) => (
+                    <option key={ds} value={ds}>
+                      {ds}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
+
+            {/* 3. 关键词搜索 */}
+            <div className="relative">
+              <SearchIcon className="size-3 absolute left-2 top-2 text-muted-foreground" />
+              <input
+                type="text"
+                value={datasetSearch}
+                onChange={(e) => setDatasetSearch(e.target.value)}
+                placeholder="搜索题库/模式/项目..."
+                className="h-7 pl-6 pr-2 text-xs rounded-md border border-border/80 bg-background focus:outline-none w-28 sm:w-36 focus:w-44 transition-all"
+              />
+            </div>
+
+            {/* 4. 视图切换 Segmented Control */}
+            <div className="flex items-center bg-muted/80 p-0.5 rounded-lg border border-border/60 text-xs font-medium shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('dataset')}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer text-xs',
+                  viewMode === 'dataset'
+                    ? 'bg-background text-indigo-600 dark:text-indigo-400 font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="按评测集聚类归纳看板，展示历史最高分与质量涨跌走势"
+              >
+                <LayersIcon className="size-3 text-indigo-500" />
+                <span>评测集聚类</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('timeline')}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 py-1 rounded-md transition-all cursor-pointer text-xs',
+                  viewMode === 'timeline'
+                    ? 'bg-background text-indigo-600 dark:text-indigo-400 font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="按时间倒序平铺流水账"
+              >
+                <ClockIcon className="size-3" />
+                <span>时间流水</span>
+              </button>
+            </div>
+
+            {/* 5. 刷新成果与发起新打擂 */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchRuns(false)}
+                className="h-7 px-2 text-xs gap-1"
+                title="刷新成果列表"
+              >
+                <RefreshCwIcon className={cn('size-3', loading && 'animate-spin')} />
+                <span className="hidden sm:inline">刷新</span>
+              </Button>
+              {onTriggerNewBattle && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={onTriggerNewBattle}
+                  className="h-7 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs gap-1 shadow-xs"
+                >
+                  <SwordsIcon className="size-3" />
+                  <span className="hidden sm:inline">发起新打擂</span>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
-        {historyRuns.length === 0 ? (
+        {/* 成果卡片列表渲染 */}
+        {filteredHistoryRuns.length === 0 ? (
           <Card className="bg-card/40 border-dashed border-border/80">
             <CardContent className="p-8 text-center space-y-3">
               <div className="size-10 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
                 <SwordsIcon className="size-5" />
               </div>
               <div className="space-y-1">
-                <div className="text-sm font-medium text-foreground">暂无已完成的打擂历史</div>
+                <div className="text-sm font-medium text-foreground">
+                  {historyRuns.length > 0 ? '未匹配到符合当前筛选条件的打擂成果' : '暂无已完成的打擂历史'}
+                </div>
                 <div className="text-xs text-muted-foreground">
-                  可以在评测工坊选择评测题库后，点击【矩阵参数打擂】发起一轮全方位评估。
+                  {historyRuns.length > 0
+                    ? '可尝试重置项目、评测集筛选下拉或清空搜索关键词。'
+                    : '可以在评测工坊选择评测题库后，点击【矩阵参数打擂】发起一轮全方位评估。'}
                 </div>
               </div>
-              {onSwitchToTestsets && (
+              {historyRuns.length > 0 ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedDatasetFilter('all')
+                    setDatasetSearch('')
+                  }}
+                  className="text-xs"
+                >
+                  重置筛选条件
+                </Button>
+              ) : onSwitchToTestsets ? (
                 <Button variant="outline" size="sm" onClick={onSwitchToTestsets} className="text-xs">
                   去题库工作台选考题
                 </Button>
-              )}
+              ) : null}
             </CardContent>
           </Card>
-        ) : (
-          <div className="space-y-3">
-            {historyRuns.map((r) => {
-              const isExpanded = expandedTaskId === r.task_id
-              const score = r.overall_score
-              const passRate = r.pass_rate
+        ) : viewMode === 'dataset' ? (
+          /* 模式 A：按评测集聚类看板 (Dataset Grouping View) */
+          <div className="space-y-3.5">
+            {datasetGroups.map((group) => {
+              const isGroupExpanded = expandedDatasets.has(group.datasetName)
+              const bestScore = group.bestScore
+              const bestPassRate = group.bestPassRate
 
               return (
                 <div
-                  key={r.task_id}
+                  key={group.datasetName}
                   className={cn(
                     'rounded-xl border transition-all duration-200 overflow-hidden',
-                    isExpanded
+                    isGroupExpanded
                       ? 'border-indigo-500/50 bg-card shadow-xs'
                       : 'border-border/70 bg-card/60 hover:border-border hover:bg-card/90'
                   )}
                 >
-                  {/* 卡片主信息栏：信息层次分明，自适应宽屏与窄屏 */}
+                  {/* 评测集卡片外层头部概览 */}
                   <div
                     className="p-3.5 sm:p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 cursor-pointer select-none"
-                    onClick={() => handleToggleExpandTask(r.task_id)}
+                    onClick={() => handleToggleExpandDataset(group.datasetName)}
                   >
-                    {/* 左半区：展开指示器 + 题库信息 + 时间参数 + 模式标签群 */}
+                    {/* 左半区：折叠指示 + 评测集名 + 来源项目 + 场次 + 模式并集 */}
                     <div className="flex items-start sm:items-center gap-3 min-w-0">
-                      <div className="p-1 rounded-md bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0 shrink-0">
-                        {isExpanded ? (
+                      <div className="p-1.5 rounded-md bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0 shrink-0">
+                        {isGroupExpanded ? (
                           <ChevronDownIcon className="size-4 text-indigo-500" />
                         ) : (
                           <ChevronRightIcon className="size-4" />
@@ -574,56 +1246,50 @@ export default function EvaluationTaskCenter({
                       </div>
 
                       <div className="space-y-1.5 min-w-0">
-                        {/* 第一行：题库文件名 + 状态彩色徽标 + 抽题数标签 */}
                         <div className="flex items-center gap-2 flex-wrap">
                           <FileTextIcon className="size-4 text-indigo-500 shrink-0" />
-                          <span className="font-semibold text-sm text-foreground tracking-tight truncate max-w-md">
-                            {r.dataset_name}
+                          <span className="font-bold text-sm text-foreground tracking-tight truncate max-w-md">
+                            {group.datasetName}
                           </span>
-                          {r.status === 'completed' ? (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              已完成
+
+                          {/* 来源项目徽标 */}
+                          {group.projectIds.map((pid) => (
+                            <span
+                              key={pid}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border border-border/50 flex items-center gap-1"
+                            >
+                              <FolderGit2Icon className="size-2.5 text-indigo-500" />
+                              <span>{getProjectName(pid)}</span>
                             </span>
-                          ) : r.status === 'aborted' ? (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                              已中止
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                              异常失败
-                            </span>
-                          )}
-                          {r.limit_count && (
-                            <span className="text-[11px] font-mono text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
-                              抽测 {r.limit_count} 题
-                            </span>
-                          )}
+                          ))}
+
+                          {/* 场次徽标 */}
+                          <span className="text-[11px] font-mono text-muted-foreground px-2 py-0.5 rounded bg-muted/60 border border-border/50">
+                            共 {group.totalCount} 场打擂
+                            {group.completedRuns.length > 0 && ` (${group.completedRuns.length} 场获分)`}
+                          </span>
                         </div>
 
-                        {/* 第二行：执行时间 + Top-K + 模式徽标组 */}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                          <div className="flex items-center gap-1 font-mono">
+                        {/* 第二行：模式标签群 + 最近打擂时间 */}
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                          <div className="flex items-center gap-1 font-mono text-[11px]">
                             <ClockIcon className="size-3 text-muted-foreground/70" />
                             <span>
-                              {new Date(r.created_at).toLocaleString('zh-CN', {
-                                year: 'numeric',
+                              最近: {new Date(group.latestCreatedAt).toLocaleString('zh-CN', {
                                 month: '2-digit',
                                 day: '2-digit',
                                 hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
+                                minute: '2-digit'
                               })}
                             </span>
                           </div>
                           <span>•</span>
-                          <span>Top-K: {r.top_k}</span>
-                          <span>•</span>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-muted-foreground/80">检索模式:</span>
-                            {r.modes.map((m) => (
+                            <span className="text-muted-foreground/80 text-[11px]">覆盖模式:</span>
+                            {group.allModes.map((m) => (
                               <span
                                 key={m}
-                                className="px-1.5 py-0.5 rounded text-[11px] font-mono font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40"
+                                className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40"
                               >
                                 {m}
                               </span>
@@ -633,237 +1299,101 @@ export default function EvaluationTaskCenter({
                       </div>
                     </div>
 
-                    {/* 右半区：评分胶囊板 + 永不折叠的操作按钮组 */}
+                    {/* 右半区：冠军分 + 质量演进涨跌幅 + 展开按钮 */}
                     <div
-                      className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-border/40"
+                      className="flex items-center justify-between sm:justify-end gap-3 sm:gap-3.5 shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-border/40"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* 综合分与通过率评分面板 */}
-                      <div className="flex items-center gap-3 bg-muted/40 px-3 py-1.5 rounded-lg border border-border/60">
+                      {/* 🏆 历史最优分胶囊 */}
+                      <div className="flex items-center gap-2 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 px-3 py-1.5 rounded-lg">
+                        <TrophyIcon className="size-4 text-amber-500 shrink-0" />
                         <div className="text-right">
-                          <div className="text-[10px] text-muted-foreground font-medium">综合分</div>
-                          <div className="text-sm font-bold font-mono">
-                            {typeof score === 'number' ? (
-                              <span
-                                className={
-                                  score >= 0.8
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : score >= 0.5
-                                      ? 'text-blue-600 dark:text-blue-400'
-                                      : 'text-rose-600 dark:text-rose-400'
-                                }
-                              >
-                                {(score * 100).toFixed(1)}
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">--</span>
-                            )}
+                          <div className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                            历史最优战绩
                           </div>
-                        </div>
-                        <div className="w-px h-6 bg-border/70" />
-                        <div className="text-right">
-                          <div className="text-[10px] text-muted-foreground font-medium">通过率</div>
-                          <div className="text-sm font-semibold font-mono">
-                            {typeof passRate === 'number' ? (
-                              <span
-                                className={
-                                  passRate > 0.5
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : passRate > 0
-                                      ? 'text-amber-600 dark:text-amber-400'
-                                      : 'text-muted-foreground'
-                                }
-                              >
-                                {(passRate * 100).toFixed(0)}%
+                          <div className="text-sm font-bold font-mono text-amber-700 dark:text-amber-300">
+                            {typeof bestScore === 'number' ? `${(bestScore * 100).toFixed(1)}分` : '--'}
+                            {typeof bestPassRate === 'number' && (
+                              <span className="text-[10px] font-normal text-amber-600/80 ml-1">
+                                ({(bestPassRate * 100).toFixed(0)}%达标)
                               </span>
-                            ) : (
-                              <span className="text-muted-foreground">--</span>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* 按钮群：水平紧凑排列，whitespace-nowrap，绝对不换行 */}
-                      <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={rerunningTaskId === r.task_id}
-                          onClick={() => setRerunConfirmItem(r)}
-                          className="h-8 px-2.5 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-medium"
-                          title="重新执行此场打擂评测"
-                        >
-                          <RotateCwIcon className={cn('size-3.5', rerunningTaskId === r.task_id && 'animate-spin')} />
-                          <span>{rerunningTaskId === r.task_id ? '重跑中' : '重跑'}</span>
-                        </Button>
+                      {/* 📈 最新战绩与迭代质量演进 */}
+                      <div className="flex items-center gap-2 bg-muted/40 border border-border/60 px-3 py-1.5 rounded-lg">
+                        <div className="text-right">
+                          <div className="text-[10px] text-muted-foreground font-medium">
+                            最新战绩 / 涨跌
+                          </div>
+                          <div className="text-sm font-bold font-mono flex items-center justify-end gap-1">
+                            <span>
+                              {typeof group.latestScore === 'number'
+                                ? `${(group.latestScore * 100).toFixed(1)}分`
+                                : '--'}
+                            </span>
+                            {group.scoreDelta !== null ? (
+                              group.scoreDelta > 0.0001 ? (
+                                <span className="inline-flex items-center text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                  <TrendingUpIcon className="size-3 mr-0.5" />
+                                  +{(group.scoreDelta * 100).toFixed(1)}%
+                                </span>
+                              ) : group.scoreDelta < -0.0001 ? (
+                                <span className="inline-flex items-center text-[11px] text-rose-600 dark:text-rose-400 font-semibold">
+                                  <TrendingDownIcon className="size-3 mr-0.5" />
+                                  {(group.scoreDelta * 100).toFixed(1)}%
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground font-normal">持平</span>
+                              )
+                            ) : group.latestRun ? (
+                              <span className="text-[10px] text-indigo-500 font-normal">首测基线</span>
+                            ) : null}
+                          </div>
+                        </div>
+                      </div>
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleExpandTask(r.task_id)}
-                          className="h-8 px-2.5 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
-                        >
-                          {isExpanded ? '收起详情' : '指标明细'}
-                        </Button>
-
-                        {r.result_url && (
-                          <a
-                            href={r.result_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 h-8 px-2.5 text-xs rounded-md border border-border/80 hover:bg-muted text-foreground transition-colors"
-                            title="在新窗口打开 MLflow 深度比对大屏"
-                          >
-                            <span>MLflow</span>
-                            <ExternalLinkIcon className="size-3 text-muted-foreground" />
-                          </a>
+                      {/* 展开/收起按钮 */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleExpandDataset(group.datasetName)}
+                        className="h-8 px-2.5 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 whitespace-nowrap"
+                      >
+                        <span>{isGroupExpanded ? '收起时序' : `展开时序 (${group.runs.length})`}</span>
+                        {isGroupExpanded ? (
+                          <ChevronDownIcon className="size-3 ml-0.5" />
+                        ) : (
+                          <ChevronRightIcon className="size-3 ml-0.5" />
                         )}
-                      </div>
+                      </Button>
                     </div>
                   </div>
 
-                  {/* 展开面板：5 大指标卡片 + 用例扣分诊断 */}
-                  {isExpanded && (
-                    <div className="p-4 bg-muted/20 border-t border-border/60 space-y-4">
-                      {detailLoading ? (
-                        <div className="py-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                          <Loader2Icon className="size-4 animate-spin text-indigo-500" />
-                          <span>正在解密打擂用例报告与多维证据链...</span>
-                        </div>
-                      ) : taskDetail ? (
-                        <div className="space-y-4">
-                          {/* 1. 五大指标雷达评分卡 */}
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                                <BrainCircuitIcon className="size-3.5 text-indigo-500" />
-                                <span>核心维度指标得分卡 (Metrics Breakdown)</span>
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={rerunningTaskId === r.task_id}
-                                onClick={() => setRerunConfirmItem(r)}
-                                className="h-6 px-2 text-xs gap-1 border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400"
-                                title="以相同题库与检索模式重新打擂"
-                              >
-                                <RotateCwIcon className={cn('size-3', rerunningTaskId === r.task_id && 'animate-spin')} />
-                                <span>{rerunningTaskId === r.task_id ? '正在重跑...' : '重跑本次打擂'}</span>
-                              </Button>
-                            </div>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
-                              {[
-                                {
-                                  key: 'faithfulness',
-                                  label: '忠实度 (Faithfulness)',
-                                  desc: '防幻觉·材料实证支撑'
-                                },
-                                {
-                                  key: 'answer_relevancy',
-                                  label: '回答相关性 (Relevancy)',
-                                  desc: '紧扣提问·无废话'
-                                },
-                                {
-                                  key: 'contextual_recall',
-                                  label: '检索召回率 (Recall)',
-                                  desc: '黄金标准答案覆盖率'
-                                },
-                                {
-                                  key: 'contextual_precision',
-                                  label: '检索精确度 (Precision)',
-                                  desc: '有效切片排序靠前度'
-                                },
-                                {
-                                  key: 'counterfactual_assertion',
-                                  label: '反事实抗扰度 (Counterfactual)',
-                                  desc: '抵御伪造事实诱导'
-                                }
-                              ].map((m) => {
-                                const val = taskDetail.metrics_summary?.[m.key]
-                                const hasVal = typeof val === 'number'
-
-                                return (
-                                  <div
-                                    key={m.key}
-                                    className="p-3 rounded-lg bg-card border border-border/70 space-y-1.5 shadow-2xs"
-                                  >
-                                    <div className="text-[11px] font-medium text-muted-foreground truncate">
-                                      {m.label}
-                                    </div>
-                                    <div className="flex items-baseline justify-between">
-                                      <div
-                                        className={cn(
-                                          'text-lg font-bold font-mono',
-                                          hasVal
-                                            ? val >= 0.8
-                                              ? 'text-emerald-500'
-                                              : val >= 0.5
-                                                ? 'text-blue-500'
-                                                : 'text-amber-500'
-                                            : 'text-muted-foreground'
-                                        )}
-                                      >
-                                        {hasVal ? (val * 100).toFixed(1) : 'N/A'}
-                                      </div>
-                                      <span className="text-[10px] text-muted-foreground">
-                                        {hasVal ? (val >= 0.7 ? '达标' : '未达标') : '无数据'}
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-muted-foreground/70 truncate">
-                                      {m.desc}
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </div>
-
-                          {/* 2. 用例扣分诊断与背靠背问答分析 */}
-                          <div>
-                            <div className="flex items-center justify-between gap-2 mb-2">
-                              <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                                <SwordsIcon className="size-3.5 text-indigo-500" />
-                                <span>背靠背诊断与裁判问询 ({taskDetail.cases?.length || 0} 题)</span>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <div className="relative">
-                                  <SearchIcon className="size-3 absolute left-2 top-2 text-muted-foreground" />
-                                  <input
-                                    type="text"
-                                    value={caseSearch}
-                                    onChange={(e) => setCaseSearch(e.target.value)}
-                                    placeholder="搜索考题或答案..."
-                                    className="h-7 pl-6 pr-2 text-xs rounded-md border border-border/80 bg-background focus:outline-none w-36 lg:w-48"
-                                  />
-                                </div>
-                                <Button
-                                  variant={failedOnlyFilter ? 'default' : 'outline'}
-                                  size="sm"
-                                  onClick={() => setFailedOnlyFilter(!failedOnlyFilter)}
-                                  className={cn(
-                                    'h-7 text-xs gap-1',
-                                    failedOnlyFilter && 'bg-rose-600 hover:bg-rose-700 text-white'
-                                  )}
-                                >
-                                  <span>仅看扣分/未通过题</span>
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
-                              {filteredCases.map((c) => (
-                                <TestCaseCard key={c.test_number} c={c} />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ) : null}
+                  {/* 展开内层：该评测集专属打擂时序子列表 */}
+                  {isGroupExpanded && (
+                    <div className="p-3.5 bg-muted/15 border-t border-border/60 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground px-1 pb-1 border-b border-border/40">
+                        <span className="font-medium">
+                          该评测集历次打擂记录（按时间倒序，点击卡片展开指标明细与扣分诊断）：
+                        </span>
+                        <span className="font-mono text-[11px]">{group.runs.length} 轮测试</span>
+                      </div>
+                      <div className="space-y-2.5">
+                        {group.runs.map((r) => renderRunCard(r, false))}
+                      </div>
                     </div>
                   )}
                 </div>
               )
             })}
+          </div>
+        ) : (
+          /* 模式 B：时间流水账 (Flat Timeline) */
+          <div className="space-y-3">
+            {filteredHistoryRuns.map((r) => renderRunCard(r, true))}
           </div>
         )}
       </div>
@@ -989,6 +1519,74 @@ export default function EvaluationTaskCenter({
             >
               <RotateCwIcon className={cn('size-3.5', !!rerunningTaskId && 'animate-spin')} />
               <span>{rerunningTaskId ? '正在排队发起...' : '确认重跑'}</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 模块 5：确认删除打擂成果弹窗 (Delete Confirmation Dialog) */}
+      <Dialog open={!!deleteConfirmItem} onOpenChange={(open) => !open && setDeleteConfirmItem(null)}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base text-rose-600 dark:text-rose-400">
+              <div className="size-7 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                <Trash2Icon className="size-4" />
+              </div>
+              <span>确认彻底删除此打擂成果？</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs pt-1">
+              删除后将彻底清除该场次在数据库中的全部得分、五大雷达指标及用例裁判记录，此操作不可撤销。
+            </DialogDescription>
+          </DialogHeader>
+
+          {deleteConfirmItem && (
+            <div className="py-2.5 px-3 rounded-lg bg-muted/40 border border-border/60 text-xs space-y-1.5 font-mono">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">任务编号:</span>
+                <span className="text-foreground font-semibold">{deleteConfirmItem.task_id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">评测题库:</span>
+                <span className="text-foreground font-semibold">{deleteConfirmItem.dataset_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">所属项目:</span>
+                <span className="text-foreground">{getProjectName(deleteConfirmItem.project_id)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">状态 / 综合分:</span>
+                <span>
+                  {deleteConfirmItem.status} /{' '}
+                  {typeof deleteConfirmItem.overall_score === 'number'
+                    ? `${(deleteConfirmItem.overall_score * 100).toFixed(1)}分`
+                    : '--'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex items-center justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDeleteConfirmItem(null)}
+              className="text-xs h-8 px-3"
+            >
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={!deleteConfirmItem || deletingTaskId === deleteConfirmItem.task_id}
+              onClick={() => deleteConfirmItem && handleDeleteRun(deleteConfirmItem.task_id)}
+              className="text-xs h-8 px-3 gap-1.5 bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              {deletingTaskId ? (
+                <Loader2Icon className="size-3.5 animate-spin" />
+              ) : (
+                <Trash2Icon className="size-3.5" />
+              )}
+              <span>{deletingTaskId ? '正在删除...' : '确认彻底删除'}</span>
             </Button>
           </DialogFooter>
         </DialogContent>
