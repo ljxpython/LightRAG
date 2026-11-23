@@ -341,7 +341,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                   className="mb-4 text-xs text-slate-600 dark:text-slate-300"
                 />
               )}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="mx-auto w-full max-w-[340px] space-y-4">
                 {/* Username Input */}
                 <div className="space-y-1.5">
                   <label htmlFor="username-input" className="text-xs font-medium text-slate-700 dark:text-slate-300">
@@ -355,7 +355,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
-                      className="h-11 rounded-lg border-slate-200 bg-slate-50/80 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
+                      className="h-11 w-full rounded-lg border-slate-200 bg-slate-50/80 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
                     />
                   </div>
                 </div>
@@ -374,7 +374,7 @@ const LoginPage = ({ autoActivateGuest = true }: LoginPageProps) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="h-11 rounded-lg border-slate-200 bg-slate-50/80 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
+                      className="h-11 w-full rounded-lg border-slate-200 bg-slate-50/80 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:bg-white focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500 dark:focus-visible:border-emerald-500"
                     />
                     <button
                       type="button"
