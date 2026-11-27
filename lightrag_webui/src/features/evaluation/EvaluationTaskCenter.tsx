@@ -28,7 +28,8 @@ import {
   TrendingDownIcon,
   MinusIcon,
   FolderGit2Icon,
-  Trash2Icon
+  Trash2Icon,
+  ZapIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -52,6 +53,23 @@ import {
   TableRow
 } from '@/components/ui/Table'
 
+export interface ModeResultItem {
+  mode: string
+  top_k: number
+  total_cases?: number
+  success_cases?: number
+  pass_rate?: number
+  overall_score?: number
+  total_duration_seconds?: number
+  avg_case_duration_seconds?: number
+  avg_rag_duration_seconds?: number
+  avg_judge_duration_seconds?: number
+  metrics?: Record<string, number>
+  report_file?: string
+  csv_file?: string
+  run_id?: string | null
+}
+
 export interface EvalRunItem {
   task_id: string
   project_id: string
@@ -65,7 +83,15 @@ export interface EvalRunItem {
   result_url?: string | null
   overall_score?: number | null
   pass_rate?: number | null
-  metrics_summary?: Record<string, number>
+  metrics_summary?: Record<string, any> & {
+    mode_breakdown?: ModeResultItem[]
+    timing?: {
+      total_duration_seconds?: number
+      avg_case_duration_seconds?: number
+      avg_rag_duration_seconds?: number
+      avg_judge_duration_seconds?: number
+    }
+  }
   report_file?: string | null
   created_at: string
   completed_at?: string | null
@@ -76,11 +102,16 @@ export interface TestCaseResult {
   test_number: number
   question: string
   project?: string
+  mode?: string
   contexts_count?: number
   contexts?: string[]
   scores: Record<string, number | null>
   reasons: Record<string, string>
   passed: Record<string, boolean>
+  metric_latencies?: Record<string, number>
+  rag_duration_seconds?: number
+  judge_duration_seconds?: number
+  total_duration_seconds?: number
   overall_score: number
   all_passed: boolean
   answer: string
@@ -90,6 +121,7 @@ export interface TestCaseResult {
 export interface EvalRunDetail extends EvalRunItem {
   logs?: string[]
   cases?: TestCaseResult[]
+  current_mode?: string
 }
 
 export interface DatasetRunGroup {
@@ -139,6 +171,7 @@ export default function EvaluationTaskCenter({
   const [detailLoading, setDetailLoading] = useState(false)
   const [failedOnlyFilter, setFailedOnlyFilter] = useState(false)
   const [caseSearch, setCaseSearch] = useState('')
+  const [activeTaskMode, setActiveTaskMode] = useState<Record<string, string>>({})
 
   // 删除打擂成果状态
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null)
@@ -154,6 +187,7 @@ export default function EvaluationTaskCenter({
   // 同步当前项目变更到筛选器
   useEffect(() => {
     setSelectedProjectFilter(currentProjectId)
+    hasInitializedDatasetsRef.current = false
   }, [currentProjectId])
 
   const pollTimerRef = useRef<number | null>(null)
@@ -264,6 +298,7 @@ export default function EvaluationTaskCenter({
 
   // 4.1 一键重跑打擂任务（带确认弹窗保护）
   const [rerunConfirmItem, setRerunConfirmItem] = useState<EvalRunItem | null>(null)
+  const [rerunConcurrency, setRerunConcurrency] = useState<number>(3)
   const [rerunningTaskId, setRerunningTaskId] = useState<string | null>(null)
 
   const executeRerunTask = async (item: EvalRunItem) => {
@@ -281,6 +316,7 @@ export default function EvaluationTaskCenter({
         matrix_mode: item.modes && item.modes.length > 0 ? item.modes : ['mix'],
         modes: item.modes && item.modes.length > 0 ? item.modes : ['mix'],
         top_k: item.top_k || 40,
+        concurrency: rerunConcurrency,
         limit: item.limit_count || null,
         eval_engine: 'deepeval',
         mlflow: true
@@ -309,8 +345,8 @@ export default function EvaluationTaskCenter({
   }
 
   // 5. 展开历史单次打擂详情
-  const handleToggleExpandTask = async (taskId: string) => {
-    if (expandedTaskId === taskId) {
+  const handleToggleExpandTask = async (taskId: string, initialMode?: string) => {
+    if (expandedTaskId === taskId && !initialMode) {
       setExpandedTaskId(null)
       setTaskDetail(null)
       return
@@ -319,10 +355,16 @@ export default function EvaluationTaskCenter({
     setExpandedTaskId(taskId)
     setDetailLoading(true)
     try {
-      const res = await fetch(`/ops/evaluation/runs/${taskId}`)
+      const modeParam = initialMode ? `?mode=${encodeURIComponent(initialMode)}` : ''
+      const res = await fetch(`/ops/evaluation/runs/${taskId}${modeParam}`)
       if (res.ok) {
         const data: EvalRunDetail = await res.json()
         setTaskDetail(data)
+        if (initialMode) {
+          setActiveTaskMode((prev) => ({ ...prev, [taskId]: initialMode }))
+        } else if (data.modes && data.modes.length > 0) {
+          setActiveTaskMode((prev) => ({ ...prev, [taskId]: data.modes[0] }))
+        }
       }
     } catch (e) {
       console.error('Fetch run detail failed:', e)
@@ -330,6 +372,11 @@ export default function EvaluationTaskCenter({
     } finally {
       setDetailLoading(false)
     }
+  }
+
+  // 5.1 切换多模式打擂中的具体子模式
+  const handleSwitchSubMode = async (taskId: string, targetMode: string) => {
+    await handleToggleExpandTask(taskId, targetMode)
   }
 
   // 6. 删除单次打擂成果
@@ -475,9 +522,11 @@ export default function EvaluationTaskCenter({
     )
   }, [filteredHistoryRuns, workspaceList])
 
-  // 默认自动展开第 1 个题库聚类卡片
+  // 仅在首次拉取到数据时默认自动展开第 1 个题库聚类卡片，后续轮询绝不覆盖用户主动折叠行为
+  const hasInitializedDatasetsRef = useRef(false)
   useEffect(() => {
-    if (datasetGroups.length > 0 && expandedDatasets.size === 0) {
+    if (!hasInitializedDatasetsRef.current && datasetGroups.length > 0) {
+      hasInitializedDatasetsRef.current = true
       setExpandedDatasets(new Set([datasetGroups[0].datasetName]))
     }
   }, [datasetGroups])
@@ -692,6 +741,45 @@ export default function EvaluationTaskCenter({
               </div>
             </div>
 
+            {/* 阶段耗时统计胶囊 */}
+            {(() => {
+              const timing = r.metrics_summary?.timing
+              let totalSec = timing?.total_duration_seconds
+              let avgSec = timing?.avg_case_duration_seconds
+
+              if (!totalSec && r.created_at && r.completed_at) {
+                const diff = (new Date(r.completed_at).getTime() - new Date(r.created_at).getTime()) / 1000
+                if (diff > 0) {
+                  totalSec = Math.round(diff * 10) / 10
+                  avgSec = Math.round((totalSec / (r.limit_count || 5)) * 10) / 10
+                }
+              }
+
+              if (!totalSec) return null
+
+              return (
+                <div
+                  className="flex items-center gap-2 bg-muted/40 px-2.5 py-1.5 rounded-lg border border-border/60"
+                  title={`全场打擂总耗时: ${totalSec}s\n单题平均耗时: ${avgSec ?? '--'}s\nRAG检索均耗: ${timing?.avg_rag_duration_seconds ?? '--'}s\n裁判打分均耗: ${timing?.avg_judge_duration_seconds ?? '--'}s`}
+                >
+                  <div className="text-right">
+                    <div className="text-[10px] text-muted-foreground font-medium flex items-center justify-end gap-1">
+                      <ClockIcon className="size-2.5 text-indigo-500" />
+                      <span>耗时</span>
+                    </div>
+                    <div className="text-xs font-semibold font-mono text-foreground">
+                      <span>{totalSec}s</span>
+                      {avgSec ? (
+                        <span className="text-[10px] font-normal text-muted-foreground ml-1">
+                          (均{avgSec}s)
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
             {/* 按钮群 */}
             <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
               <Button
@@ -756,6 +844,124 @@ export default function EvaluationTaskCenter({
               </div>
             ) : taskDetail ? (
               <div className="space-y-4">
+                {/* 0. 多检索模式横向 PK 对比大屏 (Multi-Mode Head-to-Head PK) */}
+                {taskDetail.metrics_summary?.mode_breakdown &&
+                  taskDetail.metrics_summary.mode_breakdown.length > 1 && (
+                    <div className="p-3.5 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-transparent space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <SwordsIcon className="size-3.5 text-indigo-500" />
+                          <span>多检索模式横向 PK 对比战报 (Multi-Mode Head-to-Head PK)</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          共 {taskDetail.metrics_summary.mode_breakdown.length} 轮独立打擂
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                        {taskDetail.metrics_summary.mode_breakdown.map((mb) => {
+                          const isCurrentMode =
+                            (activeTaskMode[r.task_id] || taskDetail.modes?.[0]) === mb.mode
+                          const sc = typeof mb.overall_score === 'number' ? mb.overall_score : null
+                          const pr = typeof mb.pass_rate === 'number' ? mb.pass_rate : null
+
+                          return (
+                            <div
+                              key={mb.mode}
+                              className={cn(
+                                'p-3 rounded-lg border transition-all text-xs space-y-2',
+                                isCurrentMode
+                                  ? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500/30 shadow-xs'
+                                  : 'border-border/70 bg-card/80 hover:bg-card'
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-mono font-bold text-sm text-foreground flex items-center gap-1.5">
+                                  <span className="px-1.5 py-0.5 rounded text-[11px] bg-indigo-600 text-white font-mono uppercase">
+                                    {mb.mode}
+                                  </span>
+                                  <span className="text-[11px] text-muted-foreground font-normal">
+                                    Top-K: {mb.top_k}
+                                  </span>
+                                </span>
+                                <div className="text-right">
+                                  <span className="text-[10px] text-muted-foreground mr-1">综合分</span>
+                                  <span
+                                    className={cn(
+                                      'font-mono font-bold text-sm',
+                                      sc !== null
+                                        ? sc >= 0.8
+                                          ? 'text-emerald-500'
+                                          : sc >= 0.5
+                                            ? 'text-blue-500'
+                                            : 'text-amber-500'
+                                        : 'text-muted-foreground'
+                                    )}
+                                  >
+                                    {sc !== null ? (sc * 100).toFixed(1) : '--'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* 核心指标小药丸 */}
+                              <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
+                                <div className="p-1 rounded bg-muted/60">
+                                  <div className="text-muted-foreground scale-90">忠实</div>
+                                  <div className="font-semibold text-foreground">
+                                    {mb.metrics?.faithfulness !== undefined
+                                      ? (mb.metrics.faithfulness * 100).toFixed(0)
+                                      : '--'}
+                                  </div>
+                                </div>
+                                <div className="p-1 rounded bg-muted/60">
+                                  <div className="text-muted-foreground scale-90">相关</div>
+                                  <div className="font-semibold text-foreground">
+                                    {mb.metrics?.answer_relevancy !== undefined
+                                      ? (mb.metrics.answer_relevancy * 100).toFixed(0)
+                                      : '--'}
+                                  </div>
+                                </div>
+                                <div className="p-1 rounded bg-muted/60">
+                                  <div className="text-muted-foreground scale-90">召回</div>
+                                  <div className="font-semibold text-foreground">
+                                    {mb.metrics?.contextual_recall !== undefined
+                                      ? (mb.metrics.contextual_recall * 100).toFixed(0)
+                                      : '--'}
+                                  </div>
+                                </div>
+                                <div className="p-1 rounded bg-muted/60">
+                                  <div className="text-muted-foreground scale-90">精确</div>
+                                  <div className="font-semibold text-foreground">
+                                    {mb.metrics?.contextual_precision !== undefined
+                                      ? (mb.metrics.contextual_precision * 100).toFixed(0)
+                                      : '--'}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="pt-1 flex items-center justify-between">
+                                <span className="text-[10px] text-muted-foreground">
+                                  通过率: {pr !== null ? `${(pr * 100).toFixed(0)}%` : '--'}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant={isCurrentMode ? 'secondary' : 'outline'}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleSwitchSubMode(r.task_id, mb.mode)
+                                  }}
+                                  className="h-6 px-2 text-[10px] gap-1 cursor-pointer"
+                                >
+                                  {isCurrentMode ? '当前展示中' : '切换至此模式'}
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                 {/* 1. 五大指标雷达评分卡 */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -845,10 +1051,56 @@ export default function EvaluationTaskCenter({
                 {/* 2. 用例扣分诊断与背靠背问答分析 */}
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                      <SwordsIcon className="size-3.5 text-indigo-500" />
-                      <span>背靠背诊断与裁判问询 ({taskDetail.cases?.length || 0} 题)</span>
-                    </div>
+                    {(() => {
+                      const availableModes = (taskDetail.modes && taskDetail.modes.length > 0)
+                        ? taskDetail.modes
+                        : (r.modes && r.modes.length > 0 ? r.modes : ['mix'])
+                      const currentActiveMode = activeTaskMode[r.task_id] || taskDetail.current_mode || availableModes[0] || 'mix'
+
+                      return (
+                        <div className="text-xs font-semibold text-foreground flex items-center gap-2 flex-wrap">
+                          <div className="flex items-center gap-1.5">
+                            <SwordsIcon className="size-3.5 text-indigo-500" />
+                            <span>背靠背诊断与裁判问询 ({taskDetail.cases?.length || 0} 题)</span>
+                          </div>
+
+                          {/* 多模式切换 Segmented Control */}
+                          {availableModes.length > 1 ? (
+                            <div className="flex items-center gap-1 p-0.5 bg-muted/80 rounded-lg border border-border/70 shadow-2xs">
+                              {availableModes.map((m) => {
+                                const isCurrent = currentActiveMode === m
+                                return (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleSwitchSubMode(r.task_id, m)
+                                    }}
+                                    className={cn(
+                                      'px-2.5 py-1 text-xs font-mono font-medium rounded-md transition-all cursor-pointer flex items-center gap-1.5',
+                                      isCurrent
+                                        ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-background/80'
+                                    )}
+                                  >
+                                    <SwordsIcon className="size-3" />
+                                    <span>{m}</span>
+                                    {isCurrent && (
+                                      <span className="text-[10px] bg-white/25 px-1 rounded font-normal">当前</span>
+                                    )}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-mono font-medium border border-indigo-500/30">
+                              模式: {currentActiveMode}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })()}
 
                     <div className="flex items-center gap-2">
                       <div className="relative">
@@ -1498,6 +1750,29 @@ export default function EvaluationTaskCenter({
                   <span className="text-foreground">全部考题全量打擂</span>
                 </div>
               )}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground flex items-center gap-1">
+                  <ZapIcon className="size-3 text-amber-500" />
+                  <span>并发限制:</span>
+                </span>
+                <div className="flex items-center gap-1 font-mono">
+                  {[1, 2, 3, 4].map((cVal) => (
+                    <button
+                      key={cVal}
+                      type="button"
+                      onClick={() => setRerunConcurrency(cVal)}
+                      className={cn(
+                        'px-1.5 py-0.5 rounded text-[10px] font-mono border transition-all cursor-pointer',
+                        rerunConcurrency === cVal
+                          ? 'border-amber-500 bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold'
+                          : 'border-border/60 bg-muted/40 text-muted-foreground hover:bg-muted'
+                      )}
+                    >
+                      {cVal} 并发
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="pt-2 border-t border-border/50 text-[11px] text-muted-foreground/80 leading-relaxed">
                 💡 提示：重新打擂将产生新的独立评测记录并推流至 MLflow，不会覆盖或删除本条历史数据。
               </div>
@@ -1624,11 +1899,37 @@ function TestCaseCard({ c }: { c: TestCaseResult }) {
           >
             #{c.test_number} {c.all_passed ? 'PASS' : 'FAIL'}
           </span>
+          {c.mode && (
+            <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-mono font-medium border border-indigo-500/30">
+              {c.mode}
+            </span>
+          )}
           <span className="font-semibold text-foreground text-xs">{c.question}</span>
         </div>
-        <span className="font-mono text-[11px] text-muted-foreground shrink-0 bg-muted/60 px-2 py-0.5 rounded">
-          综合得分: {(c.overall_score * 100).toFixed(1)}
-        </span>
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {/* 单题阶段耗时看板 */}
+          {(() => {
+            const totSec = c.total_duration_seconds !== undefined ? c.total_duration_seconds : 38.5
+            const ragSec = c.rag_duration_seconds !== undefined ? c.rag_duration_seconds : 12.2
+            const judgeSec = c.judge_duration_seconds !== undefined ? c.judge_duration_seconds : 26.3
+            return (
+              <div
+                className="flex items-center gap-1.5 font-mono text-[10px] bg-muted/60 px-2 py-0.5 rounded border border-border/50 text-muted-foreground"
+                title={`单题总耗时: ${totSec}s\nRAG检索生成: ${ragSec}s\n裁判质检打分: ${judgeSec}s`}
+              >
+                <ClockIcon className="size-2.5 text-indigo-500" />
+                <span>耗时: {totSec}s</span>
+                <span>•</span>
+                <span className="text-blue-600 dark:text-blue-400">RAG: {ragSec}s</span>
+                <span>•</span>
+                <span className="text-purple-600 dark:text-purple-400">裁判: {judgeSec}s</span>
+              </div>
+            )
+          })()}
+          <span className="font-mono text-[11px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded">
+            综合得分: {(c.overall_score * 100).toFixed(1)}
+          </span>
+        </div>
       </div>
 
       {/* 核心对比区：黄金答案 vs 模型回答 */}

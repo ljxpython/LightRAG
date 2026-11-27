@@ -30,6 +30,8 @@ class MLflowEvaluationTracker:
 
     DEFAULT_TRACKING_URI = "http://49.233.222.54:9128"
     DEFAULT_EXPERIMENT_NAME = "lightrag-benchmark-suite"
+    DEFAULT_TRACKING_USERNAME = "evalflow-service"
+    DEFAULT_TRACKING_PASSWORD = "4M5vvWoYjrRalG-MIyht7Y12Xv7LeTdZ1_onbUCKAC0"
 
     def __init__(
         self,
@@ -47,6 +49,12 @@ class MLflowEvaluationTracker:
         self.experiment_name = experiment_name or os.getenv("MLFLOW_EXPERIMENT_NAME") or self.DEFAULT_EXPERIMENT_NAME
         self.active_run = None
 
+        # 确保 MLflow 认证凭据被正确注入环境 (支持 EvalFlow Basic Auth)
+        if not os.getenv("MLFLOW_TRACKING_USERNAME"):
+            os.environ["MLFLOW_TRACKING_USERNAME"] = self.DEFAULT_TRACKING_USERNAME
+        if not os.getenv("MLFLOW_TRACKING_PASSWORD"):
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = self.DEFAULT_TRACKING_PASSWORD
+
         try:
             mlflow.set_tracking_uri(self.tracking_uri)
             # Find or create experiment
@@ -62,7 +70,11 @@ class MLflowEvaluationTracker:
                 self.experiment_id = exp.experiment_id
             mlflow.set_experiment(experiment_id=self.experiment_id)
         except Exception as e:
-            logger.warning(f"⚠️ 初始化 MLflow 连接失败 ({e})，将降级跳过上报。")
+            err_msg = str(e)
+            if "需要登录" in err_msg or "401" in err_msg:
+                logger.warning(f"⚠️ EvalFlow (MLflow) 认证未通过 ({err_msg})，请检查账号密码配置。")
+            else:
+                logger.warning(f"⚠️ 初始化 MLflow 连接失败 ({e})，将降级跳过上报。")
             self.enabled = False
 
     @property

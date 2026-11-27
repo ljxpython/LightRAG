@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import random
+import re
 import sys
 import time
 from datetime import datetime
@@ -82,11 +83,13 @@ class CustomDeepEvalLLM(DeepEvalBaseLLM if DEEPEVAL_AVAILABLE else object):
         self.base_url = base_url
         self.api_key = api_key
 
+        max_tokens = int(os.getenv("EVAL_JUDGE_MAX_TOKENS", "4096"))
         kwargs: Dict[str, Any] = {
             "model": model_name,
             "api_key": api_key,
             "max_retries": max_retries,
             "request_timeout": timeout,
+            "max_tokens": max_tokens,
         }
         if base_url:
             kwargs["base_url"] = base_url
@@ -98,6 +101,64 @@ class CustomDeepEvalLLM(DeepEvalBaseLLM if DEEPEVAL_AVAILABLE else object):
     def load_model(self):
         return self.client
 
+    @staticmethod
+    def _repair_and_extract_json(text: str, schema: Optional[Any] = None) -> Any:
+        """Robustly extracts, repairs, and deserializes JSON from potentially truncated or malformed LLM outputs."""
+        if not text or not isinstance(text, str):
+            return text
+        raw = text.strip()
+        cleaned = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s*```$", "", cleaned).strip()
+
+        start = cleaned.find("{")
+        end = cleaned.rfind("}") + 1
+        json_candidate = cleaned[start:end] if (start != -1 and end > start) else cleaned
+
+        parsed_data = None
+        # 1. 尝试直接解析
+        try:
+            parsed_data = json.loads(json_candidate)
+        except Exception:
+            # 2. 尝试剔除尾随逗号
+            try:
+                fixed = re.sub(r",\s*([\]}])", r"\1", json_candidate)
+                parsed_data = json.loads(fixed)
+            except Exception:
+                # 3. 尝试闭合由于 token 截断导致缺失的引号和括号
+                try:
+                    open_braces = json_candidate.count("{") - json_candidate.count("}")
+                    open_brackets = json_candidate.count("[") - json_candidate.count("]")
+                    quote_count = json_candidate.count('"') - json_candidate.count(r'\"')
+                    closing = ""
+                    if quote_count % 2 != 0:
+                        closing += '"'
+                    closing += "]" * max(0, open_brackets)
+                    closing += "}" * max(0, open_braces)
+                    fixed_closed = json_candidate + closing
+                    fixed_closed = re.sub(r",\s*([\]}])", r"\1", fixed_closed)
+                    parsed_data = json.loads(fixed_closed)
+                except Exception:
+                    pass
+
+        # 4. 若解析出字典，且目标 schema 存在，优先反序列化为 Pydantic 实例（直接满足 DeepEval 类型断言）
+        if parsed_data is not None:
+            if schema is not None:
+                try:
+                    if hasattr(schema, "model_validate"):
+                        return schema.model_validate(parsed_data)
+                    elif hasattr(schema, "parse_obj"):
+                        return schema.parse_obj(parsed_data)
+                    else:
+                        return schema(**parsed_data)
+                except Exception as val_err:
+                    logger.debug(f"Pydantic schema 兜底校验未匹配: {val_err}")
+            try:
+                return json.dumps(parsed_data, ensure_ascii=False)
+            except Exception:
+                pass
+
+        return raw
+
     def generate(self, prompt: str, schema: Optional[Any] = None, *args, **kwargs) -> Any:
         chat_model = self.load_model()
         if schema is not None:
@@ -107,7 +168,7 @@ class CustomDeepEvalLLM(DeepEvalBaseLLM if DEEPEVAL_AVAILABLE else object):
             except Exception as e:
                 logger.warning(f"⚠️ 结构化输出失败，降级为常规文本解析 ({e})")
         res = chat_model.invoke(prompt)
-        return res.content
+        return self._repair_and_extract_json(res.content, schema=schema)
 
     async def a_generate(self, prompt: str, schema: Optional[Any] = None, *args, **kwargs) -> Any:
         chat_model = self.load_model()
@@ -123,7 +184,7 @@ class CustomDeepEvalLLM(DeepEvalBaseLLM if DEEPEVAL_AVAILABLE else object):
                             raise e
                         logger.warning(f"⚠️ 异步结构化输出失败，降级为常规文本解析 ({e})")
                 res = await chat_model.ainvoke(prompt)
-                return res.content
+                return self._repair_and_extract_json(res.content, schema=schema)
             except Exception as ex:
                 ex_str = str(ex).lower()
                 if ("429" in ex_str or "rate limit" in ex_str or "too many requests" in ex_str) and attempt < 2:
@@ -311,9 +372,19 @@ async def evaluate_single_case_deepeval(
     challenge_type: Optional[str] = None,
     assertion_rule: Optional[str] = None,
     fake_answer: Optional[str] = None,
+    mode: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Evaluates a single test case using DeepEval metrics with granular reasons."""
-    safe_contexts = [c for c in contexts if c and c.strip()]
+    # 对切片进行安全保护，防止单个超大切片或过多切片挤爆裁判大模型上下文与输出 Token
+    max_chunk_chars = int(os.getenv("EVAL_MAX_CHUNK_CHARS", "3000"))
+    max_contexts = int(os.getenv("EVAL_MAX_CONTEXTS", "15"))
+    safe_contexts = []
+    for c in contexts[:max_contexts]:
+        if c and c.strip():
+            c_str = c.strip()
+            if len(c_str) > max_chunk_chars:
+                c_str = c_str[:max_chunk_chars - 1000] + "\n...[切片超长保护截断]...\n" + c_str[-800:]
+            safe_contexts.append(c_str)
     if not safe_contexts:
         safe_contexts = ["No relevant context retrieved from knowledge base."]
 
@@ -340,29 +411,37 @@ async def evaluate_single_case_deepeval(
     metric_scores: Dict[str, Optional[float]] = {}
     metric_reasons: Dict[str, str] = {}
     metric_passed: Dict[str, bool] = {}
+    metric_latencies: Dict[str, float] = {}
 
     # 从环境变量读取裁判单指标熔断超时，默认放宽至 180 秒
     metric_timeout = float(os.getenv("EVAL_METRIC_TIMEOUT_SECONDS", "180.0"))
+    judge_t0 = time.time()
 
     async def _measure_one(name, metric):
+        m_t0 = time.time()
         try:
             await asyncio.wait_for(metric.a_measure(test_case), timeout=metric_timeout)
             score = round(float(metric.score), 4) if metric.score is not None else 0.0
             passed = bool(metric.is_successful())
             reason = metric.reason or "No specific reason provided."
-            return name, score, passed, reason
+            dur = round(time.time() - m_t0, 2)
+            return name, score, passed, reason, dur
         except asyncio.TimeoutError:
+            dur = round(time.time() - m_t0, 2)
             logger.warning(f"   ⚠️ 指标 [{name}] 评分超时 ({int(metric_timeout)}s 熔断保护生效)")
-            return name, None, False, f"Metric evaluation timed out after {int(metric_timeout)}s."
+            return name, None, False, f"Metric evaluation timed out after {int(metric_timeout)}s.", dur
         except Exception as e:
+            dur = round(time.time() - m_t0, 2)
             logger.warning(f"   ⚠️ 指标 [{name}] 计算异常: {e}")
-            return name, None, False, f"Error during metric evaluation: {str(e)}"
+            return name, None, False, f"Error during metric evaluation: {str(e)}", dur
 
     metric_results = await asyncio.gather(*[_measure_one(n, m) for n, m in metrics_config])
-    for name, score, passed, reason in metric_results:
+    judge_total_duration = round(time.time() - judge_t0, 2)
+    for name, score, passed, reason, dur in metric_results:
         metric_scores[name] = score
         metric_passed[name] = passed
         metric_reasons[name] = reason
+        metric_latencies[name] = dur
 
     valid_scores = [v for v in metric_scores.values() if v is not None]
     overall_score = round(sum(valid_scores) / len(valid_scores), 4) if valid_scores else 0.0
@@ -372,11 +451,14 @@ async def evaluate_single_case_deepeval(
         "test_number": idx,
         "question": question,
         "project": project_id,
+        "mode": mode,
         "contexts_count": len(safe_contexts),
         "contexts": safe_contexts,  # 检索侧真实召回切片原文，供用户在报告与前端检视
         "scores": metric_scores,
         "reasons": metric_reasons,
         "passed": metric_passed,
+        "metric_latencies": metric_latencies,
+        "judge_duration_seconds": judge_total_duration,
         "overall_score": overall_score,
         "all_passed": all_passed,
         "answer": answer,  # 生成侧大模型回答
@@ -399,6 +481,9 @@ def save_deepeval_reports(results: List[Dict[str, Any]], results_dir: Path) -> T
     fieldnames = [
         "test_number",
         "question",
+        "rag_duration_seconds",
+        "judge_duration_seconds",
+        "total_duration_seconds",
         "faithfulness",
         "answer_relevancy",
         "contextual_recall",
@@ -417,6 +502,9 @@ def save_deepeval_reports(results: List[Dict[str, Any]], results_dir: Path) -> T
             writer.writerow({
                 "test_number": r["test_number"],
                 "question": r["question"][:50] + "..." if len(r["question"]) > 50 else r["question"],
+                "rag_duration_seconds": r.get("rag_duration_seconds", 0.0),
+                "judge_duration_seconds": r.get("judge_duration_seconds", 0.0),
+                "total_duration_seconds": r.get("total_duration_seconds", 0.0),
                 "faithfulness": scores.get("faithfulness", "N/A"),
                 "answer_relevancy": scores.get("answer_relevancy", "N/A"),
                 "contextual_recall": scores.get("contextual_recall", "N/A"),
@@ -514,6 +602,7 @@ async def run_deepeval_suite(
     print(f"   • 裁判模型:    {model_name} ({base_url or 'OpenAI Default'})")
 
     # Step 3: Run Evaluation Pipeline
+    suite_t0 = time.time()
     print(f"\n📊 [Step 3/3] 开始全量 DeepEval 断言评测 (共 {len(test_cases)} 题，协程并发度: {concurrency})...", flush=True)
     semaphore = asyncio.Semaphore(concurrency)
     completed_cases = 0
@@ -571,25 +660,32 @@ async def run_deepeval_suite(
                         challenge_type=c_type,
                         assertion_rule=a_rule,
                         fake_answer=fake_ans,
+                        mode=mode,
                     )
+
+                    res["rag_duration_seconds"] = latency
+                    judge_dur = res.get("judge_duration_seconds", 0.0)
+                    total_dur = round(latency + judge_dur, 2)
+                    res["total_duration_seconds"] = total_dur
 
                     # Print Granular Metrics and Reasons
                     scores = res["scores"]
                     reasons = res["reasons"]
                     passed = res["passed"]
 
-                    print(f"   📈 指标与诊断分析:", flush=True)
+                    print(f"   📈 指标与诊断分析 (评测耗时: {judge_dur}s | 单题端到端耗时: {total_dur}s):", flush=True)
                     for m_name in scores.keys():
                         s = scores.get(m_name)
                         status_str = "✅ PASS" if passed.get(m_name) else "❌ FAIL"
                         score_str = f"{s:.4f}" if s is not None else "N/A"
-                        print(f"      • {m_name:<25}: {score_str} [{status_str}]", flush=True)
+                        m_dur = res.get("metric_latencies", {}).get(m_name, 0.0)
+                        print(f"      • {m_name:<25}: {score_str} [{status_str}] ({m_dur}s)", flush=True)
                         r = reasons.get(m_name)
                         if r and r != "No specific reason provided.":
                             print(f"        └─ 🔍 理由: {r}", flush=True)
 
                     status_badge = "✅ ALL PASS" if res["all_passed"] else "⚠️ SOME FAILED"
-                    print(f"   🏁 [用例 {idx:02d}] 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge}", flush=True)
+                    print(f"   🏁 [用例 {idx:02d}] 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge} | ⏱️ 耗时 {total_dur}s", flush=True)
 
                 except Exception as e:
                     print(f"   ❌ 用例 {idx} 执行异常: {e}", flush=True)
@@ -606,6 +702,9 @@ async def run_deepeval_suite(
                         "passed": {},
                         "overall_score": 0.0,
                         "all_passed": False,
+                        "rag_duration_seconds": 0.0,
+                        "judge_duration_seconds": 0.0,
+                        "total_duration_seconds": 0.0,
                         "error": str(e),
                     }
 
@@ -629,11 +728,16 @@ async def run_deepeval_suite(
     total_cases = len(results)
     success_cases = sum(1 for r in results if r.get("all_passed"))
     
-    # Calculate Averages
+    # Calculate Averages and Latencies
     avg_scores = {}
     for m in ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision"]:
         vals = [r["scores"][m] for r in results if r.get("scores", {}).get(m) is not None]
         avg_scores[m] = sum(vals) / len(vals) if vals else 0.0
+
+    suite_duration = round(time.time() - suite_t0, 2)
+    avg_case_duration = round(sum(r.get("total_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
+    avg_rag_duration = round(sum(r.get("rag_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
+    avg_judge_duration = round(sum(r.get("judge_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
 
     print(f"   • 测试总题数:      {total_cases}")
     print(f"   • 全额通过题数:    {success_cases}/{total_cases} (通过率: {success_cases/total_cases*100:.1f}%)")
@@ -641,6 +745,8 @@ async def run_deepeval_suite(
     print(f"   • 平均回答相关度:  {avg_scores['answer_relevancy']:.4f}")
     print(f"   • 平均上下文召回率: {avg_scores['contextual_recall']:.4f}")
     print(f"   • 平均上下文精确度: {avg_scores['contextual_precision']:.4f}")
+    print(f"   • ⏱️ 打擂总耗时:   {suite_duration}s (并发度: {concurrency})")
+    print(f"   • ⚡ 题均综合耗时: {avg_case_duration}s (RAG检索: {avg_rag_duration}s | 裁判质检: {avg_judge_duration}s)")
     print(f"   • 报表保存 (CSV):  {csv_path}")
     print(f"   • 报表保存 (JSON): {json_path}")
     print("=" * 80)
@@ -665,6 +771,7 @@ async def run_deepeval_suite(
                     "threshold": threshold,
                     "dataset": dataset_path.name,
                     "total_cases": total_cases,
+                    "concurrency": concurrency,
                 })
                 tracker.log_metrics({
                     "faithfulness": avg_scores["faithfulness"],
@@ -672,10 +779,39 @@ async def run_deepeval_suite(
                     "contextual_recall": avg_scores["contextual_recall"],
                     "contextual_precision": avg_scores["contextual_precision"],
                     "pass_rate": round(success_cases / total_cases, 4) if total_cases else 0.0,
+                    "total_duration_seconds": suite_duration,
+                    "avg_case_duration_seconds": avg_case_duration,
+                    "avg_rag_duration_seconds": avg_rag_duration,
+                    "avg_judge_duration_seconds": avg_judge_duration,
                 })
                 tracker.log_results_table(results, framework="deepeval", artifact_file="deepeval_cases.json")
                 tracker.log_artifacts([csv_path, json_path])
                 print("   ✅ MLflow 指标与证据链大表同步完成！")
+
+    ret_run_id = None
+    if mlflow_enabled and "tracker" in locals() and tracker and tracker.run_id:
+        ret_run_id = tracker.run_id
+
+    # 4 项黄金核心指标均值
+    core_scores = [avg_scores.get(m, 0.0) for m in ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision"]]
+    overall_mean = sum(core_scores) / len(core_scores) if core_scores else 0.0
+
+    return {
+        "mode": mode,
+        "top_k": top_k,
+        "total_cases": total_cases,
+        "success_cases": success_cases,
+        "pass_rate": round(success_cases / total_cases, 4) if total_cases else 0.0,
+        "overall_score": round(overall_mean, 4),
+        "metrics": avg_scores,
+        "total_duration_seconds": suite_duration,
+        "avg_case_duration_seconds": avg_case_duration,
+        "avg_rag_duration_seconds": avg_rag_duration,
+        "avg_judge_duration_seconds": avg_judge_duration,
+        "report_file": json_path.name,
+        "csv_file": csv_path.name,
+        "run_id": ret_run_id,
+    }
 
 
 def main():
@@ -745,8 +881,8 @@ def main():
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=2,
-        help="Number of concurrent evaluation queries (default: 2)",
+        default=int(os.getenv("EVAL_CONCURRENCY", "3")),
+        help="Number of concurrent evaluation queries (default: 3 or EVAL_CONCURRENCY)",
     )
     parser.add_argument(
         "--threshold",
@@ -814,10 +950,11 @@ def main():
             print(f"   • 🚀 极速打擂验证模式: 仅抽样前 {args.limit} 题 (快速出分)", flush=True)
         print("=" * 80, flush=True)
 
+        matrix_results = []
         for m in modes:
             for k in top_ks:
                 print(f"\n▶️ [打擂子任务] 正在运行模式: mode={m}, top_k={k}...")
-                asyncio.run(
+                sub_res = asyncio.run(
                     run_deepeval_suite(
                         dataset_path=args.dataset,
                         project_id=args.project,
@@ -836,9 +973,31 @@ def main():
                         mlflow_tracking_uri=args.mlflow_tracking_uri,
                     )
                 )
+                if sub_res:
+                    matrix_results.append(sub_res)
 
+        # 导出多模式矩阵打擂汇总报告 (Matrix Summary Protocol)
+        res_dir = Path(__file__).parent / "results"
+        res_dir.mkdir(parents=True, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        summary_name = f"deepeval_matrix_summary_{ts}.json"
+        summary_path = res_dir / summary_name
+        summary_payload = {
+            "type": "matrix_summary",
+            "dataset": args.dataset.name,
+            "project_id": args.project,
+            "created_at": datetime.now().isoformat(),
+            "rounds": len(matrix_results),
+            "modes": modes,
+            "top_ks": top_ks,
+            "mode_results": matrix_results,
+        }
+        with open(summary_path, "w", encoding="utf-8") as fp:
+            json.dump(summary_payload, fp, indent=2, ensure_ascii=False)
+
+        print(f"\n[MATRIX_SUMMARY] file={summary_path.name}", flush=True)
         print("\n" + "=" * 80)
-        print("🏁 全参数矩阵打擂评测执行完毕！")
+        print(f"🏁 全参数矩阵打擂评测执行完毕！已聚合生成打擂汇总: {summary_path.name}")
         print(f"🔗 请访问 MLflow 平台大屏勾选上述 Runs 进行可视化横向打擂对比 (Compare Runs):")
         print(f"   {args.mlflow_tracking_uri or 'http://49.233.222.54:9128'}")
         print("=" * 80)

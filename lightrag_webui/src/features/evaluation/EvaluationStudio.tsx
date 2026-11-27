@@ -25,7 +25,9 @@ import {
   Edit3Icon,
   AlertCircleIcon,
   CopyIcon,
-  RotateCcwIcon
+  RotateCcwIcon,
+  ZapIcon,
+  ClockIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -282,6 +284,7 @@ export default function EvaluationStudio() {
   const [matrixOpen, setMatrixOpen] = useState(false)
   const [selectedModes, setSelectedModes] = useState<string[]>(['mix', 'hybrid'])
   const [topK, setTopK] = useState<number>(60)
+  const [matrixConcurrency, setMatrixConcurrency] = useState<number>(3)
   const [evalEngine, setEvalEngine] = useState<string>('deepeval')
   const [matrixTaskId, setMatrixTaskId] = useState<string | null>(null)
   const [matrixTaskStatus, setMatrixTaskStatus] = useState<AsyncTaskStatus | null>(null)
@@ -751,6 +754,7 @@ export default function EvaluationStudio() {
           dataset: selectedDatasetName,
           matrix_mode: selectedModes,
           top_k: Number(topK),
+          concurrency: matrixConcurrency,
           limit: matrixLimitMode === 'quick' ? 5 : null,
           eval_engine: evalEngine,
           mlflow: true
@@ -2514,6 +2518,37 @@ export default function EvaluationStudio() {
                   onChange={(e) => setTopK(Number(e.target.value))}
                   className="w-full accent-indigo-500 cursor-pointer"
                 />
+              </div>
+
+              {/* 协程并发度配置 */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                    <ZapIcon className="size-3 text-amber-500" />
+                    <span>评测协程并发度</span>
+                  </label>
+                  <span className="font-mono text-xs font-bold text-amber-500">{matrixConcurrency} 协程并发</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((cVal) => (
+                    <button
+                      key={cVal}
+                      type="button"
+                      onClick={() => setMatrixConcurrency(cVal)}
+                      className={cn(
+                        'py-1.5 px-2 rounded-md text-xs font-mono font-medium border text-center transition-all cursor-pointer',
+                        matrixConcurrency === cVal
+                          ? 'border-amber-500 bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold'
+                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                      )}
+                    >
+                      {cVal} 并发 {cVal === 3 ? '(推荐)' : ''}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground/80">
+                  ⚡ 提示：提高并发可大幅缩短耗时。若裁判大模型受限流约束，推荐保持 3 或 4。
+                </p>
               </div>
 
               <DialogFooter className="pt-2">
