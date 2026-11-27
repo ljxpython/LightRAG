@@ -954,11 +954,15 @@ class EvalTaskManager:
     def create_task(self, task_type: str, params: Dict[str, Any]) -> str:
         import uuid
         tid = f"task_{uuid.uuid4().hex[:12]}"
+        total_expected = params.get("size") or params.get("target_size") or 10
         self._tasks[tid] = {
             "task_id": tid,
             "type": task_type,
             "status": "running",
             "progress": 5,
+            "current_case": 0,
+            "total_cases": int(total_expected),
+            "message": "正在向调度网关分派考题合成任务...",
             "logs": [f"[{datetime.now().strftime('%H:%M:%S')}] 任务初始化成功，正在后台拉起子进程..."],
             "params": params,
             "result_url": None,
@@ -1654,6 +1658,16 @@ async def _run_dataset_generate_bg(task_id: str, req: DatasetGenerateRequest):
                 pm = re.search(r"\[PROGRESS:\s*(\d+)%\]", text)
                 if pm:
                     eval_task_mgr.update_task(task_id, progress=int(pm.group(1)))
+                cm = re.search(r"\[CASE:\s*(\d+)/(\d+)\]", text)
+                if cm:
+                    c_done = int(cm.group(1))
+                    c_tot = int(cm.group(2))
+                    eval_task_mgr.update_task(
+                        task_id,
+                        current_case=c_done,
+                        total_cases=c_tot,
+                        message=f"已完成 {c_done}/{c_tot} 题合成"
+                    )
                 elif "Step" in text or "切片" in text:
                     eval_task_mgr.update_task(task_id, progress=min(85, eval_task_mgr.get_task(task_id)["progress"] + 15))
         

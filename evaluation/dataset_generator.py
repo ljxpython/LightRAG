@@ -389,25 +389,45 @@ class NativeSynthesizer:
         target_size: int,
         existing_chunks: Optional[List[Dict[str, Any]]] = None,
         prefix: str = "GEN",
+        checkpoint_path: Optional[Path] = None,
+        concurrency: int = 4,
     ) -> List[Dict[str, Any]]:
         if not chunks:
             return []
 
-        results = []
+        results: List[Dict[str, Any]] = []
+        if checkpoint_path and checkpoint_path.exists():
+            try:
+                cached = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+                if isinstance(cached, list) and len(cached) > 0:
+                    results = cached
+                    logger.info(f"⚡ 发现已存在 Checkpoint 断点，已成功恢复 {len(results)}/{target_size} 题！")
+            except Exception as ex:
+                logger.warning(f"⚠️ 读取 Checkpoint 失败，重新生成: {ex}")
+
+        if len(results) >= target_size:
+            logger.info(f"🎉 Checkpoint 已包含足够考题 ({len(results)} >= {target_size})，直接跳过生成！")
+            return results[:target_size]
+
+        needed_size = target_size - len(results)
         types = (
-            ["multi_hop"] * int(target_size * 0.4) +
-            ["reasoning"] * int(target_size * 0.3) +
-            ["simple"] * int(target_size * 0.2) +
-            ["conditional"] * (target_size - int(target_size * 0.4) - int(target_size * 0.3) - int(target_size * 0.2))
+            ["multi_hop"] * int(needed_size * 0.4) +
+            ["reasoning"] * int(needed_size * 0.3) +
+            ["simple"] * int(needed_size * 0.2) +
+            ["conditional"] * (needed_size - int(needed_size * 0.4) - int(needed_size * 0.3) - int(needed_size * 0.2))
         )
         if not types:
-            types = ["simple"] * target_size
+            types = ["simple"] * needed_size
         random.shuffle(types)
 
-        logger.info(f"🚀 开始 Native 演化合成，计划生成 {len(types)} 道高阶测试题...")
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            for idx, evo_type in enumerate(types, start=1):
-                logger.info(f"   [{idx:02d}/{len(types):02d}] 正在演化类型: 【{evo_type}】...")
+        start_offset = len(results)
+        logger.info(f"🚀 开始 Native 演化合成，计划并发生成 {len(types)} 道高阶测试题 (并发度: {concurrency})...")
+
+        sem = asyncio.Semaphore(concurrency)
+        lock = asyncio.Lock()
+
+        async def _worker(seq_idx: int, evo_type: str, client: httpx.AsyncClient):
+            async with sem:
                 gen = None
                 evidence_contexts = []
                 source_doc_ids = []
@@ -421,19 +441,19 @@ class NativeSynthesizer:
                         if existing_chunks and len(existing_chunks) > 0:
                             c2 = random.choice(existing_chunks)
                         else:
-                            candidates = [c for c in chunks if c["doc_id"] != c1["doc_id"]]
+                            candidates = [c for c in chunks if c.get("doc_id") != c1.get("doc_id")]
                             c2 = random.choice(candidates) if candidates else random.choice(chunks)
 
                         prompt = PROMPT_MULTI_HOP.format(
-                            src1=c1["source"],
+                            src1=c1.get("source", "doc1"),
                             context1=c1["text"][:1000],
-                            src2=c2["source"],
+                            src2=c2.get("source", "doc2"),
                             context2=c2["text"][:1000]
                         )
                         evidence_contexts = [c1["text"], c2["text"]]
                         source_doc_ids = list(set([c1.get("doc_id", ""), c2.get("doc_id", "")]))
-                        sources = list(set([c1["source"], c2["source"]]))
-                        chunk_ids = list(set([c1["chunk_id"], c2["chunk_id"]]))
+                        sources = list(set([c1.get("source", ""), c2.get("source", "")]))
+                        chunk_ids = list(set([c1.get("chunk_id", ""), c2.get("chunk_id", "")]))
                     else:
                         c = random.choice(chunks)
                         if evo_type == "reasoning":
@@ -444,28 +464,47 @@ class NativeSynthesizer:
                             prompt = PROMPT_SIMPLE.format(context=c["text"][:1200])
                         evidence_contexts = [c["text"]]
                         source_doc_ids = [c.get("doc_id", "")]
-                        sources = [c["source"]]
-                        chunk_ids = [c["chunk_id"]]
+                        sources = [c.get("source", "")]
+                        chunk_ids = [c.get("chunk_id", "")]
 
                     gen = await self._call_llm(client, prompt)
                     if gen and "question" in gen and "ground_truth" in gen:
                         break
 
-                if gen and "question" in gen and "ground_truth" in gen:
-                    results.append({
-                        "test_id": f"{prefix}_{idx:03d}_{evo_type}",
-                        "question": gen["question"],
-                        "ground_truth": gen["ground_truth"],
-                        "contexts": evidence_contexts,
-                        "source_doc_ids": [d for d in source_doc_ids if d],
-                        "source_docs": sources,
-                        "source_chunk_ids": chunk_ids,
-                        "evolution_type": evo_type,
-                        "lifecycle_tag": "ACTIVE",
-                    })
-                    print(f"      ✅ 题干: {gen['question'][:60]}...")
-                else:
-                    logger.warning(f"      ❌ 类型 {evo_type} 重试后仍失败，跳过")
+                async with lock:
+                    if gen and "question" in gen and "ground_truth" in gen:
+                        test_case = {
+                            "test_id": f"{prefix}_{seq_idx:03d}_{evo_type}",
+                            "question": gen["question"],
+                            "ground_truth": gen["ground_truth"],
+                            "contexts": evidence_contexts,
+                            "source_doc_ids": [d for d in source_doc_ids if d],
+                            "source_docs": sources,
+                            "source_chunk_ids": chunk_ids,
+                            "evolution_type": evo_type,
+                            "lifecycle_tag": "ACTIVE",
+                        }
+                        results.append(test_case)
+                        curr_total = len(results)
+                        if checkpoint_path:
+                            try:
+                                with open(checkpoint_path, "w", encoding="utf-8") as chk_f:
+                                    json.dump(results, chk_f, ensure_ascii=False, indent=2)
+                            except Exception as chk_ex:
+                                logger.warning(f"写入 Checkpoint 异常: {chk_ex}")
+
+                        pct = min(90, int(35 + (curr_total / target_size) * 55))
+                        print(f"[PROGRESS: {pct}%] [CASE: {curr_total}/{target_size}] 正在演化类型: 【{evo_type}】...", flush=True)
+                        print(f"      ✅ [{curr_total:02d}/{target_size:02d}] 题干: {gen['question'][:60]}...", flush=True)
+                    else:
+                        logger.warning(f"      ❌ 类型 {evo_type} 重试后仍失败，跳过")
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            tasks = [
+                _worker(start_offset + idx, evo_type, client)
+                for idx, evo_type in enumerate(types, start=1)
+            ]
+            await asyncio.gather(*tasks)
 
         return results
 
@@ -496,6 +535,8 @@ async def evolve_lifecycle_dataset(
     base_url: str,
     api_key: str,
     model: str,
+    checkpoint_path: Optional[Path] = None,
+    concurrency: int = 4,
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """
     Diffs current physical storage against base dataset manifest:
@@ -551,13 +592,16 @@ async def evolve_lifecycle_dataset(
     if new_doc_ids:
         new_chunks = [c for c in current_chunks if c.get("doc_id") in new_doc_ids]
         existing_chunks = [c for c in current_chunks if c.get("doc_id") not in new_doc_ids]
-        size_to_gen = max(target_size, len(new_doc_ids) * 2)
+        # 彻底移除 max(target_size, len(new_doc_ids) * 2) 强制翻倍！严格尊重用户传入的 target_size
+        size_to_gen = target_size
         logger.info(f"✨ 正在为新增的 {len(new_doc_ids)} 篇文档生成 {size_to_gen} 道增量题库（含跨代多跳）...")
         new_cases = await synthesizer.generate_cases(
             chunks=new_chunks,
             target_size=size_to_gen,
             existing_chunks=existing_chunks,
             prefix="DELTA",
+            checkpoint_path=checkpoint_path,
+            concurrency=concurrency,
         )
 
     # Merge Cases
@@ -755,6 +799,9 @@ async def main_async():
     print(f"[PROGRESS: 35%]", flush=True)
 
     # Step 2: Incremental or Full Synthesis
+    checkpoint_path = args.output.parent / f".chk_{args.output.name}"
+    concurrency = int(os.getenv("SYNTHESIZER_CONCURRENCY", "4"))
+
     test_cases: List[Dict[str, Any]] = []
     if args.incremental and args.base_dataset and args.base_dataset.exists():
         manifest, test_cases = await evolve_lifecycle_dataset(
@@ -765,10 +812,17 @@ async def main_async():
             base_url=base_url,
             api_key=api_key,
             model=model,
+            checkpoint_path=checkpoint_path,
+            concurrency=concurrency,
         )
     else:
         synthesizer = NativeSynthesizer(base_url=base_url, api_key=api_key, model=model)
-        test_cases = await synthesizer.generate_cases(chunks, target_size=args.size)
+        test_cases = await synthesizer.generate_cases(
+            chunks=chunks,
+            target_size=args.size,
+            checkpoint_path=checkpoint_path,
+            concurrency=concurrency,
+        )
 
     if not test_cases:
         print("❌ 评测题生成失败或为空！", flush=True)
@@ -793,6 +847,14 @@ async def main_async():
     }
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    # 成功写盘后，移除临时 Checkpoint 断点
+    if checkpoint_path.exists():
+        try:
+            checkpoint_path.unlink()
+            logger.info(f"🧹 临时 Checkpoint 已安全移除: {checkpoint_path.name}")
+        except Exception:
+            pass
 
     print(f"[PROGRESS: 90%]", flush=True)
     print("\n" + "=" * 80, flush=True)

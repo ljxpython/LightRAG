@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense } from 'react'
 import {
   ActivityIcon,
   SparklesIcon,
@@ -100,9 +100,12 @@ interface DatasetSummary {
 interface AsyncTaskStatus {
   task_id: string
   type: string
-  status: 'pending' | 'running' | 'completed' | 'failed'
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'aborted'
   progress: number
   message: string
+  current_case?: number
+  total_cases?: number
+  params?: any
   logs?: string[]
   result_url?: string
   runs?: string[]
@@ -567,8 +570,85 @@ export default function EvaluationStudio() {
   }
 
   // -------------------------------------------------------------------------
-  // 4. 异步自动合成题库轮询
+  // 4. 异步自动合成题库轮询与状态自愈
   // -------------------------------------------------------------------------
+  const startSynthPolling = useCallback((taskId: string, targetName?: string) => {
+    if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
+    synthPollTimer.current = window.setInterval(async () => {
+      try {
+        const pollRes = await fetch(`/ops/evaluation/tasks/${taskId}`)
+        if (pollRes.ok) {
+          const task: AsyncTaskStatus = await pollRes.json()
+          setSynthTaskStatus(task)
+
+          if (task.status === 'completed') {
+            if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
+            toast.success(
+              `题库 "${targetName || task.params?.output_name || '自动合成'}" 顺利完成，共计 ${task.result?.cases_count || task.total_cases || synthCount} 道考题！`
+            )
+            localStorage.removeItem('lightrag-active-synth-task')
+            if (targetName || task.params?.output_name) {
+              await fetchDatasets(targetName || task.params?.output_name)
+            }
+            setSynthOpen(false)
+            setSynthTaskId(null)
+            setSynthTaskStatus(null)
+          } else if (task.status === 'failed' || task.status === 'aborted') {
+            if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
+            localStorage.removeItem('lightrag-active-synth-task')
+            if (task.status === 'failed') {
+              toast.error(`合成任务失败: ${task.error || task.message}`)
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Poll task status failed:', e)
+      }
+    }, 1500)
+  }, [fetchDatasets, synthCount])
+
+  // 页面刷新后自动自愈接管活跃出题任务
+  useEffect(() => {
+    const savedTaskId = localStorage.getItem('lightrag-active-synth-task')
+    if (savedTaskId) {
+      setSynthTaskId(savedTaskId)
+      fetch(`/ops/evaluation/tasks/${savedTaskId}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((task: AsyncTaskStatus | null) => {
+          if (task && task.status === 'running') {
+            setSynthTaskStatus(task)
+            startSynthPolling(savedTaskId, task.params?.output_name)
+          } else {
+            localStorage.removeItem('lightrag-active-synth-task')
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('lightrag-active-synth-task')
+        })
+    }
+  }, [startSynthPolling])
+
+  const handleAbortSynthTask = async () => {
+    if (!synthTaskId) return
+    if (!window.confirm('确定要中止当前出题任务吗？已生成的考题已通过 Checkpoint 安全存盘。')) return
+    try {
+      const res = await fetch(`/ops/evaluation/tasks/${synthTaskId}/abort`, { method: 'POST' })
+      if (res.ok) {
+        toast.success(`出题任务 ${synthTaskId} 已成功中止`)
+        if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
+        setSynthTaskStatus(null)
+        setSynthTaskId(null)
+        localStorage.removeItem('lightrag-active-synth-task')
+        if (selectedDatasetName) fetchDatasets(selectedDatasetName)
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(`中止任务失败: ${err.detail || '未知错误'}`)
+      }
+    } catch {
+      toast.error('网络请求失败，无法中止任务')
+    }
+  }
+
   const handleTriggerSynthesize = async (e: React.FormEvent) => {
     e.preventDefault()
     const rawTargetName =
@@ -583,6 +663,8 @@ export default function EvaluationStudio() {
         type: 'synthesize',
         status: 'running',
         progress: 10,
+        current_case: 0,
+        total_cases: Number(synthCount),
         message: '正在向调度网关分派考题合成任务...'
       })
 
@@ -607,34 +689,8 @@ export default function EvaluationStudio() {
 
       const { task_id } = await res.json()
       setSynthTaskId(task_id)
-
-      // 开始轮询
-      if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
-      synthPollTimer.current = window.setInterval(async () => {
-        try {
-          const pollRes = await fetch(`/ops/evaluation/tasks/${task_id}`)
-          if (pollRes.ok) {
-            const task: AsyncTaskStatus = await pollRes.json()
-            setSynthTaskStatus(task)
-
-            if (task.status === 'completed') {
-              if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
-              toast.success(
-                `题库 "${targetName}" 自动合成完成，共计 ${task.result?.cases_count || synthCount} 道考题！`
-              )
-              await fetchDatasets(targetName)
-              setSynthOpen(false)
-              setSynthTaskId(null)
-              setSynthTaskStatus(null)
-            } else if (task.status === 'failed') {
-              if (synthPollTimer.current) window.clearInterval(synthPollTimer.current)
-              toast.error(`合成任务失败: ${task.error || task.message}`)
-            }
-          }
-        } catch (e) {
-          console.warn('Poll task status failed:', e)
-        }
-      }, 1500)
+      localStorage.setItem('lightrag-active-synth-task', task_id)
+      startSynthPolling(task_id, targetName)
     } catch (err) {
       console.error('Trigger synthesize failed:', err)
       toast.error('网络异常，无法触发题库合成')
@@ -946,6 +1002,56 @@ export default function EvaluationStudio() {
           </div>
         </div>
       </div>
+
+      {/* 活跃后台出题任务常驻进度横幅 (Active Dataset Synthesis Progress Banner) */}
+      {synthTaskStatus && synthTaskStatus.status === 'running' && (
+        <div className="shrink-0 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3.5 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs shadow-xs animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="size-6 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <Loader2Icon className="size-3.5 animate-spin" />
+            </div>
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-foreground truncate">
+                  ⚡ 后台正在生成评测题库「{synthTaskStatus.params?.output_name || synthName || 'synth_dataset.json'}」
+                </span>
+                <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-bold shrink-0">
+                  {typeof synthTaskStatus.current_case === 'number' && synthTaskStatus.total_cases
+                    ? `${synthTaskStatus.current_case} / ${synthTaskStatus.total_cases} 题`
+                    : `${synthTaskStatus.progress || 10}%`}
+                </span>
+                <span className="text-[10px] text-muted-foreground hidden sm:inline">
+                  (已启用 4 并发与即时落盘，关闭页面不影响出题)
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate font-mono">
+                {synthTaskStatus.message || '大模型正在并发演化考题...'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <div className="w-24 hidden md:block">
+              <Progress value={synthTaskStatus.progress || 15} className="h-1.5" />
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSynthOpen(true)}
+              className="h-6 px-2.5 text-[11px] border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/15"
+            >
+              检视进度与日志
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleAbortSynthTask}
+              className="h-6 px-2 text-[11px] text-rose-600 hover:text-rose-700 hover:bg-rose-500/10"
+            >
+              中止
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* 2. 核心内容区域：按 activeSubTab 渲染 */}
       {activeSubTab === 'panorama' ? (
@@ -1733,20 +1839,69 @@ export default function EvaluationStudio() {
           </DialogHeader>
 
           {synthTaskStatus && synthTaskStatus.status === 'running' ? (
-            <div className="py-6 space-y-4 text-center">
-              <div className="size-12 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto">
-                <Loader2Icon className="size-6 animate-spin" />
+            <div className="py-4 space-y-3.5 text-center">
+              <div className="size-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto">
+                <Loader2Icon className="size-5 animate-spin" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">正在合成评测题库中...</p>
+                <p className="text-sm font-semibold text-foreground">正在并发合成评测题库中...</p>
                 <p className="text-xs text-muted-foreground font-mono">
-                  {synthTaskStatus.message}
+                  {synthTaskStatus.message || '大模型正在并发演化考题并即时落盘...'}
                 </p>
               </div>
-              <Progress value={synthTaskStatus.progress || 35} className="h-1.5" />
-              <p className="text-[10px] text-muted-foreground">
-                任务正在后台安全运行，请耐心等待调度器生成...
-              </p>
+
+              <div className="space-y-1 px-1">
+                <div className="flex justify-between text-[11px] text-muted-foreground font-mono">
+                  <span>
+                    已生成用例:{' '}
+                    <strong className="text-foreground">
+                      {synthTaskStatus.current_case || 0} / {synthTaskStatus.total_cases || synthCount} 题
+                    </strong>
+                  </span>
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                    {synthTaskStatus.progress || 10}%
+                  </span>
+                </div>
+                <Progress value={synthTaskStatus.progress || 10} className="h-1.5" />
+              </div>
+
+              {/* 实时出题控制台推流终端窗格 (Console Log Drawer) */}
+              {synthTaskStatus.logs && synthTaskStatus.logs.length > 0 && (
+                <div className="text-left bg-slate-950 text-slate-200 p-2.5 rounded-lg font-mono text-[10px] h-32 overflow-y-auto space-y-1 border border-slate-800 shadow-inner">
+                  {synthTaskStatus.logs.slice(-25).map((line, idx) => (
+                    <div key={idx} className="leading-tight break-all">
+                      <span className="text-indigo-400 select-none mr-1.5">›</span>
+                      <span>{line}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-between border-t border-border/40">
+                <p className="text-[10px] text-muted-foreground">
+                  任务在后台安全运行，关闭窗口不影响进度
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAbortSynthTask}
+                    className="h-7 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-500/10"
+                  >
+                    中止任务
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSynthOpen(false)}
+                    className="h-7 text-xs"
+                  >
+                    后台运行 (关闭弹窗)
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleTriggerSynthesize} className="space-y-4 py-2">
@@ -1831,26 +1986,126 @@ export default function EvaluationStudio() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">计划生成考题数量</label>
-                  <span className="font-mono text-xs font-bold text-indigo-500">
-                    {synthCount} 题
-                  </span>
+                  <label className="text-xs font-semibold text-foreground">
+                    计划生成考题数量 (Capacity)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min={3}
+                      max={300}
+                      value={synthCount}
+                      onChange={(e) => setSynthCount(Math.max(1, Math.min(300, Number(e.target.value))))}
+                      className="w-16 px-1.5 py-0.5 text-xs font-mono font-bold text-center rounded border border-input bg-background focus:ring-1 focus:ring-indigo-500 text-indigo-600 dark:text-indigo-400"
+                    />
+                    <span className="text-xs font-medium text-muted-foreground">题</span>
+                  </div>
                 </div>
+
+                {/* 快捷挡位与知识库覆盖推荐 */}
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSynthCount(10)}
+                    className={cn(
+                      'px-2 py-1 rounded text-[11px] font-mono border transition-all',
+                      synthCount === 10
+                        ? 'border-indigo-500 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-semibold'
+                        : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    10 题 (极速)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSynthCount(25)}
+                    className={cn(
+                      'px-2 py-1 rounded text-[11px] font-mono border transition-all',
+                      synthCount === 25
+                        ? 'border-indigo-500 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-semibold'
+                        : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    25 题 (标准)
+                  </button>
+
+                  {readiness?.total_project_docs && readiness.total_project_docs > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setSynthCount(readiness.total_project_docs)}
+                        className={cn(
+                          'px-2 py-1 rounded text-[11px] font-mono border transition-all flex items-center gap-1',
+                          synthCount === readiness.total_project_docs
+                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold'
+                            : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                        )}
+                        title={`当前知识库共 ${readiness.total_project_docs} 篇文档，平均每篇出 1 题`}
+                      >
+                        <span>🎯 全库覆盖 ({readiness.total_project_docs}题)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSynthCount(readiness.total_project_docs * 2)}
+                        className={cn(
+                          'px-2 py-1 rounded text-[11px] font-mono border transition-all flex items-center gap-1',
+                          synthCount === readiness.total_project_docs * 2
+                            ? 'border-emerald-500 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold'
+                            : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                        )}
+                        title={`当前知识库共 ${readiness.total_project_docs} 篇文档，平均每篇出 2 题深度多跳`}
+                      >
+                        <span>🧬 深度全量 ({readiness.total_project_docs * 2}题)</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setSynthCount(50)}
+                        className={cn(
+                          'px-2 py-1 rounded text-[11px] font-mono border transition-all',
+                          synthCount === 50
+                            ? 'border-indigo-500 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-semibold'
+                            : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                        )}
+                      >
+                        50 题 (深度)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSynthCount(100)}
+                        className={cn(
+                          'px-2 py-1 rounded text-[11px] font-mono border transition-all',
+                          synthCount === 100
+                            ? 'border-indigo-500 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-semibold'
+                            : 'border-border/60 text-muted-foreground hover:bg-muted/60'
+                        )}
+                      >
+                        100 题 (全量)
+                      </button>
+                    </>
+                  )}
+                </div>
+
                 <input
                   type="range"
                   min={3}
-                  max={25}
+                  max={Math.max(100, (readiness?.total_project_docs || 50) * 2)}
                   step={1}
                   value={synthCount}
                   onChange={(e) => setSynthCount(Number(e.target.value))}
                   className="w-full accent-indigo-500 cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono">
                   <span>3 (极速预览)</span>
-                  <span>10 (标准基准)</span>
-                  <span>25 (全量高精)</span>
+                  <span>
+                    ⚡ 已启用 4 并发与断点续传 (预估约 {Math.max(1, Math.ceil(synthCount / 6))} 分钟)
+                  </span>
+                  <span>上限 300 题</span>
                 </div>
               </div>
 
