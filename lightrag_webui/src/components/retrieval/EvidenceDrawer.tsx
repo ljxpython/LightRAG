@@ -11,13 +11,16 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   DatabaseIcon,
-  QuoteIcon
+  QuoteIcon,
+  SparklesIcon,
+  TargetIcon
 } from 'lucide-react'
 import type { MessageWithError } from '@/types/retrieval'
 import type { ReferenceItem } from '@/api/lightrag'
 import { cn } from '@/lib/utils'
 import { copyToClipboard } from '@/utils/clipboard'
 import { toast } from 'sonner'
+import { groundChunkSentences } from '@/utils/sentenceGrounding'
 
 export interface GroundedEvidenceDoc {
   referenceId: string
@@ -74,13 +77,15 @@ interface EvidenceDrawerProps {
   isOpen: boolean
   onClose: () => void
   message: MessageWithError
+  userQuery?: string
 }
 
-export default function EvidenceDrawer({ isOpen, onClose, message }: EvidenceDrawerProps) {
+export default function EvidenceDrawer({ isOpen, onClose, message, userQuery }: EvidenceDrawerProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
   const [expandedChunks, setExpandedChunks] = useState<Record<string, boolean>>({})
 
   const evidence = useMemo(() => getGroundedEvidence(message), [message])
+  const answerText = message.displayContent || message.content || ''
 
   const handleCopyText = async (text: string, key: string, successMsg = '已复制到剪贴板') => {
     try {
@@ -226,13 +231,29 @@ export default function EvidenceDrawer({ isOpen, onClose, message }: EvidenceDra
                             const isExpanded = Boolean(expandedChunks[chunkKey])
                             const isLong = chunkText.length > 280
 
+                            // Run precision sentence grounding on this chunk
+                            const analysis = groundChunkSentences(chunkText, userQuery, answerText)
+
                             return (
                               <div
                                 key={chunkIdx}
-                                className="rounded-lg border border-border/60 bg-muted/30 p-2.5 text-xs font-mono transition-colors"
+                                className={cn(
+                                  "rounded-lg border p-2.5 text-xs font-mono transition-colors",
+                                  analysis.hasHighlightedSentence
+                                    ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-950/20"
+                                    : "border-border/60 bg-muted/30"
+                                )}
                               >
                                 <div className="flex items-center justify-between text-[11px] text-muted-foreground pb-1.5 mb-1.5 border-b border-border/30">
-                                  <span className="text-emerald-500/90 font-medium">切片 #{chunkIdx + 1} ({chunkText.length} 字符)</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-emerald-500/90 font-medium">切片 #{chunkIdx + 1} ({chunkText.length} 字符)</span>
+                                    {analysis.hasHighlightedSentence && (
+                                      <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 border border-amber-500/30 px-1.5 py-0.2 text-[9px] font-sans font-medium text-amber-500 dark:text-amber-300">
+                                        <TargetIcon className="size-2.5" />
+                                        <span>已定位核心句</span>
+                                      </span>
+                                    )}
+                                  </div>
                                   <button
                                     type="button"
                                     onClick={() => handleCopyText(chunkText, chunkKey, '已复制切片正文')}
@@ -250,9 +271,26 @@ export default function EvidenceDrawer({ isOpen, onClose, message }: EvidenceDra
 
                                 <div className={cn(
                                   'text-[11px] leading-relaxed text-foreground/90 whitespace-pre-wrap break-words',
-                                  !isExpanded && isLong && 'line-clamp-4'
+                                  !isExpanded && isLong && 'line-clamp-5'
                                 )}>
-                                  {chunkText}
+                                  {analysis.sentences.length > 0 ? (
+                                    analysis.sentences.map((sent, sIdx) => {
+                                      if (sent.isCoreEvidence) {
+                                        return (
+                                          <mark
+                                            key={sIdx}
+                                            className="bg-amber-400/25 text-amber-900 dark:text-amber-200 border-b-2 border-amber-500 font-semibold px-0.5 rounded-xs"
+                                            title="底层检索命中的关键事实依据句"
+                                          >
+                                            {sent.text}
+                                          </mark>
+                                        )
+                                      }
+                                      return <span key={sIdx}>{sent.text}</span>
+                                    })
+                                  ) : (
+                                    chunkText
+                                  )}
                                 </div>
 
                                 {isLong && (

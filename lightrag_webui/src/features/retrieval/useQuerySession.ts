@@ -12,8 +12,30 @@ import {
   restoredAiGeneratedFlag
 } from '@/lib/aiContentNotice'
 import type { RetrievalHistoryStore } from '@/stores/retrievalHistory'
+import { useChatSessionStore } from '@/stores/chatSessionStore'
 import { serializeQueryRequest } from './serializeQueryRequest'
 import { streamErrorChunk } from './streamErrorChunk'
+import { compactReferenceChunk } from '@/utils/sentenceGrounding'
+import type { ReferenceItem } from '@/api/lightrag'
+
+export function compactReferencesForStorage(
+  references: ReferenceItem[] | undefined,
+  query: string = '',
+  answer: string = ''
+): ReferenceItem[] | undefined {
+  if (!references || !Array.isArray(references) || references.length === 0) {
+    return references
+  }
+  return references.map((ref) => {
+    const compactContent = Array.isArray(ref.content)
+      ? ref.content.map((c) => compactReferenceChunk(c, query, answer, 360))
+      : ref.content
+    return {
+      ...ref,
+      content: compactContent
+    }
+  })
+}
 
 /**
  * Shared query-session controller used by BOTH query pages (`RetrievalView`
@@ -158,7 +180,24 @@ export function useQuerySession({
 
   const [messages, setMessages] = useState<MessageWithError[]>(() => {
     try {
-      const history = historyStore.getState().history || []
+      let history = historyStore.getState().history || []
+      // Fail-safe self-healing: if historyStore is empty, attempt recovery from chatSessionStore
+      if (history.length === 0) {
+        try {
+          const storageKey = (historyStore as any)?.storageKey || ''
+          const sessionId = storageKey.replace(/^lightrag_hist_/, '')
+          const sessions = useChatSessionStore.getState().sessions || []
+          const matching = sessions.find((s) => s.id === sessionId) ||
+            (sessionId === 'session-default' ? sessions.find((s) => s.id === useChatSessionStore.getState().activeSessionId) : undefined)
+          if (matching && matching.messages && matching.messages.length > 0) {
+            history = matching.messages as any
+            // Self-heal: backfill into historyStore so isolated store stays consistent
+            historyStore.getState().setHistory(history)
+          }
+        } catch (e) {
+          console.warn('Fallback history recovery error:', e)
+        }
+      }
       // Ensure each message from history has a unique ID and mermaidRendered status
       return history.map((msg, index) => {
         try {
@@ -398,13 +437,13 @@ export function useQuerySession({
         // Detect if the assistant message contains complete LaTeX formulas
         assistantMessage.latexRendered = detectLatexCompleteness(assistantMessage.content)
 
-        // Single unified update to avoid race conditions
+        // Single unified immutable update so React memoized consumers re-render immediately
         setMessages((prev) => {
           const newMessages = [...prev]
-          const lastMessage = newMessages[newMessages.length - 1]
-          if (lastMessage && lastMessage.id === assistantMessage.id) {
-            // Update all properties at once to maintain consistency
-            Object.assign(lastMessage, {
+          const lastIndex = newMessages.length - 1
+          if (lastIndex >= 0 && newMessages[lastIndex].id === assistantMessage.id) {
+            newMessages[lastIndex] = {
+              ...newMessages[lastIndex],
               content: assistantMessage.content,
               thinkingContent: assistantMessage.thinkingContent,
               displayContent: assistantMessage.displayContent,
@@ -417,7 +456,7 @@ export function useQuerySession({
               responseTime: assistantMessage.responseTime,
               firstTokenTime: assistantMessage.firstTokenTime,
               references: assistantMessage.references
-            })
+            }
           }
           return newMessages
         })
@@ -466,9 +505,12 @@ export function useQuerySession({
               assistantMessage.references = references
               setMessages((prev) => {
                 const newMessages = [...prev]
-                const lastMessage = newMessages[newMessages.length - 1]
-                if (lastMessage && lastMessage.id === assistantMessage.id) {
-                  lastMessage.references = references
+                const lastIndex = newMessages.length - 1
+                if (lastIndex >= 0 && newMessages[lastIndex].id === assistantMessage.id) {
+                  newMessages[lastIndex] = {
+                    ...newMessages[lastIndex],
+                    references
+                  }
                 }
                 return newMessages
               })
@@ -548,9 +590,12 @@ export function useQuerySession({
             // Sync the finalized time into the rendered message
             setMessages((prev) => {
               const newMessages = [...prev]
-              const lastMessage = newMessages[newMessages.length - 1]
-              if (lastMessage && lastMessage.id === assistantMessage.id) {
-                lastMessage.responseTime = assistantMessage.responseTime
+              const lastIndex = newMessages.length - 1
+              if (lastIndex >= 0 && newMessages[lastIndex].id === assistantMessage.id) {
+                newMessages[lastIndex] = {
+                  ...newMessages[lastIndex],
+                  responseTime: assistantMessage.responseTime
+                }
               }
               return newMessages
             })
@@ -584,6 +629,30 @@ export function useQuerySession({
             } finally {
               // Ensure cleanup happens regardless of errors
               thinkingStartTime.current = null
+            }
+
+            // Compact references to safeguard localStorage 5MB quota while keeping evidence intact
+            if (assistantMessage.references && assistantMessage.references.length > 0) {
+              const compacted = compactReferencesForStorage(
+                assistantMessage.references,
+                query,
+                assistantMessage.displayContent || assistantMessage.content
+              )
+              assistantMessage.references = compacted
+              // Sync compacted references to active message list
+              setMessages((prev) => {
+                const newMessages = [...prev]
+                const lastIndex = newMessages.length - 1
+                if (lastIndex >= 0 && newMessages[lastIndex].id === assistantMessage.id) {
+                  newMessages[lastIndex] = {
+                    ...newMessages[lastIndex],
+                    references: compacted,
+                    displayContent: assistantMessage.displayContent,
+                    isThinking: false
+                  }
+                }
+                return newMessages
+              })
             }
 
             // Save history into THIS page's injected storage

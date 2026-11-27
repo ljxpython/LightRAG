@@ -90,7 +90,7 @@ function createBoundedHistoryStorage() {
 }
 
 export function createRetrievalHistoryStore(storageKey: string): RetrievalHistoryStore {
-  return create<RetrievalHistoryState>()(
+  const store = create<RetrievalHistoryState>()(
     persist(
       (set) => ({
         history: [],
@@ -123,4 +123,6 @@ export function createRetrievalHistoryStore(storageKey: string): RetrievalHistor
       }
     )
   )
+  ;(store as any).storageKey = storageKey
+  return store
 }
