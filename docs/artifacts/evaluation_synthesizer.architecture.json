@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LightRAG 评测题库逆向合成系统架构",
+    "locale": "zh-CN",
+    "output": "evaluation_synthesizer_architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "dispatch-lifecycle",
+        "label": "异步调度与子进程守护",
+        "focus": ["webui", "gateway", "task_mgr", "generator"],
+        "note": "WebUI 异步发起出题请求，网关通过 EvalTaskManager 在独立 Python 子进程中运行出题逻辑。"
+      },
+      {
+        "id": "corpus-synthesis",
+        "label": "语料血缘差量与大模型演化",
+        "focus": ["generator", "storage", "llm"],
+        "note": "分析当前知识库物理切片与历史基准的 CRUD 差量，驱动大模型演化生成高质测试用例。"
+      },
+      {
+        "id": "catalog-and-mlflow",
+        "label": "题库资产落地与 MLflow 治理",
+        "focus": ["generator", "catalog", "mlflow"],
+        "note": "生成携带血缘签名 Manifest 的题库文件，落盘 Catalog 数据库并同步登记至评测中台。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "webui",
+      "type": "frontend",
+      "label": "EvaluationStudio",
+      "sublabel": "React 前端交互与轮询",
+      "pos": [40, 90],
+      "size": [150, 56]
+    },
+    {
+      "id": "gateway",
+      "type": "backend",
+      "label": "WebUI API Gateway",
+      "sublabel": "FastAPI :9621",
+      "pos": [280, 90],
+      "size": [150, 56]
+    },
+    {
+      "id": "task_mgr",
+      "type": "backend",
+      "label": "EvalTaskManager",
+      "sublabel": "内存任务池与状态守护",
+      "pos": [520, 90],
+      "size": [150, 56]
+    },
+    {
+      "id": "storage",
+      "type": "database",
+      "label": "物理语料切片库",
+      "sublabel": "sandbox_storage / KV",
+      "pos": [280, 220],
+      "size": [150, 56]
+    },
+    {
+      "id": "generator",
+      "type": "backend",
+      "label": "Dataset Generator",
+      "sublabel": "dataset_generator.py 进程",
+      "pos": [520, 220],
+      "size": [150, 56]
+    },
+    {
+      "id": "llm",
+      "type": "external",
+      "label": "大模型推理网关",
+      "sublabel": "OpenAI 兼容协议 :443",
+      "pos": [800, 220],
+      "size": [150, 56]
+    },
+    {
+      "id": "catalog",
+      "type": "database",
+      "label": "题库持久化目录",
+      "sublabel": "datasets/*.json & SQLite",
+      "pos": [520, 350],
+      "size": [150, 56]
+    },
+    {
+      "id": "mlflow",
+      "type": "cloud",
+      "label": "MLflow 评测中台",
+      "sublabel": ":9128 Tracking Server",
+      "pos": [800, 350],
+      "size": [150, 56]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "生产宿主机运行域 (sshmy2)",
+      "wraps": ["gateway", "task_mgr", "storage", "generator", "catalog"],
+      "pad": 20
+    },
+    {
+      "kind": "security-group",
+      "label": "异步守护沙箱 (Subprocess Pool)",
+      "wraps": ["task_mgr", "generator"],
+      "pad": 14
+    }
+  ],
+  "connections": [
+    {
+      "id": "webui-to-gateway",
+      "from": "webui",
+      "to": "gateway",
+      "label": "POST /generate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "webui-poll",
+      "from": "webui",
+      "to": "gateway",
+      "label": "轮询任务进度",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "labelDy": 20
+    },
+    {
+      "id": "gateway-to-mgr",
+      "from": "gateway",
+      "to": "task_mgr",
+      "label": "分派任务"
+    },
+    {
+      "id": "mgr-to-generator",
+      "from": "task_mgr",
+      "to": "generator",
+      "label": "拉起独立子进程",
+      "variant": "emphasis",
+      "labelAt": [595, 185]
+    },
+    {
+      "id": "generator-read-chunks",
+      "from": "generator",
+      "to": "storage",
+      "label": "提取语料与切片"
+    },
+    {
+      "id": "generator-call-llm",
+      "from": "generator",
+      "to": "llm",
+      "label": "Evol-Instruct 演化",
+      "variant": "emphasis",
+      "labelAt": [735, 210]
+    },
+    {
+      "id": "generator-save-dataset",
+      "from": "generator",
+      "to": "catalog",
+      "label": "持久化 JSON 题库",
+      "variant": "emphasis",
+      "labelAt": [595, 315]
+    },
+    {
+      "id": "generator-sync-mlflow",
+      "from": "generator",
+      "to": "mlflow",
+      "label": "登记评测集血缘",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "left"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "异步解耦与任务守护",
+      "items": [
+        "WebUI 提交参数后立即返回 task_id，前端弹窗轮询状态与百分比进度",
+        "EvalTaskManager 集中管理独立 Python 子进程，管道重定向捕获实时日志"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "生命周期血缘与差量演化",
+      "items": [
+        "基于文档内容 Hash 自动识别新增（ADD）、修改（MODIFIED）与移除（DELETED）",
+        "Evol-Instruct 驱动多跳推理与边界考题生成，已删除文档考题自动转为负面拒答考题"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "题库资产落地与可信治理",
+      "items": [
+        "输出包含 Corpus Manifest v2 契约签名，严格绑定知识库文档版本",
+        "CatalogManager 自动注册题库元数据并同步至远程 MLflow 评测中台"
+      ]
+    }
+  ]
+}
