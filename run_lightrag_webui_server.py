@@ -81,7 +81,19 @@ snapshot_mgr = SnapshotManager(storage_root=storage_root)
 
 
 def resolve_project_working_dir(tenant_id: str, project_id: str) -> Path:
-    """Resolves physical storage path for a given tenant and project."""
+    """Resolves physical storage path for a given tenant and project with self-healing."""
+    # 候选租户名归一化与自愈互查 (防止 default 与 __default 租户名历史割裂)
+    tenant_candidates = [tenant_id]
+    if tenant_id == "__default":
+        tenant_candidates.append("default")
+    elif tenant_id == "default":
+        tenant_candidates.append("__default")
+
+    for t in tenant_candidates:
+        p_active = storage_root / t / project_id / "active"
+        if p_active.exists() and (p_active.resolve() / "kv_store_full_docs.json").exists():
+            return p_active
+
     # 1. Standard production structure: sandbox_storage/<tenant_id>/<project_id>/active
     p_active = storage_root / tenant_id / project_id / "active"
     if p_active.exists():

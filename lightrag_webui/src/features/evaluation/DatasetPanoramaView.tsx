@@ -26,7 +26,8 @@ import {
   Loader2Icon,
   InfoIcon,
   ImageIcon,
-  AlertCircleIcon
+  AlertCircleIcon,
+  Trash2Icon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Button from '@/components/ui/Button'
@@ -106,13 +107,17 @@ interface DatasetPanoramaViewProps {
   currentTenantId: string
   onNavigateToBattle: (datasetName: string, targetProjectId: string, targetTenantId?: string) => Promise<void> | void
   onOpenSynthModal: () => void
+  onNavigateToCases?: (datasetName: string) => void
+  onDatasetDeleted?: (datasetName: string) => void
 }
 
 export default function DatasetPanoramaView({
   currentProjectId,
   currentTenantId,
   onNavigateToBattle,
-  onOpenSynthModal
+  onOpenSynthModal,
+  onNavigateToCases,
+  onDatasetDeleted
 }: DatasetPanoramaViewProps) {
   const [datasets, setDatasets] = useState<PanoramaDatasetItem[]>([])
   const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([])
@@ -121,6 +126,7 @@ export default function DatasetPanoramaView({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProjectFilter, setSelectedProjectFilter] = useState<string>('all')
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<'all' | 'custom' | 'benchmark'>('all')
+  const [deletingDatasetName, setDeletingDatasetName] = useState<string | null>(null)
 
   // 折叠抽屉状态
   const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({})
@@ -179,6 +185,38 @@ export default function DatasetPanoramaView({
   useEffect(() => {
     loadData()
   }, [])
+
+  // 1.1 删除题库安全移入回收站
+  const handleDeletePanoramaDataset = async (datasetName: string) => {
+    if (!datasetName) return
+    if (datasetName === 'business_qa.json' || datasetName === 'sample_lightrag.json') {
+      toast.error('基准题库为系统级资产，受保护禁止删除！')
+      return
+    }
+    const confirmed = window.confirm(
+      `⚠️ 确定要将题库 "${datasetName}" 移入回收站归档吗？\n该操作会将其安全移入 .trash 目录，不影响历史打擂记录。`
+    )
+    if (!confirmed) return
+
+    try {
+      setDeletingDatasetName(datasetName)
+      const res = await fetch(`/ops/evaluation/datasets/${encodeURIComponent(datasetName)}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        toast.success(`题库 "${datasetName}" 已成功移入回收站！`)
+        setDatasets((prev) => prev.filter((d) => d.name !== datasetName))
+        onDatasetDeleted?.(datasetName)
+      } else {
+        const err = await res.json().catch(() => ({}))
+        toast.error(`删除失败: ${err.detail || '未知错误'}`)
+      }
+    } catch (err) {
+      toast.error(`删除题库请求失败: ${err}`)
+    } finally {
+      setDeletingDatasetName(null)
+    }
+  }
 
   // 2. 统计宏观指标
   const stats = useMemo(() => {
@@ -709,8 +747,28 @@ export default function DatasetPanoramaView({
                       </div>
                     </div>
 
-                    {/* 右侧核心动作按钮：前往打擂 */}
+                    {/* 右侧核心动作按钮：前往打擂与删除 */}
                     <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
+                      {!d.is_benchmark &&
+                        d.name !== 'business_qa.json' &&
+                        d.name !== 'sample_lightrag.json' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeletePanoramaDataset(d.name)}
+                            disabled={deletingDatasetName === d.name}
+                            className="h-8 px-2.5 text-xs text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all flex items-center gap-1 shrink-0"
+                            title="删除此题库 (安全移入回收站)"
+                          >
+                            {deletingDatasetName === d.name ? (
+                              <Loader2Icon className="size-3.5 animate-spin" />
+                            ) : (
+                              <Trash2Icon className="size-3.5" />
+                            )}
+                            <span className="hidden sm:inline">删除</span>
+                          </Button>
+                        )}
+
                       <Button
                         size="sm"
                         variant={isTargetCurrent ? 'default' : 'secondary'}
@@ -793,17 +851,30 @@ export default function DatasetPanoramaView({
                   {/* 第三行：考题与指标抽样预览（像表格汇总中那样：支持点击查看、修改边界、查看支撑上下文！） */}
                   {d.sample_cases && d.sample_cases.length > 0 && (
                     <div className="text-xs">
-                      <div className="flex items-center justify-between text-muted-foreground">
-                        <span className="text-[11px]">
-                          考题画像抽样（展示前 {d.sample_cases.length} 题标准问答 · 点击卡片检视详情与编辑切片边界）:
+                      <div className="flex items-center justify-between text-muted-foreground flex-wrap gap-2">
+                        <span className="text-[11px] font-medium text-foreground/80 flex items-center gap-1.5">
+                          <span className="inline-block size-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                          考题画像抽样：已展示前 {d.sample_cases.length} 题核心问答 (全库共包含 <strong className="text-indigo-600 dark:text-indigo-400 font-bold">{d.cases_count}</strong> 道考题) · 点击卡片检视详情:
                         </span>
-                        <button
-                          onClick={() => toggleCases(d.name)}
-                          className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
-                        >
-                          {isCasesExpanded ? '收起考题预览' : '展开考题与切片证据'}
-                          {isCasesExpanded ? <ChevronUpIcon className="size-3" /> : <ChevronDownIcon className="size-3" />}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          {onNavigateToCases && (
+                            <button
+                              onClick={() => onNavigateToCases(d.name)}
+                              className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline flex items-center gap-0.5 font-medium cursor-pointer"
+                              title={`切换至表格汇总视图查看该题库全部 ${d.cases_count} 道题目`}
+                            >
+                              前往表格查看全部 {d.cases_count} 题
+                              <ArrowRightIcon className="size-3" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => toggleCases(d.name)}
+                            className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
+                          >
+                            {isCasesExpanded ? '收起考题预览' : '展开抽样预览'}
+                            {isCasesExpanded ? <ChevronUpIcon className="size-3" /> : <ChevronDownIcon className="size-3" />}
+                          </button>
+                        </div>
                       </div>
 
                       {isCasesExpanded && (

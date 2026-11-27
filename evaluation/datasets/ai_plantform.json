@@ -1,0 +1,783 @@
+{
+  "dataset_id": "ds_proj_1ld3edpo_1795766239",
+  "project_id": "proj_1ld3edpo",
+  "engine": "native",
+  "model": "deepseek-v4.1-flash",
+  "timestamp": "2026-11-27T15:57:19",
+  "total_cases": 10,
+  "corpus_manifest": {
+    "project_id": "proj_1ld3edpo",
+    "revision_id": "rev_1",
+    "snapshot_hash": "sha256:762e7fc0203aeadd41283cc0cc8f9618eccd293c0413f7f99702291ac2cb8de3",
+    "total_docs": 70,
+    "total_chunks": 524,
+    "docs": [
+      {
+        "doc_id": "doc-037a12615c97b90c885c9f135b5eb4e2",
+        "file_name": "05-runtime-service__concepts__08-database-architecture-dual-chains-and-application-schema.md",
+        "file_path": "05-runtime-service__concepts__08-database-architecture-dual-chains-and-application-schema.md",
+        "content_hash": "7a7df0bb20635cba9d5e808bdaceb1cc",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-04c6e90faac2675aa89e2176d2eec7d8",
+        "file_name": "README.md",
+        "file_path": "README.md",
+        "content_hash": "aba6e047b42d379552aa8691a4d5c33c",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-087192c7b4f93d8d9fb3e23ee98603f7",
+        "file_name": "05-runtime-service__concepts__03-dual-process-runtime-deep-dive.md",
+        "file_path": "05-runtime-service__concepts__03-dual-process-runtime-deep-dive.md",
+        "content_hash": "137c42ea1876ef00a0e43b04c1c315d0",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-0b4e338dee6c5d5a0194d8b8132c07a8",
+        "file_name": "05-runtime-service__04-tools-and-skills.md",
+        "file_path": "05-runtime-service__04-tools-and-skills.md",
+        "content_hash": "f9e5e0e9967fa11b840121fa3befffbe",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-0b8f37af74342b6a5cb107892384e2e4",
+        "file_name": "06-scenarios__04-plan-mode-flow.md",
+        "file_path": "06-scenarios__04-plan-mode-flow.md",
+        "content_hash": "2182569f4b64c03cd8888a63f61966ee",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-0c88b722e5b377cd1adcdb4508bacf0c",
+        "file_name": "07-agents__01-dearflow-agent__06-high-fidelity-implementation.md",
+        "file_path": "07-agents__01-dearflow-agent__06-high-fidelity-implementation.md",
+        "content_hash": "bf74d9817ddc95a24d67c774425efc80",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-10498bba11bc97e95c00d244ae668d69",
+        "file_name": "05-data-isolation.md",
+        "file_path": "05-data-isolation.md",
+        "content_hash": "630947ef2355d2b33a189e21fa0fa0d1",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-16fa68e358483d9c63a1e14eff1eae4a",
+        "file_name": "05-runtime-service__02-langgraph-execution.md",
+        "file_path": "05-runtime-service__02-langgraph-execution.md",
+        "content_hash": "9ed439439e43920b96b703c62ac9b7f4",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-18be31885875b1ecfa68c4e86352a32a",
+        "file_name": "04-platform-api__concepts__07-opaque-token-and-credential-governance.md",
+        "file_path": "04-platform-api__concepts__07-opaque-token-and-credential-governance.md",
+        "content_hash": "c6fe62453b60884a8de6ce521ddc5a12",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-19b153be3d3232067a3c9f91167d82a0",
+        "file_name": "04-platform-api__concepts__02-onion-middleware-model.md",
+        "file_path": "04-platform-api__concepts__02-onion-middleware-model.md",
+        "content_hash": "6fb0ab1da0f7c9f900a98f3ea37c7464",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-21c2bc372933f659ed2b6ec318b1c21c",
+        "file_name": "METHODOLOGY.md",
+        "file_path": "METHODOLOGY.md",
+        "content_hash": "c386ac810cc522e617647f315a967035",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-232bc9713e7713aa1f50479dec8c3d84",
+        "file_name": "05-token-usage-and-read-models.md",
+        "file_path": "05-token-usage-and-read-models.md",
+        "content_hash": "edfb5ea1d30766e86c1acca63dbd62c6",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-26f307c09dc92c3dd5dc05670173030e",
+        "file_name": "04-platform-api__concepts__05-iam-and-rbac-architecture.md",
+        "file_path": "04-platform-api__concepts__05-iam-and-rbac-architecture.md",
+        "content_hash": "0f1172b2ccd19c0ce784dd83b54607b0",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-2860ccdbdc19d8c57b08b7897e32b660",
+        "file_name": "07-agents__01-dearflow-agent__02-memory-engine.md",
+        "file_path": "07-agents__01-dearflow-agent__02-memory-engine.md",
+        "content_hash": "8a95e0ccdfbac13d986847cd3418583e",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-2be160259d36d5d62aae69a0272fda11",
+        "file_name": "06-scenarios__09-platform-assistant-diagnostics-flow.md",
+        "file_path": "06-scenarios__09-platform-assistant-diagnostics-flow.md",
+        "content_hash": "7414780e8fe7d5d7f16d9c195f548c8b",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-2d7d72a5f9917c23145aaf16c2156688",
+        "file_name": "05-runtime-service__concepts__07-runtime-core-module-anatomy-and-code-responsibilities.md",
+        "file_path": "05-runtime-service__concepts__07-runtime-core-module-anatomy-and-code-responsibilities.md",
+        "content_hash": "8ee643cafe27959e9fe8192bf1ff4a16",
+        "status": "ACTIVE",
+        "chunks_count": 9
+      },
+      {
+        "doc_id": "doc-2eb94a4e233a71a7161e09c28950318d",
+        "file_name": "04-platform-api__concepts__08-lightweight-observability-philosophy.md",
+        "file_path": "04-platform-api__concepts__08-lightweight-observability-philosophy.md",
+        "content_hash": "9c7db9c0db7440c8f74e208d773d6831",
+        "status": "ACTIVE",
+        "chunks_count": 2
+      },
+      {
+        "doc_id": "doc-334481e927d31b42c10982b6d5840e01",
+        "file_name": "04-trace-and-observability.md",
+        "file_path": "04-trace-and-observability.md",
+        "content_hash": "079d0944c681002d5ad61631e851484c",
+        "status": "ACTIVE",
+        "chunks_count": 8
+      },
+      {
+        "doc_id": "doc-33885f3c810b2acce7f97074e17ee83d",
+        "file_name": "07-agents__01-dearflow-agent__README.md",
+        "file_path": "07-agents__01-dearflow-agent__README.md",
+        "content_hash": "53599bcc58d93e6a5c81db3dbd3b4985",
+        "status": "ACTIVE",
+        "chunks_count": 2
+      },
+      {
+        "doc_id": "doc-34fae9d7a1ae5cf9e5005c1b4c0b5caa",
+        "file_name": "system-topology.arch.json",
+        "file_path": "system-topology.arch.json",
+        "content_hash": "9d81db8b034edfa69cd7ff3d1657ed87",
+        "status": "ACTIVE",
+        "chunks_count": 3
+      },
+      {
+        "doc_id": "doc-365d09d6e3c2d3077a74e8631d04f695",
+        "file_name": "01-architecture.md",
+        "file_path": "01-architecture.md",
+        "content_hash": "8e1834d661b5625da0e0e824bcff67f5",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-36c0e75c70c11b7da33ba225e9b6cad0",
+        "file_name": "05-runtime-service__concepts__05-message-inbox-advisory-lock-and-reconciliation-deep-dive.md",
+        "file_path": "05-runtime-service__concepts__05-message-inbox-advisory-lock-and-reconciliation-deep-dive.md",
+        "content_hash": "d9bfdc41689971396247f7e0038472d1",
+        "status": "ACTIVE",
+        "chunks_count": 9
+      },
+      {
+        "doc_id": "doc-37cf88120c9f510ecb0a1334158c77b9",
+        "file_name": "06-scenarios__03-subagent-dispatch.md",
+        "file_path": "06-scenarios__03-subagent-dispatch.md",
+        "content_hash": "a6ef5cbea83dc9735adfc8004e1e8d25",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-3d80cddb6f1372373dd94a9296258855",
+        "file_name": "05-runtime-service__concepts__02-runtime-execution-and-developer-experience-critique.md",
+        "file_path": "05-runtime-service__concepts__02-runtime-execution-and-developer-experience-critique.md",
+        "content_hash": "095ffb0a5baa1bf33eb209318e948c27",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-3f3330b9d139cd732a317a4b81f0f423",
+        "file_name": "07-agents__01-dearflow-agent__05-skills-runtime.md",
+        "file_path": "07-agents__01-dearflow-agent__05-skills-runtime.md",
+        "content_hash": "f84aec02689827476ebbe63bec75f31c",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-412342a1f003e2b3758fb85d3ad667fa",
+        "file_name": "07-agents__01-dearflow-agent__03-tools-ecosystem.md",
+        "file_path": "07-agents__01-dearflow-agent__03-tools-ecosystem.md",
+        "content_hash": "b69539a730fa84c4ec2a3669ab30b85e",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-41737995773c749d26d207af7aa5ea18",
+        "file_name": "04-platform-api__concepts__03-chestertons-fence-in-software-defense.md",
+        "file_path": "04-platform-api__concepts__03-chestertons-fence-in-software-defense.md",
+        "content_hash": "bd0ca6f43937b7fac633bad0dd287a2c",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-4494ef80ce5d3e4bf2a393da58aa8426",
+        "file_name": "08-session-and-runtime-retention-ttl.md",
+        "file_path": "08-session-and-runtime-retention-ttl.md",
+        "content_hash": "953dc6532bdc8bd4c80a641030bcfb88",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-4785bbf070cb532b279675ab81ac2373",
+        "file_name": "04-platform-api__concepts__04-control-vs-execution-plane-permissions.md",
+        "file_path": "04-platform-api__concepts__04-control-vs-execution-plane-permissions.md",
+        "content_hash": "0260594258a5d3d892ba699cae5b9f74",
+        "status": "ACTIVE",
+        "chunks_count": 8
+      },
+      {
+        "doc_id": "doc-4ab94bd208085dad0aa354cf2b5d485a",
+        "file_name": "02-runtime-gateway.md",
+        "file_path": "02-runtime-gateway.md",
+        "content_hash": "bcbcf310e9254280c824b47348e33b76",
+        "status": "ACTIVE",
+        "chunks_count": 7
+      },
+      {
+        "doc_id": "doc-4cd8d335b11adaafaa8e4dc6e83d8e0a",
+        "file_name": "03-component-design.md",
+        "file_path": "03-component-design.md",
+        "content_hash": "487c7d5f028eea0bfb9d3fd4414e107c",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-4d7f0773a2763f3fc77e1f58573330a9",
+        "file_name": "01-communication-matrix.md",
+        "file_path": "01-communication-matrix.md",
+        "content_hash": "58a84b69b1492b722febfd51880c699c",
+        "status": "ACTIVE",
+        "chunks_count": 7
+      },
+      {
+        "doc_id": "doc-51c9f660c4b8173db9320fd875735747",
+        "file_name": "05-runtime-service__03-hitl-and-interrupts.md",
+        "file_path": "05-runtime-service__03-hitl-and-interrupts.md",
+        "content_hash": "a2c2490ecdc0caca1e6b17dd098e3f7c",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-57ba27ffec95ce4d43d3f160ec59ce54",
+        "file_name": "07-agents__01-dearflow-agent__04-workspace-sandbox.md",
+        "file_path": "07-agents__01-dearflow-agent__04-workspace-sandbox.md",
+        "content_hash": "8aa89036aa6aeb856b5a88ca6d29fc26",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-5fdb57456732a4b54231b711f0f0b7bd",
+        "file_name": "07-agents__02-showcase-demo-agent.md",
+        "file_path": "07-agents__02-showcase-demo-agent.md",
+        "content_hash": "a29f62dd8ab367c609bd9f862a23880b",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-6661f59d2ed19d09704b4d43fe971c6f",
+        "file_name": "06-scenarios__02-hitl-approval-flow.md",
+        "file_path": "06-scenarios__02-hitl-approval-flow.md",
+        "content_hash": "745bba4ac199eac547a907b26d1bb840",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-6c62e327efbdb0019084e1caa03fc0e0",
+        "file_name": "04-platform-api__concepts__06-dual-layer-rbac-deep-dive.md",
+        "file_path": "04-platform-api__concepts__06-dual-layer-rbac-deep-dive.md",
+        "content_hash": "7be98901e2267a1de2dc7274a0f75f90",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-6d2878174d2b30408d6e9802e45af6ab",
+        "file_name": "06-scenarios__06-knowledge-studio-flow.md",
+        "file_path": "06-scenarios__06-knowledge-studio-flow.md",
+        "content_hash": "1fa373e26a0e6d300e57a6ab932ea7e5",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-719c76dad6d28d6db2e2edfb2d229ae1",
+        "file_name": "05-runtime-service__concepts__01-runtime-autonomy-and-decoupled-testing.md",
+        "file_path": "05-runtime-service__concepts__01-runtime-autonomy-and-decoupled-testing.md",
+        "content_hash": "4f31c0c1b5977960fcb24589e1c4abf6",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-7541b0e97f0e4c5a448b342f22dcfd10",
+        "file_name": "06-scenarios__01-agent-chat-flow.md",
+        "file_path": "06-scenarios__01-agent-chat-flow.md",
+        "content_hash": "eda7642c870fb79dd8bf9e5545fcc433",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-7f207a9c52952c35d7d74296d3b3589a",
+        "file_name": "05-runtime-service__concepts__10-runtime-webapp-api-server-and-inbox-pipeline.md",
+        "file_path": "05-runtime-service__concepts__10-runtime-webapp-api-server-and-inbox-pipeline.md",
+        "content_hash": "0d2971a17f5b93ca81372c3b0f2e46cf",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-8025260e4ccd9d1535be79460abdc7cb",
+        "file_name": "07-agents__01-dearflow-agent__01-architecture-and-modes.md",
+        "file_path": "07-agents__01-dearflow-agent__01-architecture-and-modes.md",
+        "content_hash": "8007d62d894deb266a4b90d511ade894",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-80eb8e6515c3fa4792b9bd5f0f238efd",
+        "file_name": "06-scenarios__07-model-resilience-fallback-flow.md",
+        "file_path": "06-scenarios__07-model-resilience-fallback-flow.md",
+        "content_hash": "e0762d6870ac7051a659fa0dbb35fd9f",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-8cb8030a7f7d65c935a2bb002203ebf2",
+        "file_name": "03-design-principles.md",
+        "file_path": "03-design-principles.md",
+        "content_hash": "f76926763626a43e31da6e01e90d0f0a",
+        "status": "ACTIVE",
+        "chunks_count": 2
+      },
+      {
+        "doc_id": "doc-95f74556177172191c6ed585dd320e63",
+        "file_name": "05-runtime-service__concepts__11-upstream-langgraph-monkey-patches-and-hitl-bug-anatomy.md",
+        "file_path": "05-runtime-service__concepts__11-upstream-langgraph-monkey-patches-and-hitl-bug-anatomy.md",
+        "content_hash": "0dee4203d6e7a8d7fccb375dc649804f",
+        "status": "ACTIVE",
+        "chunks_count": 3
+      },
+      {
+        "doc_id": "doc-98a7eb8c8e61333ffdef1abc6b1f8d9d",
+        "file_name": "05-runtime-service__concepts__12-runtime-observability-langfuse-and-otel-pipeline.md",
+        "file_path": "05-runtime-service__concepts__12-runtime-observability-langfuse-and-otel-pipeline.md",
+        "content_hash": "23d44994b8c553eb8dce6cac8c3f6469",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-a5783fd4b35cddd310391b97861f0ba7",
+        "file_name": "02-chat-session-engine.md",
+        "file_path": "02-chat-session-engine.md",
+        "content_hash": "3bf4da762f7303a0bbdffbd3b0d49441",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-a67e92e1f59b0f9cc3451429a92b2c4f",
+        "file_name": "05-runtime-service__concepts__06-request-authentication-and-runtime-resolution-pipeline.md",
+        "file_path": "05-runtime-service__concepts__06-request-authentication-and-runtime-resolution-pipeline.md",
+        "content_hash": "87a11fce8301061c6b292432bafa4281",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-a7efef8ae62c338661d29b9a4082a290",
+        "file_name": "04-catalog-management.md",
+        "file_path": "04-catalog-management.md",
+        "content_hash": "538f1e00e654966987b0e3970fc9f80f",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-a82b529ea80d21cf44bc9a4d758ea547",
+        "file_name": "07-agents__03-platform-assistant-agent.md",
+        "file_path": "07-agents__03-platform-assistant-agent.md",
+        "content_hash": "8ec41001ecf34a1f8ab87fc1276d90af",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-ac6a5490b68a9e026089210931374349",
+        "file_name": "02-tech-stack.md",
+        "file_path": "02-tech-stack.md",
+        "content_hash": "d9d281b8b8115bf31345fad8a5100d48",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-b16c22f04a949ab4efa8ac4b8c677579",
+        "file_name": "05-runtime-service__concepts__09-workspace-sandbox-pty-and-asset-pipeline.md",
+        "file_path": "05-runtime-service__concepts__09-workspace-sandbox-pty-and-asset-pipeline.md",
+        "content_hash": "09f189ebf41ab503254696dfd0cbfd2f",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-b1967b02d4c531c4d8fad99fa5211fae",
+        "file_name": "07-continuous-evaluation-flywheel.md",
+        "file_path": "07-continuous-evaluation-flywheel.md",
+        "content_hash": "0b1039fd135487f67317e6f745bf5bd0",
+        "status": "ACTIVE",
+        "chunks_count": 7
+      },
+      {
+        "doc_id": "doc-bfff155f01808a38be587418327e4630",
+        "file_name": "system-topology-interactive.html",
+        "file_path": "system-topology-interactive.html",
+        "content_hash": "5f31e0f3c3c3fe726537e4b8643c1548",
+        "status": "ACTIVE",
+        "chunks_count": 201
+      },
+      {
+        "doc_id": "doc-c0aa8f34b68d827dd95a847a103f4178",
+        "file_name": "04-platform-api__concepts__01-mvc-ddd-hexagonal.md",
+        "file_path": "04-platform-api__concepts__01-mvc-ddd-hexagonal.md",
+        "content_hash": "d12a114d9ffb9d9bd38926e1604d4d2e",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-c20b5721575d869ea04ba0e7eed105f7",
+        "file_name": "05-runtime-service__05-context-blowup-defense-and-resilience.md",
+        "file_path": "05-runtime-service__05-context-blowup-defense-and-resilience.md",
+        "content_hash": "42c8d03556496b9f35af0c583a90c55d",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-c34874065bf096a1c34a0cf138e3a62e",
+        "file_name": "05-runtime-service__concepts__14-resilient-mcp-fault-isolation.md",
+        "file_path": "05-runtime-service__concepts__14-resilient-mcp-fault-isolation.md",
+        "content_hash": "6a2157e79445adeef5e23dde10e56d95",
+        "status": "ACTIVE",
+        "chunks_count": 2
+      },
+      {
+        "doc_id": "doc-c506254517eb62db356235d695af1723",
+        "file_name": "06-scenarios__10-gateway-usage-to-trace-flow.md",
+        "file_path": "06-scenarios__10-gateway-usage-to-trace-flow.md",
+        "content_hash": "5864629e7deb217221ccdd03facf034e",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-c52dad974a4bf18c5a70b784eefb0f4f",
+        "file_name": "03-iam-and-governance.md",
+        "file_path": "03-iam-and-governance.md",
+        "content_hash": "febc18766bb9907d8a13af3d595636d7",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-ca589467832e258efc777cb88a18ce3b",
+        "file_name": "06-scenarios__08-session-to-eval-flywheel-flow.md",
+        "file_path": "06-scenarios__08-session-to-eval-flywheel-flow.md",
+        "content_hash": "24d321dbe6e91bf496f5b8c2435a5db7",
+        "status": "ACTIVE",
+        "chunks_count": 6
+      },
+      {
+        "doc_id": "doc-cccd378b9a857f7adf1bced85d59e5c4",
+        "file_name": "01-system-topology.md",
+        "file_path": "01-system-topology.md",
+        "content_hash": "de5a8c3f2913419536fe3379a14a4224",
+        "status": "ACTIVE",
+        "chunks_count": 3
+      },
+      {
+        "doc_id": "doc-ce58e89a9f5e0e4922d70fa086b038c4",
+        "file_name": "03-sse-streaming-pipeline.md",
+        "file_path": "03-sse-streaming-pipeline.md",
+        "content_hash": "890883536660fad34317fab6d6b67eb6",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-cf231b5a3de2a7d0f98b4a0d5a3c269e",
+        "file_name": "05-runtime-service__concepts__13-asynchronous-memory-and-mmr-algorithm.md",
+        "file_path": "05-runtime-service__concepts__13-asynchronous-memory-and-mmr-algorithm.md",
+        "content_hash": "888baaf9e1ec0ea2eb1c7e0316a72cdc",
+        "status": "ACTIVE",
+        "chunks_count": 2
+      },
+      {
+        "doc_id": "doc-d4b964c1adcc61fd9c1aefccaca8b985",
+        "file_name": "06-knowledge-studio-and-zero-tunnel.md",
+        "file_path": "06-knowledge-studio-and-zero-tunnel.md",
+        "content_hash": "7e2b53299833990c7d309518064dec71",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-e3a6885eb476dc933ec99fea716286e8",
+        "file_name": "07-agents__01-dearflow-agent__07-real-world-lifecycle-case-study.md",
+        "file_path": "07-agents__01-dearflow-agent__07-real-world-lifecycle-case-study.md",
+        "content_hash": "8dea12f6dd41c94f397def385998a1b7",
+        "status": "ACTIVE",
+        "chunks_count": 7
+      },
+      {
+        "doc_id": "doc-e5be42045ad4bd44f59f5ca79503c0a4",
+        "file_name": "06-scenarios__05-trace-to-logs-flow.md",
+        "file_path": "06-scenarios__05-trace-to-logs-flow.md",
+        "content_hash": "321fa141882b7cb707ec151d5cbeca51",
+        "status": "ACTIVE",
+        "chunks_count": 1
+      },
+      {
+        "doc_id": "doc-f50d001a94e209607f78373607f76202",
+        "file_name": "02-delegation-auth.md",
+        "file_path": "02-delegation-auth.md",
+        "content_hash": "ef802d82c58ba787cf9c05a392eb9fa1",
+        "status": "ACTIVE",
+        "chunks_count": 4
+      },
+      {
+        "doc_id": "doc-f50f9b494383010b3b2c17af8baa5036",
+        "file_name": "05-runtime-service__01-architecture.md",
+        "file_path": "05-runtime-service__01-architecture.md",
+        "content_hash": "69fbc48c0d6e6e9397b8cde93d95c9ec",
+        "status": "ACTIVE",
+        "chunks_count": 13
+      },
+      {
+        "doc_id": "doc-f743800da6bafe93e241c6d419af6670",
+        "file_name": "05-runtime-service__concepts__04-langgraph-ecosystem-thin-wrapper-and-agent-development-guide.md",
+        "file_path": "05-runtime-service__concepts__04-langgraph-ecosystem-thin-wrapper-and-agent-development-guide.md",
+        "content_hash": "811e5a0ae42aed0c9034d87f18b6a0b2",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      },
+      {
+        "doc_id": "doc-fc80a80c5752d42531b1a09211bf8b99",
+        "file_name": "04-platform-api__01-architecture.md",
+        "file_path": "04-platform-api__01-architecture.md",
+        "content_hash": "ccd93d6f3b4482415aea6f77712c47dc",
+        "status": "ACTIVE",
+        "chunks_count": 5
+      }
+    ]
+  },
+  "test_cases": [
+    {
+      "test_id": "GEN_001_simple",
+      "question": "在 editorial 预设且启用 trace 动画时，[data-animate=\"node\"] 的动画持续时间是多少？",
+      "ground_truth": "3.5s",
+      "contexts": [
+        ": 2.15s;\n    }\n    svg[data-preset=\"blueprint\"][data-animation=\"trace\"] [data-animate=\"node\"] {\n      animation-name: archify-blueprint-node-pulse;\n      animation-duration: 3.8s;\n    }\n    svg[data-preset=\"editorial\"][data-animation=\"trace\"] [data-animate=\"edge\"] {\n      filter: none;\n      animation-duration: 2.2s;\n    }\n    svg[data-preset=\"editorial\"][data-animation=\"trace\"] [data-animate=\"node\"] {\n      animation-name: archify-editorial-node-pulse;\n      animation-duration: 3.5s;\n    }\n    /* Embedded proofs are static until a named Story Trail chapter is played.\n       This keeps proof grids calm and ensures ?play=1 stops all viewer motion\n       after one 3.2 second chapter instead of leaving ambient trace loops on. */\n    html[data-embed=\"true\"] svg[data-animation=\"trace\"] [data-animate],\n    html[data-share-playback=\"true\"] svg[data-animation=\"trace\"] [data-animate] {\n      animation: none !important;\n      stroke-dashoffset: 0;\n    }\n    @keyframes archify-edge-flow {\n      0% { stroke-dasharray: 10 8; stroke-dashoffset: 54; opacity: 0.42; }\n      88% { stroke-dasharray: 10 8; stroke-dashoffset: 0; opacity: 1; }\n      99.9% { stroke-dasharray: 10 8; stroke-dashoffset: 0; opacity: 1; }\n      100% { stroke-dashoffset: 0; opacity: 1; }\n    }\n    @keyframes archify-node-pulse {\n      0%, 72%, 100% { filter: none; stroke-width: 1.5; }\n      18%, 36% {\n        filter: drop-shadow(0 0 8px var(--arrow-emphasis));\n        stroke-width: 2.4;\n      }\n    }\n    @keyframes archify-blueprint-node-pulse {\n      0%, 72%, 100% { opacity: 1; filter: none; }\n      18%, 36% { opacity: 0.72; filter: drop-shadow(0 0 2px var(--frontend-stroke)); }\n    }\n    @keyframes archify-editorial-node-pulse {\n      0%, 72%, 100% { opacity: 1; filter: none; }\n      18%, 36% { opacity: 0.78; filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--text) 18%, transparent)); }\n    }\n    @keyframes archify-signal-scan {\n      0%, 18% { opacity: 1; transform: translateX(-70%); }\n      70% { opacity: 1; transform: translateX(70%); }\n      100% { opacity: 0; transform: translateX(70%); }\n    }\n    @keyframes archify-radar-live {\n      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--backend-stroke) 52%, transparent); }\n      55%, 100% { box-shadow: 0 0 0 0.32rem transparent; }\n    }\n    @keyframes archify-guided-progress {\n      from { transform: scaleX(var(--guided-progress-start, 0)); }\n      to { transform: scaleX(1); }\n    }\n    @keyframes archify-story-flow {\n      to { stroke-dashoffset: 0; }\n    }\n    @keyframes archify-intent-trace-flow {\n      0% { opacity: 0.28; stroke-dashoffset: 0; }\n      12%, 78% { opacity: 0.94; }\n      100% { opacity: 0; stroke-dashoffset: -1; }\n    }\n    @keyframes archify-route-probe-flow {\n      0% { stroke-dashoffset: 0; opacity: 0.96; }\n      78% { stroke-dashoffset: -1; opacity: 0.96; }\n      100% { stroke-dasharray: none; stroke-dashoffset: 0; opacity: 0.58; }\n    }\n    @keyframes archify-route-journey-flow {\n      0% { opacity: 0.16; stroke-dashoffset: 0; }\n      14%, 76% { opacity: 1; }\n      100% { opacity: 0; stroke-dashoffset: -1; }\n    }\n    @keyframes archify-semantic-lens-flow {\n      0% { opacity: 0.2; stroke-dashoffset: 0; }\n      12%, 78% { opacity: 0.9; }\n      100% { opacity: 0; stroke-dashoffset: -1; }\n    }\n    @keyframes archify-relationship-pulse {\n      0% { opacity: 0.18; stroke-dashoffset: 0; }\n      10%, 76% { opacity: 0.98; }\n      100% { opacity: 0; stroke-dashoffset: -1; }\n    }\n    @keyframes archify-relationship-token-life {\n      0%, 7% { opacity: 0; }\n      13%, 82% { opacity: 1; }\n      100%"
+      ],
+      "source_doc_ids": [
+        "doc-bfff155f01808a38be587418327e4630"
+      ],
+      "source_docs": [
+        "system-topology-interactive.html"
+      ],
+      "source_chunk_ids": [
+        "doc-bfff155f01808a38be587418327e4630-chunk-105"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_002_simple",
+      "question": "在 LangGraph 官方最新源码的 StreamToolCallHandler._error 方法中，官方没有做任何异常类型判断，而是直接向流下发了什么事件？",
+      "ground_truth": "直接下发 \"tool-error\" 事件，并携带 tool_call_id 和 message（str(error)）。",
+      "contexts": [
+        "支源码铁证\n老王我通过 MCP 查证了 LangGraph 官方主分支（`libs/langgraph/langgraph/pregel/_tools.py`）的最新代码，证据确凿，白纸黑字：\n\n```python\n# LangGraph 官方最新源码 (libs/langgraph/langgraph/pregel/_tools.py)\nclass StreamToolCallHandler(BaseCallbackHandler, _StreamingCallbackHandler):\n    ...\n    def _error(self, error: BaseException, *, run_id: UUID) -> None:\n        info = self._run_to_call.pop(run_id, None)\n        if info is None:\n            return\n        ns, tool_call_id, token = info\n        self._reset_writer(token)\n        # 艹！官方在这里完全没有做任何异常类型判断，直接向流下发 tool-error！\n        self.stream(\n            (\n                ns,\n                \"tools\",\n                {\n                    \"event\": \"tool-error\",\n                    \"tool_call_id\": tool_call_id,\n                    \"message\": str(error),\n                },\n            )\n        )\n```\n\n### 3. 本平台的手术刀式热补丁实现\n在 [`apps/runtime-service/src/runtime_service/patches.py`](../../../../apps/runtime-service/src/runtime_service/patches.py) 中，老王给它动了精准的微创手术：\n\n```python\n# patches.py: _patch_stream_tool_call_handler()\ndef _patch_stream_tool_call_handler() -> None:\n    from langgraph.pregel._tools import StreamToolCallHandler\n\n    # 1. 幂等检查：打过补丁直接跳过\n    if getattr(StreamToolCallHandler, \"_bubble_up_patched\", False):\n        return\n\n    orig_error = StreamToolCallHandler._error\n\n    def _patched_error(self: StreamToolCallHandler, error: BaseException, *, run_id: UUID) -> None:\n        # 核心拦截点：GraphBubbleUp (包含 GraphInterrupt) 是正常的控制流中断信号，不是工具执行失败！\n        if isinstance(error, GraphBubbleUp):\n            info = self._run_to_call.pop(run_id, None)\n            if info is not None:\n                _, _, token = info\n                self._reset_writer(token) # 干净利落地重置 writer 状态\n            return # 绝不向前端发射 tool-error 假报警！直接静默交还控制权给图引擎！\n\n        # 真正的工具故障（如除以零、网络中断）放行调用官方原逻辑\n        return orig_error(self, error, run_id=run_id)\n\n    # 替换方法并打上幂等标记\n    StreamToolCallHandler._error = _patched_error\n    StreamToolCallHandler._bubble_up_patched = True\n```\n- **疗效**：触发审批时，流式管道安静平稳，前端只收到合法的 `interrupt` 审批卡片，红灯假报警彻底消声灭迹！\n\n---\n\n## 三、缺陷二深潜：ToolNode 中断冒泡防吞没\n\n### 1. 历史缺陷回顾\n在早期的 LangGraph 中，`ToolNode` 内部包裹了复杂的异常转译逻辑（将异常包装成 `ToolMessage(content=\"error...\")`）。如果工具抛出的是控制流中断信号 `GraphBubbleUp`，若被无差别的 `except Exception:` 拦截包装成 `ToolMessage`，图引擎就会以为工具执行结束了，继续往下跑，从而导致**人机审批中断被当场吞没，智能体直接跳过审批裸奔！**\n\n### 2. 官方修补证据\n经过社区反馈，官方在后期的重构中（`libs/prebuilt/langgraph/prebuilt/tool_node.py`）显式加入了特殊处理：\n\n```python\n# 官方最新 ToolNode._execute_tool_async 源码\ntry:\n    response = await tool.ainvoke(call_args, config)\n    ...\n# GraphInterrupt is a special exception that will always be raised.\n# It can be triggered when GraphInterrupt(GraphBubbleUp) is raised from an interrupt invocation\nexcept GraphBubbleUp:\n    raise # 官方终于把这个异常显式往外抛了！\nexcept Exception as e:\n    # 其它常规工具异常处理\n```\n\n### 3. 本平台为什么依然保留 `_patch_tool_node_bubble_up()`？\n```python\n# patches.py: _patch_tool_node_bubble_up()\ndef _patched_run_one(self: ToolNode, *args: Any, **kwargs: Any) -> Any:\n    try:\n        return orig_run_one(self, *args, **kwargs)\n    except GraphBubbleUp:\n        raise # 强制双保险冒泡！\n```\n1. **环境版本异构防线**：生产环境或开发者机器上的 Python 依赖可能因为锁版本差异存在旧版 `langgraph`，补丁保证了跨环境行为绝对一致；\n2. **三方 Wrapper 穿透**：当用户或中间件配置了自定义的 `wrap_tool_call` 时，此补丁确保即使自定义 Wrapper 逻辑有缺陷，中断信号也绝不丢失。\n\n---\n\n## 四、零侵入自执行与幂等守卫机制\n\n很多初学者写猴子补丁，到处在各个业务函数里重复 `import` 重复替换，或者补丁生效时机太晚，导致部分对象已经实例化完毕。老王带你看本项目的架构设计"
+      ],
+      "source_doc_ids": [
+        "doc-95f74556177172191c6ed585dd320e63"
+      ],
+      "source_docs": [
+        "05-runtime-service__concepts__11-upstream-langgraph-monkey-patches-and-hitl-bug-anatomy.md"
+      ],
+      "source_chunk_ids": [
+        "doc-95f74556177172191c6ed585dd320e63-chunk-001"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_003_reasoning",
+      "question": "在 Run 状态由 running 变为 success 的竞态场景中，为什么系统要在入队前先发起本地 HTTP 调用检查目标 Run 状态，并且只在 inbox.has_message 判定为“全新消息”时抛出 HTTP 409 run_changed 拒绝入队？其背后的机制与架构意义是什么？",
+      "ground_truth": "因为消息入队与 Run 状态变更可能并发发生，如果目标 Run 已经进入 success、error 或 cancelled 等终态，此时再入队的新消息将没有合法消费者，最终会变成死信或僵尸消息。系统在 webapp.py 入队前调用 GET /threads/{id}/runs/{run_id} 查询目标 Run 的物理状态，发现状态已不是 running 后，会通过 inbox.has_message 判断该消息是否先前已经被成功接收过：若是全新消息，说明它没有可依赖的既有接收记录，也没有合法消费路径，因此立即返回 HTTP 409 Conflict run_changed，拒绝入队；这样可以防止向已终结的 Run 注入死信，并让客户端收到 409 后提示用户重新发起新一轮对话。若消息此前已成功接收，则 has_message 可用于区分重复投递或幂等场景，避免误伤已有接收记录。该机制直接落实“仅当目标 Run 物理状态为 running 时才允许入队，严禁向终态 Run 注入死信”的入队前置 Run 状态不变量，从源头保证消息可被消费、状态一致性和故障可恢复性。",
+      "contexts": [
+        "态由 `running` 变为 `success`。\n- **系统防御**：\n  1. [`webapp.py`](../../../apps/runtime-service/src/runtime_service/webapp.py#L184) 在入队前会发起本地 HTTP 调用 `GET /threads/{id}/runs/{run_id}`；\n  2. 发现目标 Run 的状态已经不是 `running`；\n  3. 代码通过 `inbox.has_message` 检查这条消息是否曾在先前已经被成功接收过；\n  4. 如果是全新消息，立即抛出 `HTTP 409 Conflict (\"run_changed\")`，拒绝入队！\n  5. **最终结果**：绝不允许向一个已经死掉的 Run 塞入死信消息，客户端收到 409 后可在前端提示用户重新发起新一轮对话。\n\n### 场景四：运维管理与 24 小时孤儿线程清理机制\n- **现象**：用户在控制台直接删除了一个会话（Thread），收件箱里积压的旧记录会不会永远变成僵尸垃圾？\n- **系统防御**：\n  1. 运维命令行工具 [`messaging/__main__.py`](../../../apps/runtime-service/src/runtime_service/messaging/__main__.py) 提供了 `--prune-deleted` 指令；\n  2. 底座执行 `prune_deleted_threads()`：扫描在 `threads` 表中已被物理删除、且不存在活跃 Run 超过 24 小时的孤儿会话记录；\n  3. 安全清理过期消息，同时保留 24 小时的故障复盘重试窗口，兼顾存储紧凑与容灾审计。\n\n---\n\n## 七、架构不变量清单（Invariants）\n\n1. **锁粒度单会话不变量**：向 `runtime_message_inbox` 执行写入或分配序列号，必须持有针对该 `thread_id` 的 64 位咨询互斥锁（`pg_advisory_xact_lock`），严禁无锁并发读写。\n2. **入队前置 Run 状态不变量**：仅当目标 Run 的物理状态为 `running` 时才允许向其入队新消息，严禁向终态 Run（`success`, `error`, `cancelled`）注入死信。\n3. **租约有限性不变量**：任何 Worker 认领消息必须持有有限租约（默认 30 秒），严禁无限期持有 `claimed` 状态。\n4. **对账依据确定性不变量**：消息消费状态的最终冲销（`consumed`），必须且只能以持久化入库的检查点快照（`committed checkpoint`）中包含的存根为准，绝不允许基于内存传递判定送达。\n5. **单会话堆积硬约束**：单个会话内未消费（`queued` + `claimed`）消息总数绝对不得超过 100 条；单个消息序列化体积绝对不得超过 65,536 字节（64KB）。"
+      ],
+      "source_doc_ids": [
+        "doc-36c0e75c70c11b7da33ba225e9b6cad0"
+      ],
+      "source_docs": [
+        "05-runtime-service__concepts__05-message-inbox-advisory-lock-and-reconciliation-deep-dive.md"
+      ],
+      "source_chunk_ids": [
+        "doc-36c0e75c70c11b7da33ba225e9b6cad0-chunk-008"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_004_reasoning",
+      "question": "为什么该系统要用 __getattribute__ 动态反射给原生 SDK 的每个回调方法套一层“防弹服”，把 401、429、网络超时等异常统一记录到内存 Counter，而不是让异常向 Agent 核心计算图传播？同时，为什么外部 Metadata 必须先经过 _CALLER_METADATA 严格白名单过滤，再由 _TRUSTED_METADATA 做权威覆盖，并用 _SENSITIVE_KEYS 粉碎敏感字段？请从故障隔离、主流程可用性与审计轨迹可信性角度解释其机理。",
+      "ground_truth": "首先，__getattribute__ 会在访问原生 SDK 回调方法时动态介入，相当于对每一个同步或异步回调统一加代理层；底层一旦抛出 401 Unauthorized、429 限流或网络超时，代理层即可捕获并通过 _record_export_error 写入内部内存 Counter（_metrics[\"export_error\"] += 1），而不是把异常继续抛给上层。这样做的机理是故障隔离：观测/导出侧的失败被降级为可计数指标，Agent 核心计算图不会因 SDK 回调异常而中断，从而继续向前执行，提高生产级高可用性。其次，元数据入口若不加约束，客户端可能塞入敏感数据或伪造字段污染审计轨迹；因此外部 Metadata 只有命中 _CALLER_METADATA 白名单的键才允许保留，先做严格准入。随后 _TRUSTED_METADATA 作为权威小票覆盖相关元数据，防止调用方伪造身份或关键审计字段；_SENSITIVE_KEYS 则对 authorization、cookie、token、api_key、secret、password 等敏感键进行粉碎。其逻辑链路是：白名单限制可进入字段，权威覆盖保证身份与审计字段可信，敏感键粉碎避免泄露，最终使审计轨迹既不被外部输入污染，也不携带敏感信息。",
+      "contexts": [
+        "return super().__getattribute__(name)\n```\n- **老王点评**：\n  “看到这个 `__getattribute__` 没有？利用 Python 动态反射把原生 SDK 的每一个回调方法都穿上一层‘防弹服’！无论是同步还是异步方法，底层只要报 401 Unauthorized、429 限流、还是网络超时，通通被 `_record_export_error` 记录到内部的内存 Counter 中（`_metrics[\"export_error\"] += 1`），Agent 核心计算图连眼皮都不眨一下继续往前跑！这才是生产级高可用代码的标杆设计！”\n\n---\n\n### 2. 零信任消杀与元数据白名单分层（Zero-Trust Metadata & Redaction）\n\n外部请求打到 Agent 底座，客户端可能在 Config 里随手塞入敏感数据，或者攻击者恶意伪造字段企图污染审计轨迹。底座设立了严格的白名单和敏感词粉碎机制：\n\n```python\n# 对应 apps/runtime-service/src/runtime_service/observability/langfuse.py 第 27-70 行\n_CALLER_METADATA = frozenset({\n    \"run_id\", \"thread_id\", \"assistant_id\", \"assistant_version\", \"deployment_version\"\n})\n\n_TRUSTED_METADATA = frozenset({\n    \"tenant_id\", \"project_id\", \"user_id\", \"model_id\", \"config_hash\",\n    \"prompt_version\", \"prompt_hash\", \"policy_version\", \"policy_hash\",\n    \"skills_hash\", \"execution_mode\", \"effective_reasoning\", \"request_id\", \"platform_trace_id\"\n})\n\n_SENSITIVE_KEYS = frozenset({\n    \"authorization\", \"cookie\", \"set-cookie\", \"token\", \"access_token\",\n    \"api_key\", \"x-api-key\", \"secret\", \"client_secret\", \"password\"\n})\n```\n\n- **严格白名单过滤**：外部调用方传进来的 Metadata 只有在 `_CALLER_METADATA` 集合中的键才被允许保留；\n- **权威小票覆盖（防伪造身份）**：调用方如果在请求中伪造了 `user_id=\"super_admin\"`，在 `with_langfuse_tracing()` 中会被网关验签得到的 `trusted_metadata` 强行覆盖，绝无篡改可能；\n- **敏感词粉碎消杀**：任何键名包含敏感词，或者字符串长度超过 256 字符的，统统就地替换为 `[REDACTED]`；\n- **Prompt 数据保护 (`_mask`)**：默认抹除回调 payload 中的原始大文本，防止用户的商业私密数据和敏感上下文无脑落入第三方平台。\n\n---\n\n### 3. 本地常驻离线诊断器（_RuntimeDiagnosticsCallback）\n\n很多平台一旦关了外部 APM，本地就变成瞎子。底座在 `with_langfuse_tracing()` 中，无论是否开启远程 Langfuse，都会装配一个纯本地的轻量诊断器：\n\n```python\n# 对应 observability/langfuse.py（省略部分指标与兼容日志）\nclass _RuntimeDiagnosticsCallback(BaseCallbackHandler):\n    \"\"\"Bounded Run/Tool diagnostics independent of Langfuse export.\"\"\"\n\n    def on_llm_end(self, response: Any, *, run_id: Any, **_: Any) -> None:\n        usage = getattr(response, \"llm_output\", None) or {}\n        token_usage = usage.get(\"token_usage\", {}) if isinstance(usage, Mapping) else {}\n        total = token_usage.get(\"total_tokens\")\n        if isinstance(total, int) and total >= 0:\n            _metrics[\"token_total\"] += total\n\n    def _finish(self, run_id: Any, status: str) -> None:\n        started = self._starts.pop(run_id, None)\n        duration_ms = (\n            round((time.monotonic() - started) * 1000, 2)\n            if started is not None else None\n        )\n        _metrics[f\"run_{status}\"] += 1\n        log_diagnostic(\n            \"runtime.graph.completed\",\n            {\n                \"graph_id\": self._graph_id,\n                **self._metadata,\n                \"callback_run_id\": str(run_id),\n                \"outcome\": status,\n                \"duration_ms\": duration_ms,\n            },\n        )\n```\n- `get_observability_metrics()` 可断言 `run_success`、`token_total` 与 `tool_error`，具体耗时取决于图和环境，不承诺固定0.05秒。\n- `ModelErrorMiddleware` 位于 fallback/retry 内侧、timeout 外侧，记录每次失败后重新抛出同一异常。恢复后Run仍可success；取消/HITL不算provider失败。\n- 本地诊断只保存类型、稳定码、有限namespace/ID和duration；原始message/body/stack/header不得进入新诊断日志或安全OTel/Langfuse事件。\n- Langfuse diagnostic event 在创建前通过公开 `propagate_attributes(session_id=...)` 绑定session；tenant/project/native Run派生trace ID，与graph回调共用显式trace_context。关掉导出时页面无法从stdout回查，本期无诊断数据库。\n\n---\n\n### 4. 停机优雅排空与防死锁（Bounded Graceful Flush）\n\n服务在执行优雅下线时，若直接退出会导致缓冲区指标丢失；若无脑阻塞等待，一"
+      ],
+      "source_doc_ids": [
+        "doc-98a7eb8c8e61333ffdef1abc6b1f8d9d"
+      ],
+      "source_docs": [
+        "05-runtime-service__concepts__12-runtime-observability-langfuse-and-otel-pipeline.md"
+      ],
+      "source_chunk_ids": [
+        "doc-98a7eb8c8e61333ffdef1abc6b1f8d9d-chunk-002"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_005_reasoning",
+      "question": "为什么底座在接到授权事实后可以“闭眼执行”，而不需要在LangGraph Pregel引擎运行过程中再次进行权限裁决？这种设计对安全边界与执行性能带来了怎样的机制性影响？",
+      "ground_truth": "根据知识切片，底座接到的不是“请求申请”，而是“已经裁决完毕的授权事实”，这意味着权限裁决职责已在上层完成并封装为确定性结果。底座的处理逻辑分为三步：先验防伪，即校验签名和71位SHA256的context_hash，不对则返回401/403；再物理装配，即依据denied_tool_names把bash_execute从工具箱中物理移除，并依据allowed_model_ids选定模型；最后闭眼执行，把组装好的图交给LangGraph Pregel引擎全速运算。因此执行阶段无需再次裁决，因为授权边界已通过“物理装配”强制落地，而不是依赖模型自觉或运行时动态判断。这样做的性能影响是避免重复权限判断带来的额外开销和延迟，使Pregel引擎可以全速运算；安全影响是越权工具在装配阶段已被物理剔除，模型即使想调用也无法调用，但前提是防伪验证必须可靠，否则上层授权事实出错时底座不会二次拦截。所以“闭眼执行”的机理是：裁决前置+物理强制+防伪校验，三者共同保证执行阶段既无需再裁决又能守住边界，从而在安全与性能之间取得平衡。",
+      "contexts": [
+        "allowed_model_ids=(\"deepseek:DeepSeek-V4-Flash\",), # 只准调这个模型！\n    denied_tool_names=(\"bash_execute\",),             # 必须把这个工具剔除！\n    tool_policy_version=\"tv-2\"\n)\n\n# 3. 范围锚定 (Scope): 锁死操作边界\nscope = RuntimeScope(\n    tenant_id=\"tenant-abc\", project_id=\"proj-456\",\n    thread_id=\"th-789\", assistant_id=\"dearflow_agent\", operation=\"run-create\"\n)\n\n# 4. 指纹防伪 (Context Hash):\ncontext_hash = \"71位的SHA256指纹\"\n```\n\n### 3. 底座接到后是“能处理就直接处理吗”？\n\n**是的！底座接到的不是“请求申请”，而是“已经裁决完毕的授权事实”。**\n底座的处理逻辑就像流水线工人：\n1. **验防伪**：算一下签名对不对、算一下 `context_hash` 对不对；不对直接按报警器报 401/403；\n2. **物理装配**：拿着 `denied_tool_names`，把工具箱里的 `bash_execute` 扳手物理拿走；拿着 `allowed_model_ids` 选定模型；\n3. **闭眼执行**：把组装好的图扔进 LangGraph Pregel 引擎全速运算，谁也别来打扰。\n\n---\n\n## 三、批判式审视：当前设计对新开发者到底合不合理？（The Hard Truth）\n\n现在老王站在客观中立、挑刺批判的架构师角度，回答用户的核心质疑：\n**“别人如果来开发一个新 Agent，他是怎么开发的？他必须理解上层逻辑吗？当前设计合理吗？”**\n\n---\n\n### 1. 现在的真实开发流：新同学是怎么写新 Agent 的？\n\n假设新来了一位算法同学小张，要开发一个新的 `data_analyst_agent`：\n1. **小张需要写什么？**\n   - 创建 `apps/runtime-service/src/runtime_service/services/data_analyst/`；\n   - 编写分析专用的工具（如 `sql_query`, `python_chart`）；\n   - 编写专用的 Prompt 模板；\n   - 编写 `agent.py`，暴露一个核心入口函数：`async def get_agent(config: RunnableConfig) -> Pregel`；\n2. **小张需要注册什么？**\n   - 在根目录的 `langgraph.json` 中加一行：\n     ```json\n     \"data_analyst\": {\n       \"path\": \"./src/runtime_service/graphs/data_analyst.py:get_agent\",\n       \"description\": \"Data Analyst Agent\"\n     }\n     ```\n3. **小张如何本地自测？**\n   - 小张写一个 `test_analyst.py`，按照第一章的“模式 A”或“模式 B”，在本地直接 `pytest` 跑通全部分析逻辑；\n   - **在这一步，小张完全不需要了解上层的 Vue 前端、FastAPI 网关、RBAC 角色、PostgreSQL 账户表！**\n\n---\n\n### 2. 公平中立的批判：当前架构的“合理之处”（为什么代码不得不这么写？）\n\n很多新手看到 `agent.py` 里那么多数值校验，第一反应是：“太繁琐了，过度设计！”\n老王客观评价：**在企业级高权限 Agent 系统中，这种设计有极其硬核的安全防御价值：**\n\n1. **纵深防御（Defense in Depth）不是一句空话**：\n   - Agent 不是普通微服务，它拥有在服务器宿主机或 Docker 沙箱里执行 Shell、读写文件的能力（RCE 风险）；\n   - 如果底层不做 `facts` 验签与工具强制剔除，一旦外层网关发生配置失误或参数污染，黑客就能越权调用高危命令；\n2. **多租户物理工作空间的确定性隔离**：\n   - 真实的沙箱目录是 `root = /workspaces/{tenant_id}/{project_id}/{thread_id}`；\n   - 如果底座没有 `RuntimePrincipal` 提供经过签名的租户信息，底座根本不敢创建本地文件系统，否则租户 A 的文件就会被租户 B 随意读取！\n\n---\n\n### 3. 犀利的批判：当前架构的三大痛点与设计硬伤（Over-Engineering & DX Debt）\n\n虽然安全做到了极致，但站在**开发者体验（Developer Experience, DX）**的角度，老王必须狠狠批判现有实现的三个严重问题：\n\n#### 🔴 痛点一：组合根（Composition Root）样板代码严重超标，关注点未分离\n- **问题现状**：翻开 [`services/dearflow_agent/agent.py`](../../../../apps/runtime-service/src/runtime_service/services/dearflow_agent/agent.py)，文件一共 429 行，其中**前 150 行几乎全在写安全校验胶水代码**：\n  ```python\n  user = configurable.get(\"langgraph_auth_user\")\n  facts = verified_delegation_from_user(user)\n  if runtime_context_hash(context) != facts.context_hash: raise ...\n  if facts.scope.assistant_id != \"dearflow_agent\": raise ..."
+      ],
+      "source_doc_ids": [
+        "doc-3d80cddb6f1372373dd94a9296258855"
+      ],
+      "source_docs": [
+        "05-runtime-service__concepts__02-runtime-execution-and-developer-experience-critique.md"
+      ],
+      "source_chunk_ids": [
+        "doc-3d80cddb6f1372373dd94a9296258855-chunk-002"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_006_conditional",
+      "question": "假设面板 panel 当前可见（panel.hidden 为 false），且其宽高均不为 0；容器和面板布局正常；页面上已有若干被选中节点，并且仅从几何重叠看，左侧候选区域与这些节点的重叠面积明显大于右侧候选区域。此时如果浏览器窗口的 window.innerWidth 恰好等于 720px，dockPanel(byId) 会返回哪个停靠侧？为什么？",
+      "ground_truth": "会返回 'right'。因为 dockPanel 一开始会先移除 panel 的 data-dock-side 属性，然后执行 if (panel.hidden || window.innerWidth <= 720) return 'right'；window.innerWidth 恰好等于 720 时满足 <= 720 的边界条件，因此会在读取 panelRect/containerRect、筛选 selectedRects、计算 leftScore/rightScore 之前直接返回 'right'。即使左侧候选区域与选中节点的重叠面积更大，也不会进入左右重叠评分比较逻辑。",
+      "contexts": [
+        "var height = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));\n        return width * height;\n      }\n      function dockPanel(byId) {\n        panel.removeAttribute('data-dock-side');\n        if (panel.hidden || window.innerWidth <= 720) return 'right';\n        var panelRect = panel.getBoundingClientRect();\n        var containerRect = container.getBoundingClientRect();\n        if (!panelRect.width || !panelRect.height) return 'right';\n        var selectedRects = Object.keys(byId).filter(function (id) {\n          return selectedKinds.indexOf(byId[id].getAttribute('data-node-kind') || 'neutral') >= 0;\n        }).map(function (id) { return byId[id].getBoundingClientRect(); });\n        var top = panelRect.top;\n        var width = panelRect.width;\n        var leftCandidate = { left: containerRect.left + 16, right: containerRect.left + 16 + width, top: top, bottom: panelRect.bottom };\n        var rightCandidate = { left: containerRect.right - 16 - width, right: containerRect.right - 16, top: top, bottom: panelRect.bottom };\n        var leftScore = selectedRects.reduce(function (score, rect) { return score + overlapArea(leftCandidate, rect); }, 0);\n        var rightScore = selectedRects.reduce(function (score, rect) { return score + overlapArea(rightCandidate, rect); }, 0);\n        var legend = svg.querySelector('[data-legend]');\n        var nav = container.querySelector('.diagram-nav');\n        var protectedRects = [legend, nav].filter(function (element) {\n          return element && !element.hidden && window.getComputedStyle(element).display !== 'none';\n        }).map(function (element) { return element.getBoundingClientRect(); });\n        leftScore += protectedRects.reduce(function (score, rect) {\n          return score + overlapArea(leftCandidate, rect) * 1000;\n        }, 0);\n        rightScore += protectedRects.reduce(function (score, rect) {\n          return score + overlapArea(rightCandidate, rect) * 1000;\n        }, 0);\n        var side = leftScore < rightScore ? 'left' : 'right';\n        panel.setAttribute('data-dock-side', side);\n        return side;\n      }\n      function applySelection(options) {\n        options = options || {};\n        cleanSvgState();\n        var byId = nodesById();\n        var nodeKind = Object.create(null);\n        Object.keys(byId).forEach(function (id) { nodeKind[id] = byId[id].getAttribute('data-node-kind') || 'neutral'; });\n        if (!selectedKinds.length) {\n          status.textContent = viewerText('viewer.lens.choose');\n          updateTrigger();\n          renderKinds();\n          dockPanel(byId);\n          if (options.updateUrl !== false) updateHash();\n          return false;\n        }\n\n        var chosen = {};\n        selectedKinds.forEach(function (kind) { chosen[kind] = true; });\n        Object.keys(byId).forEach(function (id) {\n          if (!chosen[nodeKind[id]]) return;\n          byId[id].setAttribute('data-lens-match', '');\n          byId[id].setAttribute('data-lens-selected', '');\n        });\n\n        var touching = 0;\n        var forward = 0;\n        var reverse = 0;\n        var crossKind = selectedKinds.length === 2;\n        var matchedFlow = [];\n        edgeGroups().forEach(function (edge) {\n          var fromKind = nodeKind[edge.from];\n          var toKind = nodeKind[edge.to];\n          var match = false;\n          if (crossKind) {\n            if (fromKind === selectedKinds[0] && toKind === selectedKinds[1]) { match = true; forward += 1; }\n            if (fromKind === selectedKinds[1] && toKind === selectedKinds[0]) { match = true; reverse += 1; }\n          } else if (fromKind === selectedKinds[0] || toKind === selectedKinds[0]) {\n            match = true;\n            touching += 1;\n          }\n          if (!match) return;\n          var direction = 'within';\n          if (crossKind) {\n            direction = fromKind === selectedKinds[0] ? 'forward' : 'reverse';\n          } else {\n            direction = fromKind === selectedKinds[0] && toKind !== selectedKinds[0] ? 'out'\n              : (toKind === selectedKinds[0] && fromKind !== selectedKinds[0] ? 'in' : 'within');\n          }\n          matchedFlow.push({ edge: edge, direction: direction });\n          edge.members.forEach(function (member) { member.setAttribute('data-lens-match', ''); });\n          if (!crossKind) {\n            [edge.from, edge.to].forEach(function (id) {\n              if (!byId[id]) return;\n              byId[id].setAttribute('data-lens-match', '');\n              if (!chosen[nodeKind[id]]) byId[id].setAttribute('data-lens-peer', '');\n            });\n          }\n        });\n\n        svg.setAttribute('data-lens-active', selectedKinds.join(' '));\n        renderFlowOverlay(matchedFlow);\n        if (crossKind) {\n          var total = forward + reverse;\n          status.textContent = viewerCount('viewer.lens.compare', total, {\n            first: viewerKindLabel(selectedKinds[0]),\n            second: viewerKindLabel(selectedKinds[1]),\n            forward: forward,\n            reverse: reverse\n          });\n        } else {\n          var nodeCount = collectKinds().filter(function (kind) { return kind.id === selectedKinds[0]; })[0].nodes"
+      ],
+      "source_doc_ids": [
+        "doc-bfff155f01808a38be587418327e4630"
+      ],
+      "source_docs": [
+        "system-topology-interactive.html"
+      ],
+      "source_chunk_ids": [
+        "doc-bfff155f01808a38be587418327e4630-chunk-212"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_007_reasoning",
+      "question": "在 ObsAPI 通过 Loki 执行 LogQL 查询并向前端返回毫秒对齐日志流的可观测链路中，为什么需要在入口中间件解析或生成 W3C traceparent，并用 contextvars 保存 trace_id 与 span_id？其背后的跨协程上下文传播机制及对日志-追踪联动的架构影响是什么？",
+      "ground_truth": "因为该链路的可观测性依赖于同一请求在 API、Runtime、Loki 日志和前端 Trace & Logs 抽屉之间保持统一的追踪标识。推理过程如下：第一，W3CTraceMiddleware 从请求头读取 traceparent，并用正则校验其是否符合 W3C 格式；若合法，则提取 trace_id 和 parent_span_id，否则生成新的追踪上下文，从而保证每个请求都有可追踪标识。第二，异步服务通常在同一事件循环中并发处理多个协程，若用普通全局变量保存 trace_id/span_id，会发生跨请求污染；contextvars 提供请求级、协程级的上下文隔离，使当前 trace_id 和 span_id 能随 await 调用链传播，供下游日志、Loki 查询和子 span 继续使用。第三，携带同一 trace_id 的日志与 Trace 才能在 Loki 返回的 API 与 Runtime 毫秒对齐日志流中被正确关联，ObsAPI 才能向前端返回结构化时序日志列表。第四，前端 Web 才能据此联动滑出右侧 Trace & Logs 抽屉，在甘特图中高亮异常微服务与报错堆栈，并一键跳转 Langfuse 或会话回放。架构影响是：它把请求入口、异步协程、日志查询和前端可视化串成端到端因果链，避免并发请求间追踪上下文串扰，提升故障定位与日志-追踪联动能力，同时中间件解析与 contextvars 设置的性能开销很小，适合在高并发 API 链路中使用。",
+      "contexts": [
+        "\"loki/api/v1/query\"\n    ObsAPI->>Loki: 7. 执行 LogQL 查询\n    Loki-->>ObsAPI: 8. 返回 API 与 Runtime 毫秒对齐日志流\n    ObsAPI-->>Web: 9. 返回结构化时序日志列表\n    Web->>Web: 10. 联动滑出右侧 Trace & Logs 抽屉<br>甘特图高亮异常微服务与报错堆栈<br>提供一键跳转 Langfuse / 会话回放\n```\n\n---\n\n## 五、 核心实现高保真伪代码（High-Fidelity Pseudocode）\n\n### 1. W3C `traceparent` 解析、生成与跨协程派生中间件\n\n```python\n# 对应真实源码：apps/platform-api/src/platform_api/core/observability.py\nimport contextvars\nimport re\nimport secrets\nfrom starlette.middleware.base import BaseHTTPMiddleware\nfrom starlette.requests import Request\nfrom starlette.responses import Response\n\ncurrent_trace_id_ctx = contextvars.ContextVar(\n    \"current_trace_id_ctx\", default=None\n)\ncurrent_span_id_ctx = contextvars.ContextVar(\n    \"current_span_id_ctx\", default=None\n)\n\nTRACEPARENT_REGEX = re.compile(r\"^00-([a-f0-9]{32})-([a-f0-9]{16})-[a-f0-9]{2}$\")\n\n\nclass W3CTraceMiddleware(BaseHTTPMiddleware):\n\n    async def dispatch(self, request: Request, call_next) -> Response:\n        traceparent = request.headers.get(\"traceparent\")\n        if traceparent and (match := TRACEPARENT_REGEX.match(traceparent)):\n            trace_id = match.group(1)\n            parent_span_id = match.group(2)\n        else:\n            trace_id = secrets.token_hex(16)  # 生成 32 位十六进制全局链路 ID\n            parent_span_id = None\n\n        # 为当前服务节点派生唯一的 16 位 Span ID\n        current_span_id = secrets.token_hex(8)\n\n        # 写入协程安全上下文（ContextVar）\n        t_token = current_trace_id_ctx.set(trace_id)\n        s_token = current_span_id_ctx.set(current_span_id)\n\n        request.state.trace_id = trace_id\n        request.state.span_id = current_span_id\n        request.state.parent_span_id = parent_span_id\n\n        # 构造向下游派生的 traceparent\n        request.state.downstream_traceparent = (\n            f\"00-{trace_id}-{current_span_id}-01\"\n        )\n\n        try:\n            response: Response = await call_next(request)\n            # 在响应头回显标准 W3C 头与兼容追踪头\n            response.headers[\"traceparent\"] = (\n                request.state.downstream_traceparent\n            )\n            response.headers[\"X-Trace-Id\"] = trace_id\n            response.headers[\"X-Request-Id\"] = trace_id\n            return response\n        finally:\n            current_trace_id_ctx.reset(t_token)\n            current_span_id_ctx.reset(s_token)\n```\n\n### 2. 防自回声污染的 Loki LogQL 代理查询引擎\n\n```python\n# 对应真实源码：apps/platform-api/src/platform_api/modules/observability/service.py\nimport httpx\nfrom platform_api.config import Settings\n\n\nclass ObservabilityService:\n\n    def __init__(self, settings: Settings):\n        self._settings = settings\n\n    async def query_trace_logs(\n        self, trace_id: str, limit: int = 200\n    ) -> dict[str, any]:\n        loki_url = self._settings.loki_url.rstrip(\"/\")\n\n        # 核心防自回声语法：否定匹配查询端点自身，绝不让查询日志自我放大\n        logql = (\n            f'{{job=~\"systemd-journal|app-file-logs\"}} '\n            f'|= \"{trace_id}\" '\n            f'!~ \"loki/api/v1/query\"'\n        )\n\n        endpoint = f\"{loki_url}/loki/api/v1/query_range\"\n        params = {\n            \"query\": logql,\n            \"limit\": limit,\n            \"direction\": \"FORWARD\",  # 时序正序对齐\n        }\n\n        async with httpx.AsyncClient() as client:\n            try:\n                resp = await client.get(\n                    endpoint,\n                    params=params,\n                    timeout=self._settings.loki_timeout_seconds,\n                )\n                if resp.status_code != 200:\n                    return {\"status\": \"error\", \"logs\": [], \"error\": resp.text}\n\n                # 解析 Loki 统一 JSON 结构并格式化为前端甘特流水\n                data = resp.json()\n                parsed_logs = self._parse_loki_streams(data)\n                return {\"status\": \"success\", \"logs\": parsed_logs}\n            except httpx.RequestError as exc:\n                return {\n                    \"status\": \"unavailable\",\n                    \"logs\": [],\n                    \"error\": str(exc),\n                }\n```\n\n### 3. 前端 ECharts 时序毛刺点击联动 Trace/Logs 抽屉控制器\n\n```typescript\n// 对应真实源码：apps/platform-web/src/modules/usage/components/GatewayUsageTab.vue\nimport * as echarts from 'echarts'\nimport { ref } from 'vue'\n\nconst isDrawerOpen = ref(false)\nconst selectedTraceId = ref('')\nconst activeLogs = ref<any[]>([])\n\nfunction initUsageChart(chartDom: HTMLElement, trendData: any[]) {\n  const chart = echarts.init(chartDom)\n\n  chart.setOption({\n    xAxis: { type: 'category', data:"
+      ],
+      "source_doc_ids": [
+        "doc-334481e927d31b42c10982b6d5840e01"
+      ],
+      "source_docs": [
+        "04-trace-and-observability.md"
+      ],
+      "source_chunk_ids": [
+        "doc-334481e927d31b42c10982b6d5840e01-chunk-005"
+      ],
+      "evolution_type": "reasoning",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_008_simple",
+      "question": "在认证中间件 AuthCtx 中，遇到公共白名单路径（如 /api/identity/session、/_system/health 等）时会执行什么处理？",
+      "ground_truth": "直接放行，不提取和解析 Bearer Token。",
+      "contexts": [
+        "公共白名单 (/api/identity/session, /_system/health 等)\n        AuthCtx->>Router: 直接放行\n    else 提取 Bearer Token\n        AuthCtx->>AuthCtx: decode_access_token(token)\n        AuthCtx->>DB: run_in_threadpool(_load_actor, user_id, project_id)\n        DB-->>AuthCtx: 返回用户实体及关联的平台/项目角色\n        AuthCtx->>AuthCtx: 构造不可变 ActorContext 存入 request.state\n    end\n\n    AuthCtx->>Router: 执行具体业务路由函数\n    Router->>DB: session_scope() 开启事务并执行业务逻辑\n    DB-->>Router: 返回领域模型\n    Router-->>AuthCtx: 返回 Response 实体\n    AuthCtx->>AuthCtx: 注入响应头 (x-user-id, x-principal-type 等)\n    AuthCtx-->>ReqCtx: 传递 Response\n    ReqCtx->>ReqCtx: 记录 HTTP 耗时 Metrics 并写日志\n    ReqCtx->>ReqCtx: 注入 x-request-id 与 x-trace-id\n    ReqCtx-->>Audit: 传递 Response\n    Audit->>Audit: 判断是否为数据变更操作，记录审计日志\n    Audit-->>CORS: 返回 Response\n    CORS-->>Client: 最终客户端接收报文\n```\n\n---\n\n## 五、核心实现高保真伪代码（High-Fidelity Pseudocode）\n\n### 1. 应用启动校验与生命周期绑定（Lifespan）\n```python\n# 对应 apps/platform-api/src/platform_api/bootstrap/lifespan.py\n\n@asynccontextmanager\nasync def lifespan(app: FastAPI) -> AsyncIterator[None]:\n    settings = app.state.settings\n    engine = None\n\n    if settings.platform_db_enabled:\n        # 1. 建立数据库连接池 (pool_pre_ping 杜绝死连接)\n        engine = build_engine(settings.database_url)\n        app.state.db_engine = engine\n        session_factory = build_session_factory(engine)\n        app.state.db_session_factory = session_factory\n\n        # 2. 严格校验数据库 Schema 完整性 (必须包含关键列)\n        inspector = inspect(engine)\n        columns = {c[\"name\"] for c in inspector.get_columns(\"thread_access\")} if inspector.has_table(\"thread_access\") else set()\n        if not {\"provisioning_status\", \"reserved_at\"} <= columns:\n            raise RuntimeError(\"Platform database schema is outdated; apply Alembic revision 20260925_0005\")\n\n        # 3. 兜底初始化超级管理员\n        if settings.bootstrap_admin_enabled:\n            service = IdentityService(settings=settings, session_factory=session_factory)\n            await run_in_threadpool(service.ensure_bootstrap_admin)\n\n    try:\n        yield\n    finally:\n        # 4. 优雅关闭，释放连接池资源\n        if engine is not None:\n            await run_in_threadpool(engine.dispose)\n        app.state.db_engine = None\n        app.state.db_session_factory = None\n```\n\n### 2. 数据库事务上下文（Session Scope）\n```python\n# 对应 apps/platform-api/src/platform_api/core/db/session.py\n\ndef build_session_factory(engine: Engine) -> sessionmaker[Session]:\n    # expire_on_commit=False 保证事务提交后，实体属性依然可以在内存中读取，不触发惰性加载异常\n    return sessionmaker(\n        bind=engine,\n        autoflush=False,\n        autocommit=False,\n        expire_on_commit=False,\n    )\n\ndef session_scope(session_factory: sessionmaker[Session]) -> AbstractContextManager[Session]:\n    # 借助 SQLAlchemy 的 begin() 上下文管理器：退出无异常自动 commit，异常自动 rollback\n    return session_factory.begin()\n```\n\n---\n\n## 六、假想断电与极限场景推演（Thought Experiments）\n\n### 场景一：攻击者篡改 URL 中的 `project_id` 越权操作\n- **推演过程**：攻击者拥有项目 A 的访问权限，但尝试向 `/api/projects/{Project_B_ID}/assistants` 发送请求，Header 中保留其合法的项目 A Token 与 `x-project-id: Project_A_ID`。\n- **系统表现**：`auth_context_middleware` 在解析请求时，比对路径中的 `route_project_id`（Project_B_ID）与 Header 中的 `header_project_id`（Project_A_ID），发现不一致，立即在中间件层熔断并返回 `400 project_scope_mismatch`。请求完全无法触达业务路由，DB 查询被直接避免。\n\n### 场景二：数据库发生主备切换或连接因网络超时中断\n- **推演过程**：RDS 实例发生瞬时网络抖动或主备切换，已建立的数据库连接成为失效连接。\n- **系统表现**：`build_engine` 中配置了 `pool_pre_ping=True`。每次业务代码通过 `session_scope` 获取连接时，连接池会自动发送轻量级的 `SELECT 1` 心跳检测。发现连接断开后，连接池自动将其剔除并重连，而不会将废弃连接扔给业务逻辑抛出 `OperationalError: server closed the connection unexpectedly`。\n\n### 场景三：异步接口内部跨线程读取 ORM 属性\n- **推演过程**：FastAPI 业务函数在 `run_in_threadpool` 提交事务后，将查询出的 ORM 模型返回到外层异步函数中序列化。\n- **系统表现**：由于 `build"
+      ],
+      "source_doc_ids": [
+        "doc-fc80a80c5752d42531b1a09211bf8b99"
+      ],
+      "source_docs": [
+        "04-platform-api__01-architecture.md"
+      ],
+      "source_chunk_ids": [
+        "doc-fc80a80c5752d42531b1a09211bf8b99-chunk-003"
+      ],
+      "evolution_type": "simple",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_009_multi_hop",
+      "question": "当 runtime-service 下线某个 Graph 能力后，system-topology-interactive 的语义雷达在展示该 Graph 节点及其相连关系、并允许追踪有向路径时，目录侧应如何处理该节点？为什么雷达不能直接物理移除该节点？请结合节点能力来源与失效资产处理原则说明。",
+      "ground_truth": "语义雷达展示的是节点及其相连关系，并支持聚焦节点和追踪有向路径；但这些 Graph/Tool 实体必须以 runtime-service 实际暴露的能力为事实来源，平台数据库只作为缓存与策略绑定媒介。因此，当 runtime-service 下线某个 Graph 能力时，目录服务应将该节点标记为 stale 或 disabled，而不是物理硬删除；语义雷达中也不应直接移除该节点及其关系，而应保留可识别为失效的节点引用，以维持历史会话重放与 Checkpoint 审计追踪的引用完整性。这样既遵循能力发现单向对齐原则，又遵循失效资产软隔离原则：雷达视图可继续保留节点和关系用于聚焦/路径追踪，但其有效性状态应反映目录中的 stale/disabled 标记。",
+      "contexts": [
+        "ens.node.other\":\"{count} 个{label}节点\",\"viewer.lens.relationship.one\":\"{count} 条相连关系\",\"viewer.lens.relationship.other\":\"{count} 条相连关系\",\"viewer.radar.title\":\"语义雷达\",\"viewer.radar.building\":\"正在构建总览\",\"viewer.radar.openFull\":\"打开完整语义雷达\",\"viewer.radar.open\":\"打开雷达\",\"viewer.radar.close\":\"关闭语义雷达\",\"viewer.radar.surface\":\"图表总览。点击节点进行聚焦，或使用方向键平移。\",\"viewer.radar.click\":\"点击节点\",\"viewer.radar.drag\":\"拖动平移\",\"viewer.radar.space\":\"语义雷达需要更多地图可见空间。\",\"viewer.radar.nodes\":\"语义图表雷达节点\",\"viewer.radar.focus\":\"从语义雷达聚焦{label}\",\"viewer.radar.status\":\"{count} 个节点 · {viewport}\",\"viewer.radar.fullMap\":\"{count} 个节点 · 完整地图\",\"viewer.radar.compacted\":\"已收紧雷达，避免遮挡语义护照或地图控件。\",\"viewer.radar.cancelWaiting\":\"取消等待更多地图空间的语义雷达\",\"viewer.radar.needsSpace\":\"语义雷达需要更多可见地图空间\",\"viewer.radar.viewport.full\":\"完整地图\",\"viewer.radar.viewport.width\":\"宽度 {percent}%\",\"viewer.radar.viewport.scale\":\"视口 {percent}%\",\"viewer.nav.controls\":\"图表视图控制\",\"viewer.nav.route\":\"追踪有向路径\",\"viewer.nav.route.title\":\"追踪路径（R）\",\"viewer.nav.route.short\":\"路径\",\"viewer.nav.radar\":\"打开语义雷达\",\"viewer.nav.radar.title\":\"语义雷达（M）\",\"viewer.nav.radar.short\":\"地图\",\"viewer.nav.lens\":\"打开语义透镜\",\"viewer.nav.lens.title\":\"语义透镜（L）\",\"viewer.nav.lens.short\":\"透镜\",\"viewer.nav.find\":\"查找节点\",\"viewer.nav.find.title\":\"查找节点（/）\",\"viewer.nav.guide\":\"打开图表指南\",\"viewer.nav.guide.title\":\"图表指南（?）\",\"viewer.nav.zoomOut\":\"缩小\",\"viewer.nav.zoomOut.title\":\"缩小（-）\",\"viewer.nav.reset\":\"重置图表视图\",\"viewer.nav.reset.title\":\"重置视图（0）\",\"viewer.nav.read\":\"阅读\",\"viewer.nav.zoomIn\":\"放大\",\"viewer.nav.zoomIn.title\":\"放大（+）\",\"viewer.nav.camera\":\"{hint}。重置图表视图\",\"viewer.nav.camera.title\":\"{semantic}{hint} · 重置视图（0）\",\"viewer.nav.camera.semantic\":\"语义相机已启用 · \",\"viewer.nav.level.map\":\"概览\",\"viewer.nav.level.read\":\"阅读\",\"viewer.nav.level.full\":\"完整\",\"viewer.nav.level.auto\":\"自动\",\"viewer.nav.detail.map\":\"放大以显示关系标签和节点上下文\",\"viewer.nav.detail.read\":\"再次放大以显示标签和注释\",\"viewer.nav.detail.full\":\"完整图表详情\",\"viewer.intent.summary\":\"{label}。{out} 条出向，{in} 条入向{loops}。共 {total} 条连接。按 Enter 查看详情。\",\"viewer.intent.loops\":\"，{count} 条自环\",\"viewer.common.copied\":\"已复制\",\"viewer.common.copyFailed\":\"复制失败\",\"viewer.common.copyLink\":\"复制链接\",\"viewer.common.clear\":\"清除\",\"viewer.common.close\":\"关闭\"}}</script>\n    <div class=\"guided-views no-print\" id=\"guided-views\" hidden aria-label=\"图表引导视图\">\n      <button id=\"guided-view-prev\" type=\"button\" aria-label=\"上一个引导视图\" title=\"上一个引导视图（[）\">&#8592;</button>\n      <div class=\"guided-view-copy\">\n        <div class=\"guided-view-meta\">\n          <span>引导视图</span>\n          <span id=\"guided-view-count\"></span>\n          <span class=\"guided-view-progress\" aria-hidden=\"true\"><span id=\"guided-view-progress-bar\"></span></span>\n          <span class=\"guided-view-handoff\" id=\"guided-view-handoff\" hidden aria-hidden=\"true\"></span>\n        </div>\n        <strong id=\"guided-view-label\">探索此系统</strong>\n        <small id=\"guided-view-note\" aria-live=\"polite\" aria-atomic=\"true\">沿精选路径逐步查看，而不改变源图表。</small>\n        <div class=\"guided-view-trail\" id=\"guided-view-trail\" hidden role=\"group\" aria-label=\"故事轨迹\"></div>\n        <div class=\"guided-story-caption\" id=\"guided-story-caption\" hidden aria-live=\"polite\" aria-atomic=\"true\">\n          <span class=\"guided-story-caption-index\" id=\"guided-story-caption-index\">节点</span>\n          <strong id=\"guided-story-caption-route\"></strong>\n          <small id=\"guided-story-caption-detail\"></small>\n          <span class=\"guided-story-caption-next\" id=\"guided-story-caption-next\" hidden aria-hidden=\"true\">\n            <small>下一步</small>\n            <strong id=\"guided-story-caption-next-label\"></strong>\n          </span>\n        </div>\n      </div>\n      <button id=\"guided-view-next\" type=\"button\" aria-label=\"下一个引导视图\" title=\"下一个引导视图（]）\">&#8594;</button>\n      <div class=\"guided-view-actions\">\n        <button class=\"guided-view-play\" id=\"guided-view-play\" type=\"button\" aria-label=\"播放引导故事\" aria-pressed=\"false\" title=\"播放引导故事",
+        "runtime-service/services/.../agent.py` 的 `_runtime_model` 注入机制与 `tests/support.py`，完整的三层解耦架构详见 [01-执行层微服务自治与无依赖测试架构](../../05-runtime-service/concepts/01-runtime-autonomy-and-decoupled-testing.md)。\n</details>\n\n---\n\n## 七、架构不变量清单（Architectural Invariants）\n\n1. **凭据非对称暴露原则**：对外部管理平台暴露的模型查询模型（`RuntimeModelCatalogItem`），绝对禁止包含明文 API Key 字段；对外可见的只有 `credential_configured` 布尔标记。\n2. **凭据即时解密不缓存原则**：内部模型配置端点解密得到的明文 API Key，仅用于当前推理请求的内存组装，绝对禁止被二次写入任何日志文件、缓存服务（Redis）或长期持久化介质。\n3. **能力发现单向对齐原则**：平台目录中的 Graph 与 Tool 实体必须以 `runtime-service` 实际暴露的能力为事实来源（Source of Truth），平台数据库只作为缓存与策略绑定媒介。\n4. **失效资产软隔离原则**：当下游图下线或工具废弃时，目录服务只将其标记为 `stale` 或 `disabled`，严禁物理硬删除，确保历史会话重放与 Checkpoint 审计追踪的引用完整性。"
+      ],
+      "source_doc_ids": [
+        "doc-bfff155f01808a38be587418327e4630",
+        "doc-a7efef8ae62c338661d29b9a4082a290"
+      ],
+      "source_docs": [
+        "04-catalog-management.md",
+        "system-topology-interactive.html"
+      ],
+      "source_chunk_ids": [
+        "doc-bfff155f01808a38be587418327e4630-chunk-114",
+        "doc-a7efef8ae62c338661d29b9a4082a290-chunk-004"
+      ],
+      "evolution_type": "multi_hop",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    },
+    {
+      "test_id": "GEN_010_conditional",
+      "question": "某多租户 AI 平台采用切片中的 AAA 体系与双层 RBAC 治理。假设用户小李的 User JWT 合法有效，其平台角色为“平台普通管理员”，项目角色仅为“项目 A 的 Owner”；他通过请求头携带该 JWT，尝试在从未加入的“项目 B”中调用工具 T。同时，工具 T 已被平台级策略全局封禁。请判断：系统应按什么顺序处理该请求？最终应返回 401 还是 403？平台普通管理员身份或项目 A 的 Owner 角色能否让他越界访问项目 B 或绕过工具封禁？审计应记录哪些关键信息？",
+      "ground_truth": "系统必须按 AAA 顺序处理：先认证、再鉴权、最后审计，鉴权通过后才可抵达业务。小李的 User JWT 合法有效，因此身份认证通过，不应返回 401。进入鉴权阶段后，平台角色与项目角色必须物理切开：平台普通管理员身份不等于超级管理员，不能随意越界；项目 A 的 Owner 角色也只作用于项目 A，不能传递到未加入的项目 B。因此小李对项目 B 缺少合法项目角色，已构成越权。同时，工具 T 被平台级策略全局封禁，属于工具级细粒度封禁，即使小李拥有项目 B 权限也不得调用。故最终应返回 403 Forbidden，请求不得抵达核心业务执行。审计必须结构化记录该被拒尝试：谁（小李/用户标识）、何时、来自哪个 IP、请求目标（项目 B 与工具 T）、被拒原因（缺少项目 B 项目角色且工具 T 被平台级封禁），以便追溯越权与封禁治理。",
+      "contexts": [
+        "# 05-IAM 身份认证、双层 RBAC 与多租户安全治理深度透析 (IAM, Dual-Layer RBAC & Multi-Tenant Governance)\n\n> **核心定位**：彻底扫除企业级安全治理的认知门槛——用人话拆解 **IAM（身份识别与访问管理）** 的底层逻辑。搞清楚为什么单靠 `is_admin` 会让系统死无葬身之地、RBAC（基于角色的访问控制）如何优雅解耦、平台角色与项目角色为什么必须物理切开、超管为什么绝不能随意越界，以及 AI 平台独有的 BYOK 密钥保全与工具级细粒度封禁治理。\n\n---\n\n## 一、 生活大白话演进史（不讲黑话讲人话）\n\n### 1. 小区硬核保安的“哲学三连问”（AAA 体系）\n\n在软件工程中，**IAM = Identity and Access Management（身份识别与访问管理）**。\n别被这一长串英文缩写唬住了，它的本质就是高档小区的门禁保安系统。任何一个请求想要访问系统资源，IAM 永远在回答保安的**“哲学三连问”**（工业界统称 **AAA 体系**）：\n\n```mermaid\nflowchart TD\n    Req[\"👉 客户端 HTTP 请求\"] --> AuthN\n\n    subgraph AAA[\"IAM 核心三部曲 (AAA 治理体系)\"]\n        AuthN[\"1. 身份认证 (Authentication - 401)\\n你是谁？拿出合法证件证明你自己！\\n(验证账号密码 / User JWT / 指纹)\"]\n        AuthZ[\"2. 权限鉴权 (Authorization - 403)\\n你想干啥？你手里的工牌配干这事吗？\\n(翻阅 RBAC 权限矩阵 / 判定操作合法性)\"]\n        Audit[\"3. 行为审计 (Audit)\\n你干了啥？白纸黑字给我刻在石碑上！\\n(结构化落库: 谁在几点来自哪个IP改了什么)\"]\n\n        AuthN -->|\"身份真实合法\"| AuthZ\n        AuthZ -->|\"权限判定通过\"| Audit\n    end\n\n    Audit --> Service[\"抵达核心业务\\n(执行 Agent / 修改模型配置 / 查阅数据)\"]\n```\n\n1. **你是谁？—— 身份认证（Authentication，简称 AuthN，门禁卡）**\n   - 你声称自己是张三，拿什么证明？密码、手机短信码，还是请求头带的 `Authorization: Bearer <User JWT>`？\n   - 证明不了身份？当场一脚踹出去：**`401 Unauthorized`**！\n2. **你想干啥？你配干吗？—— 权限鉴权（Authorization，简称 AuthZ，通行条）**\n   - 证明你是张三了，但你想物理删除生产环境的核心 Agent（`thread-delete`），你有这个资格吗？\n   - 查了权限表发现你只是个只读访客？当场亮红灯拦截：**`403 Forbidden`**！\n3. **你干了什么？—— 行为审计（Audit，监控录像）**\n   - 如果张三是管理员，真把 Agent 给删除了，系统必须自动把**“张三、在几点几分、来自哪个 IP、删了哪个 Thread”**结构化记入不可篡改的审计日志。\n   - 发生安全事故时，合规审查员调取日志，白纸黑字谁也抵赖不了。\n\n---\n\n### 2. 为什么单靠 `is_admin` 布尔值在企业级会死得很惨？\n\n初学者写玩具 Demo，数据库 `User` 表里通常就搞一个布尔字段：`is_admin: bool`。\n每个接口内部到处充斥着胶水代码：\n```python\nif not current_user.is_admin:\n    raise HTTPException(status_code=403, detail=\"必须是管理员才能操作！\")\n```\n\n> 💥 **老王拍桌：这在真实企业级系统里纯属自杀行为！**\n\n#### 真实企业环境有多残酷？\n1. **跨部门越权灾难**：财务部有个 Admin，自动驾驶算法部也有个 Admin。如果只有一个全局 `is_admin`，财务部的 Admin 岂不是能直接登录自动驾驶项目，把核心算法代码和会话全清空了？\n2. **职责分离（Separation of Duties）**：同一个敏捷小组内，张三负责调试 Prompt（开发者），李四负责财务审批（买 Token 充值），王五是实习生只能看报表。如果你直接给张三开全局 Admin，他就能乱花公款；给李四开 Admin，他就能乱改生产 Agent！\n3. **临时工与最小权限原则（PoLP）**：外部顾问进驻两周做模型调优，他只需要单次执行权限，绝对禁止他导出全公司的私有会话数据。\n\n**因此，企业级系统必须引入分层分级的正规权限模型！**\n\n---\n\n## 二、 20 行极简代码对立演示（Naive vs. Production）\n\n### 1. 脆弱不堪的单体硬编码（反例：全局布尔与水平越权"
+      ],
+      "source_doc_ids": [
+        "doc-26f307c09dc92c3dd5dc05670173030e"
+      ],
+      "source_docs": [
+        "04-platform-api__concepts__05-iam-and-rbac-architecture.md"
+      ],
+      "source_chunk_ids": [
+        "doc-26f307c09dc92c3dd5dc05670173030e-chunk-000"
+      ],
+      "evolution_type": "conditional",
+      "lifecycle_tag": "ACTIVE",
+      "project": "proj_1ld3edpo"
+    }
+  ]
+}

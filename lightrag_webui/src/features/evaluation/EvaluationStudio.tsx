@@ -24,7 +24,8 @@ import {
   Settings2Icon,
   Edit3Icon,
   AlertCircleIcon,
-  CopyIcon
+  CopyIcon,
+  RotateCcwIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -272,8 +273,8 @@ export default function EvaluationStudio() {
   const [synthOpen, setSynthOpen] = useState(false)
   const [synthName, setSynthName] = useState('')
   const [synthCount, setSynthCount] = useState<number>(5)
-  const [synthCrudDiff, setSynthCrudDiff] = useState(true)
-  const [synthTargetMode, setSynthTargetMode] = useState<'overwrite' | 'create'>('overwrite')
+  const [synthCrudDiff, setSynthCrudDiff] = useState(false)
+  const [synthTargetMode, setSynthTargetMode] = useState<'overwrite' | 'create'>('create')
   const [synthTaskId, setSynthTaskId] = useState<string | null>(null)
   const [synthTaskStatus, setSynthTaskStatus] = useState<AsyncTaskStatus | null>(null)
 
@@ -295,7 +296,14 @@ export default function EvaluationStudio() {
   useEffect(() => {
     fetch('/ops/workspaces')
       .then((res) => (res.ok ? res.json() : []))
-      .then((data) => setWorkspaceList(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.workspaces)
+            ? data.workspaces
+            : []
+        setWorkspaceList(list)
+      })
       .catch(() => {})
   }, [currentProjectId])
 
@@ -569,6 +577,22 @@ export default function EvaluationStudio() {
     }
   }
 
+  // 放弃未保存的本地编辑，还原磁盘版本
+  const handleDiscardChanges = async () => {
+    if (!selectedDatasetName) return
+    const confirmed = window.confirm(
+      '确定要放弃当前所有未保存的本地修改吗？\n考题将重新从磁盘载入，已编辑的内容将被还原。'
+    )
+    if (!confirmed) return
+    try {
+      await fetchDatasetDetail(selectedDatasetName)
+      setIsDirty(false)
+      toast.info('已放弃本地修改，考题已还原为磁盘最新数据')
+    } catch (err: any) {
+      toast.error(`还原失败: ${err?.message || '未知错误'}`)
+    }
+  }
+
   // -------------------------------------------------------------------------
   // 4. 异步自动合成题库轮询与状态自愈
   // -------------------------------------------------------------------------
@@ -675,8 +699,11 @@ export default function EvaluationStudio() {
           project_id: currentProjectId,
           output_name: targetName,
           size: Number(synthCount),
-          incremental: Boolean(synthCrudDiff),
-          base_dataset: selectedDatasetName || undefined
+          incremental: synthTargetMode === 'overwrite' && Boolean(synthCrudDiff),
+          base_dataset:
+            synthTargetMode === 'overwrite' && Boolean(synthCrudDiff)
+              ? selectedDatasetName || undefined
+              : undefined
         })
       })
 
@@ -939,19 +966,10 @@ export default function EvaluationStudio() {
             <Button
               size="sm"
               onClick={() => {
-                if (
-                  selectedDatasetName &&
-                  (projectDatasets.some((d) => d.name === selectedDatasetName) ||
-                    selectedDatasetName.startsWith('lineage_') ||
-                    selectedDatasetName.startsWith('synth_'))
-                ) {
-                  setSynthTargetMode('overwrite')
-                  setSynthName(selectedDatasetName)
-                } else {
-                  setSynthTargetMode('create')
-                  const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
-                  setSynthName(`${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`)
-                }
+                setSynthTargetMode('create')
+                setSynthCrudDiff(false)
+                const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
+                setSynthName(`${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`)
                 setSynthOpen(true)
               }}
               className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5 text-xs shadow-xs px-2.5 sm:px-3 whitespace-nowrap"
@@ -1072,6 +1090,13 @@ export default function EvaluationStudio() {
               currentTenantId={currentTenantId}
               onNavigateToBattle={handleNavigateToBattle}
               onOpenSynthModal={() => setSynthOpen(true)}
+              onDatasetDeleted={() => {
+                fetchDatasets()
+              }}
+              onNavigateToCases={(datasetName) => {
+                setSelectedDatasetName(datasetName)
+                setActiveSubTab('cases')
+              }}
             />
           </Suspense>
         </div>
@@ -1082,6 +1107,7 @@ export default function EvaluationStudio() {
         <div className="flex-1 min-h-0 overflow-y-auto">
           <EvaluationTaskCenter
             currentProjectId={currentProjectId}
+            currentProjectName={currentProjectName}
             workspaceList={workspaceList}
             onSwitchToTestsets={() => handleSubTabChange('cases')}
             onTriggerNewBattle={() => setMatrixOpen(true)}
@@ -1364,6 +1390,20 @@ export default function EvaluationStudio() {
                 <PlusIcon className="size-3" />
                 <span>添加考题</span>
               </Button>
+
+              {isDirty && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDiscardChanges}
+                  disabled={saving}
+                  className="h-7 gap-1 text-xs px-2 sm:px-2.5 text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 border-border/70 transition-all whitespace-nowrap cursor-pointer"
+                  title="放弃所有未保存修改，重新从磁盘载入"
+                >
+                  <RotateCcwIcon className="size-3" />
+                  <span>放弃修改</span>
+                </Button>
+              )}
 
               <Button
                 size="sm"
@@ -1905,19 +1945,52 @@ export default function EvaluationStudio() {
             </div>
           ) : (
             <form onSubmit={handleTriggerSynthesize} className="space-y-4 py-2">
-              {/* 题库维护策略：覆盖更新当前专属题库 vs 创建新版本 */}
+              {/* 题库维护策略：创建新题库 vs 覆盖更新现有题库 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">
-                  题库维护策略 (防泛滥治理)
+                  题库合成策略 (出题意图)
                 </label>
                 <div className="grid grid-cols-2 gap-2">
+                  <div
+                    onClick={() => {
+                      setSynthTargetMode('create')
+                      setSynthCrudDiff(false)
+                      const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
+                      setSynthName(
+                        `${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`
+                      )
+                    }}
+                    className={cn(
+                      'p-2.5 rounded-lg border text-left cursor-pointer transition-all',
+                      synthTargetMode === 'create'
+                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        ✨ 创建全新独立题库 (推荐)
+                      </span>
+                      <input
+                        type="radio"
+                        name="synthTargetMode"
+                        checked={synthTargetMode === 'create'}
+                        readOnly
+                        className="size-3 accent-indigo-500"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1 leading-normal">
+                      基于当前知识库全部文档纯净出题，完全独立，不继承任何旧题干扰。
+                    </p>
+                  </div>
+
                   <div
                     onClick={() => {
                       setSynthTargetMode('overwrite')
                       if (selectedDatasetName) setSynthName(selectedDatasetName)
                     }}
                     className={cn(
-                      'p-2 rounded-lg border text-left cursor-pointer transition-all',
+                      'p-2.5 rounded-lg border text-left cursor-pointer transition-all',
                       synthTargetMode === 'overwrite'
                         ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
@@ -1925,7 +1998,7 @@ export default function EvaluationStudio() {
                   >
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                        🔄 覆盖更新当前题库
+                        🔄 覆盖更新已有题库
                       </span>
                       <input
                         type="radio"
@@ -1935,38 +2008,8 @@ export default function EvaluationStudio() {
                         className="size-3 accent-indigo-500"
                       />
                     </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                      保持单一专属题库，差量迭代
-                    </p>
-                  </div>
-
-                  <div
-                    onClick={() => {
-                      setSynthTargetMode('create')
-                      const prefix = currentProjectId ? currentProjectId.slice(0, 8) : 'custom'
-                      setSynthName(
-                        `${prefix}_synth_${new Date().toISOString().slice(5, 10).replace('-', '')}.json`
-                      )
-                    }}
-                    className={cn(
-                      'p-2 rounded-lg border text-left cursor-pointer transition-all',
-                      synthTargetMode === 'create'
-                        ? 'border-indigo-500 bg-indigo-500/10 text-foreground font-medium ring-1 ring-indigo-500/30'
-                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60'
-                    )}
-                  >
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold">✨ 创建新题库版本</span>
-                      <input
-                        type="radio"
-                        name="synthTargetMode"
-                        checked={synthTargetMode === 'create'}
-                        readOnly
-                        className="size-3 accent-indigo-500"
-                      />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      保留历史，新建独立版本
+                    <p className="text-[10px] text-muted-foreground mt-1 leading-normal">
+                      覆写当前选定的专属题库，支持全新全量重写或文档变动差量同步。
                     </p>
                   </div>
                 </div>
@@ -1978,7 +2021,7 @@ export default function EvaluationStudio() {
                 </label>
                 <input
                   type="text"
-                  placeholder="例如：synth_benchmark_v1"
+                  placeholder="例如：synth_benchmark_v1.json"
                   value={synthName}
                   onChange={(e) => setSynthName(e.target.value)}
                   className="w-full px-3 py-1.5 text-xs font-mono rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -2109,31 +2152,50 @@ export default function EvaluationStudio() {
                 </div>
               </div>
 
-              {/* 全生命周期增删改差量探测开关 */}
-              <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-3 space-y-2">
-                <div className="flex items-start gap-2.5">
-                  <input
-                    type="checkbox"
-                    id="crud-diff-checkbox-table"
-                    checked={synthCrudDiff}
-                    onChange={(e) => setSynthCrudDiff(e.target.checked)}
-                    className="mt-0.5 rounded border-indigo-500 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  />
-                  <div className="space-y-0.5">
-                    <label
-                      htmlFor="crud-diff-checkbox-table"
-                      className="text-xs font-semibold text-foreground cursor-pointer"
-                    >
-                      开启全生命周期增删改差量探测 (CRUD Differential Mode)
-                    </label>
+              {/* 针对不同模式展示专属的生命周期说明 */}
+              {synthTargetMode === 'create' ? (
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-2.5">
+                  <SparklesIcon className="size-4 text-emerald-500 mt-0.5 shrink-0" />
+                  <div className="space-y-0.5 text-xs">
+                    <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+                      全新纯净独立抽取
+                    </span>
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      智能对比当前文档集合与历史指纹：只针对<strong>新增或更新文档</strong>
-                      定向合成考题；对于<strong>已删除文档</strong>
-                      关联考题自动执行修剪，杜绝无效全量重算。
+                      将从当前知识库文档切片中进行高质量全新采样，生成一个纯正独立的全新题库，绝不掺杂任何旧题库历史数据。
                     </p>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-3 space-y-2">
+                  <div className="flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="crud-diff-checkbox-table"
+                      checked={synthCrudDiff}
+                      onChange={(e) => setSynthCrudDiff(e.target.checked)}
+                      className="mt-0.5 rounded border-indigo-500 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                    />
+                    <div className="space-y-0.5">
+                      <label
+                        htmlFor="crud-diff-checkbox-table"
+                        className="text-xs font-semibold text-foreground cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>开启知识库文档变动差量同步 (Doc CRUD Differential)</span>
+                        <span className="text-[10px] px-1 py-0.5 bg-indigo-500/10 text-indigo-600 rounded">
+                          仅限文档增删改场景
+                        </span>
+                      </label>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        智能对比知识库文档指纹：只针对<strong>新增或更新文档</strong>定向补题；对<strong>已删除文档</strong>关联考题自动执行修剪。
+                        <br />
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">
+                          ⚠️ 概念澄清：此选项是针对底层“文档变动”的差量演化，并非在现有题库上简单追加题目。若需单纯重生成，请保持未勾选。
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <DialogFooter className="pt-2">
                 <Button

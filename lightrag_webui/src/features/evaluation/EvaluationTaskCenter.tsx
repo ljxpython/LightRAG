@@ -113,6 +113,7 @@ export interface DatasetRunGroup {
 
 interface EvaluationTaskCenterProps {
   currentProjectId: string
+  currentProjectName?: string
   workspaceList?: Array<{ project_id: string; name?: string }>
   onSwitchToTestsets?: () => void
   onTriggerNewBattle?: () => void
@@ -120,6 +121,7 @@ interface EvaluationTaskCenterProps {
 
 export default function EvaluationTaskCenter({
   currentProjectId,
+  currentProjectName,
   workspaceList,
   onSwitchToTestsets,
   onTriggerNewBattle
@@ -361,6 +363,7 @@ export default function EvaluationTaskCenter({
   // 项目友好名称映射
   const getProjectName = (pid: string) => {
     if (!pid || pid === 'common') return '通用公共'
+    if (pid === currentProjectId && currentProjectName) return currentProjectName
     const found = workspaceList?.find((w) => w.project_id === pid)
     if (found?.name && found.name !== found.project_id) return found.name
     if (pid === '11111111-1111-4111-8111-111111111111') return '平台默认项目'

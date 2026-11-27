@@ -173,8 +173,8 @@ def extract_project_corpus(
     for chunk_id, chunk_info in chunks_raw.items():
         doc_id = chunk_info.get("full_doc_id")
         content = chunk_info.get("content", "").strip()
-        # Filter out trivial or file-metadata-only chunks
-        if len(content) < 120 or (content.startswith("Title:") and len(content) < 250):
+        # Filter out trivial, SVG paths, or file-metadata-only chunks
+        if not _is_meaningful_text_chunk(content):
             continue
 
         parent_doc = doc_id_to_manifest.get(doc_id)
@@ -330,6 +330,44 @@ PROMPT_REVERIFY = """知识库文档已更新。请根据最新切片内容，�
 """
 
 
+def _is_meaningful_text_chunk(content: str) -> bool:
+    """Filters out SVG paths, base64 data, dense CSS/code snippets that are unsuitable for QA synthesis."""
+    if not content or len(content) < 120:
+        return False
+    lower = content.lower()
+    # 彻底过滤 SVG 矢量代码与矢量路径
+    if "<svg" in lower or "viewbox=" in lower or "xmlns=\"http://www.w3.org/2000/svg" in lower:
+        return False
+    if "<path d=" in lower or "%3cpath d=" in lower or "fill-rule=" in lower or "d='m" in lower or 'd="m' in lower:
+        return False
+    # 过滤元数据单行
+    if content.startswith("Title:") and len(content) < 250:
+        return False
+    # 统计符号率与文本密度：有效自然语言字符比例过低直接剔除
+    alphanumeric_count = sum(1 for ch in content if ch.isalnum() or '\u4e00' <= ch <= '\u9fff')
+    if alphanumeric_count / max(len(content), 1) < 0.40:
+        return False
+    return True
+
+
+def _is_valid_qa_pair(q: Any, gt: Any) -> bool:
+    """Strictly validates question and ground_truth to prevent placeholder ellipses or empty QAs."""
+    if not q or not gt:
+        return False
+    q_str = str(q).strip()
+    gt_str = str(gt).strip()
+    # 彻底杜绝省略号占位符
+    if "..." in q_str or q_str == "…" or "…" in gt_str or gt_str == "..." or "…" in q_str:
+        return False
+    if len(q_str) < 6 or len(gt_str) < 3:
+        return False
+    # 过滤拒答短语
+    refusal_keywords = ["cannot answer", "not able to", "无法回答", "无法从提供的上下文", "无法生成", "抱歉"]
+    if any(kw in q_str.lower() for kw in refusal_keywords):
+        return False
+    return True
+
+
 def extract_json_from_llm(raw_text: str) -> Optional[Dict[str, Any]]:
     """Robustly extracts JSON object from arbitrary LLM output (including thinking text / fences)."""
     raw_text = raw_text.strip()
@@ -409,33 +447,23 @@ class NativeSynthesizer:
             logger.info(f"🎉 Checkpoint 已包含足够考题 ({len(results)} >= {target_size})，直接跳过生成！")
             return results[:target_size]
 
-        needed_size = target_size - len(results)
-        types = (
-            ["multi_hop"] * int(needed_size * 0.4) +
-            ["reasoning"] * int(needed_size * 0.3) +
-            ["simple"] * int(needed_size * 0.2) +
-            ["conditional"] * (needed_size - int(needed_size * 0.4) - int(needed_size * 0.3) - int(needed_size * 0.2))
-        )
-        if not types:
-            types = ["simple"] * needed_size
-        random.shuffle(types)
-
-        start_offset = len(results)
-        logger.info(f"🚀 开始 Native 演化合成，计划并发生成 {len(types)} 道高阶测试题 (并发度: {concurrency})...")
-
         sem = asyncio.Semaphore(concurrency)
         lock = asyncio.Lock()
 
         async def _worker(seq_idx: int, evo_type: str, client: httpx.AsyncClient):
             async with sem:
+                async with lock:
+                    if len(results) >= target_size:
+                        return
+
                 gen = None
                 evidence_contexts = []
                 source_doc_ids = []
                 sources = []
                 chunk_ids = []
 
-                # Retry up to 3 candidate chunks
-                for attempt in range(3):
+                # Retry up to 4 candidate chunks
+                for attempt in range(4):
                     if evo_type == "multi_hop":
                         c1 = random.choice(chunks)
                         if existing_chunks and len(existing_chunks) > 0:
@@ -468,15 +496,18 @@ class NativeSynthesizer:
                         chunk_ids = [c.get("chunk_id", "")]
 
                     gen = await self._call_llm(client, prompt)
-                    if gen and "question" in gen and "ground_truth" in gen:
+                    if gen and _is_valid_qa_pair(gen.get("question"), gen.get("ground_truth")):
                         break
 
                 async with lock:
-                    if gen and "question" in gen and "ground_truth" in gen:
+                    if len(results) >= target_size:
+                        return
+                    if gen and _is_valid_qa_pair(gen.get("question"), gen.get("ground_truth")):
+                        curr_total = len(results) + 1
                         test_case = {
-                            "test_id": f"{prefix}_{seq_idx:03d}_{evo_type}",
-                            "question": gen["question"],
-                            "ground_truth": gen["ground_truth"],
+                            "test_id": f"{prefix}_{curr_total:03d}_{evo_type}",
+                            "question": gen["question"].strip(),
+                            "ground_truth": gen["ground_truth"].strip(),
                             "contexts": evidence_contexts,
                             "source_doc_ids": [d for d in source_doc_ids if d],
                             "source_docs": sources,
@@ -485,7 +516,6 @@ class NativeSynthesizer:
                             "lifecycle_tag": "ACTIVE",
                         }
                         results.append(test_case)
-                        curr_total = len(results)
                         if checkpoint_path:
                             try:
                                 with open(checkpoint_path, "w", encoding="utf-8") as chk_f:
@@ -493,20 +523,36 @@ class NativeSynthesizer:
                             except Exception as chk_ex:
                                 logger.warning(f"写入 Checkpoint 异常: {chk_ex}")
 
-                        pct = min(90, int(35 + (curr_total / target_size) * 55))
+                        pct = min(95, int(35 + (curr_total / target_size) * 60))
                         print(f"[PROGRESS: {pct}%] [CASE: {curr_total}/{target_size}] 正在演化类型: 【{evo_type}】...", flush=True)
                         print(f"      ✅ [{curr_total:02d}/{target_size:02d}] 题干: {gen['question'][:60]}...", flush=True)
                     else:
-                        logger.warning(f"      ❌ 类型 {evo_type} 重试后仍失败，跳过")
+                        logger.warning(f"      ❌ 类型 {evo_type} 多次重试未产生有效问答对，将在补偿轮次重试")
 
         async with httpx.AsyncClient(timeout=60.0) as client:
-            tasks = [
-                _worker(start_offset + idx, evo_type, client)
-                for idx, evo_type in enumerate(types, start=1)
-            ]
-            await asyncio.gather(*tasks)
+            round_idx = 0
+            while len(results) < target_size and round_idx < 4:
+                round_idx += 1
+                needed_size = target_size - len(results)
+                types = (
+                    ["multi_hop"] * int(needed_size * 0.4) +
+                    ["reasoning"] * int(needed_size * 0.3) +
+                    ["simple"] * int(needed_size * 0.2) +
+                    ["conditional"] * (needed_size - int(needed_size * 0.4) - int(needed_size * 0.3) - int(needed_size * 0.2))
+                )
+                if not types:
+                    types = ["simple"] * needed_size
+                random.shuffle(types)
+                if round_idx > 1:
+                    logger.info(f"🔄 启动第 {round_idx} 轮差额补偿生成: 当前已完成 {len(results)}/{target_size} 题，补充派发 {len(types)} 个生成任务...")
 
-        return results
+                tasks = [
+                    _worker(idx, evo_type, client)
+                    for idx, evo_type in enumerate(types, start=1)
+                ]
+                await asyncio.gather(*tasks)
+
+        return results[:target_size]
 
     async def reverify_stale_case(self, client: httpx.AsyncClient, case: Dict[str, Any], new_chunk_text: str) -> Dict[str, Any]:
         prompt = PROMPT_REVERIFY.format(
