@@ -29,8 +29,11 @@ import {
   MinusIcon,
   FolderGit2Icon,
   Trash2Icon,
-  ZapIcon
+  ZapIcon,
+  ScaleIcon,
+  CheckIcon
 } from 'lucide-react'
+import { EvaluationComparisonModal, CompareTargetItem } from './EvaluationComparisonModal'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import Button from '@/components/ui/Button'
@@ -185,6 +188,28 @@ export default function EvaluationTaskCenter({
   const [datasetSearch, setDatasetSearch] = useState<string>('')
   const [viewMode, setViewMode] = useState<'dataset' | 'timeline'>('dataset')
   const [expandedDatasets, setExpandedDatasets] = useState<Set<string>>(new Set())
+
+  // 多维对比工坊状态 (Matrix & Multi-Mode Comparison)
+  const [compareModalOpen, setCompareModalOpen] = useState(false)
+  const [compareTargets, setCompareTargets] = useState<CompareTargetItem[]>([])
+
+  const isTargetSelected = (taskId: string, mode?: string) => {
+    return compareTargets.some(t => t.task_id === taskId && (!mode || t.mode === mode))
+  }
+
+  const handleToggleCompareTarget = (target: CompareTargetItem) => {
+    setCompareTargets(prev => {
+      const exists = prev.some(t => t.task_id === target.task_id && t.mode === target.mode)
+      if (exists) {
+        return prev.filter(t => !(t.task_id === target.task_id && t.mode === target.mode))
+      }
+      if (prev.length >= 4) {
+        toast.warning('最多同时支持对比 4 组打擂')
+        return prev
+      }
+      return [...prev, target]
+    })
+  }
 
   // 同步当前项目变更到筛选器
   useEffect(() => {
@@ -590,15 +615,18 @@ export default function EvaluationTaskCenter({
     const isExpanded = expandedTaskId === r.task_id
     const score = r.overall_score
     const passRate = r.pass_rate
+    const isCompareSelected = isTargetSelected(r.task_id)
 
     return (
       <div
         key={r.task_id}
         className={cn(
-          'rounded-xl border transition-all duration-200 overflow-hidden',
-          isExpanded
-            ? 'border-indigo-500/50 bg-card shadow-xs'
-            : 'border-border/70 bg-card/60 hover:border-border hover:bg-card/90'
+          'rounded-xl border transition-all duration-200 overflow-hidden relative',
+          isCompareSelected
+            ? 'border-indigo-500/80 bg-indigo-50/20 ring-1 ring-indigo-500/40 shadow-xs dark:bg-indigo-950/25 dark:border-indigo-500'
+            : isExpanded
+              ? 'border-indigo-500/50 bg-card shadow-xs'
+              : 'border-border/70 bg-card/60 hover:border-border hover:bg-card/90'
         )}
       >
         {/* 卡片主信息栏：自适应宽屏与窄屏 */}
@@ -606,8 +634,35 @@ export default function EvaluationTaskCenter({
           className="p-3.5 sm:p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 cursor-pointer select-none"
           onClick={() => handleToggleExpandTask(r.task_id)}
         >
-          {/* 左半区：展开指示器 + 题库信息 + 时间参数 + 模式标签群 */}
+          {/* 左半区：打擂多选勾选框 + 展开指示器 + 题库信息 + 时间参数 + 模式标签群 */}
           <div className="flex items-start sm:items-center gap-3 min-w-0">
+            {/* 卡片最左侧：多选对比复选框（Check Indicator） */}
+            <div
+              className="mt-0.5 sm:mt-0 shrink-0 flex items-center pr-1"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleCompareTarget({
+                  task_id: r.task_id,
+                  mode: r.modes?.[0] || 'mix',
+                  label: `打擂 #${r.task_id.replace('task_', '').slice(0, 8)} (${r.modes?.[0] || 'mix'})`
+                })
+              }}
+              title={isCompareSelected ? '已选中，点击取消对比' : '点击勾选加入多场对比'}
+            >
+              <div
+                className={cn(
+                  'w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer',
+                  isCompareSelected
+                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs scale-105 ring-2 ring-indigo-500/20'
+                    : 'bg-background/90 border-slate-300 dark:border-slate-600 hover:border-indigo-400 hover:bg-indigo-50/40'
+                )}
+              >
+                {isCompareSelected && (
+                  <CheckIcon className="size-3.5 stroke-[3]" />
+                )}
+              </div>
+            </div>
+
             <div className="p-1 rounded-md bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0 shrink-0">
               {isExpanded ? (
                 <ChevronDownIcon className="size-4 text-indigo-500" />
@@ -805,6 +860,29 @@ export default function EvaluationTaskCenter({
                 {isExpanded ? '收起详情' : '指标明细'}
               </Button>
 
+              {/* 加入多维对比复选胶囊 */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleToggleCompareTarget({
+                    task_id: r.task_id,
+                    mode: r.modes?.[0] || 'mix',
+                    label: `打擂 #${r.task_id.slice(-8)} (${r.modes?.[0] || 'mix'})`
+                  })
+                }}
+                className={cn(
+                  'h-8 px-2.5 text-xs rounded-md border flex items-center gap-1.5 transition-all cursor-pointer select-none',
+                  isTargetSelected(r.task_id)
+                    ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-bold dark:bg-indigo-950/40 dark:border-indigo-600 dark:text-indigo-300 shadow-xs'
+                    : 'bg-background border-border/80 text-muted-foreground hover:bg-muted/60'
+                )}
+                title="勾选此打擂加入横向/纵向多维对比"
+              >
+                <ScaleIcon className="size-3.5" />
+                <span>{isTargetSelected(r.task_id) ? '✓ 已选对比' : '+ 对比'}</span>
+              </button>
+
               {(() => {
                 if (!r.result_url) return null
                 const safeUrl = r.result_url.includes('/compare-runs?') && !r.result_url.includes('/#/compare-runs?')
@@ -862,9 +940,37 @@ export default function EvaluationTaskCenter({
                           <SwordsIcon className="size-3.5 text-indigo-500" />
                           <span>多检索模式横向 PK 对比战报 (Multi-Mode Head-to-Head PK)</span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-mono">
-                          共 {taskDetail.metrics_summary.mode_breakdown.length} 轮独立打擂
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            共 {taskDetail.metrics_summary.mode_breakdown.length} 轮独立打擂
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const mbList = taskDetail.metrics_summary?.mode_breakdown || []
+                              if (mbList.length >= 2) {
+                                setCompareTargets([
+                                  {
+                                    task_id: taskDetail.task_id,
+                                    mode: mbList[0].mode,
+                                    label: `打擂 #${taskDetail.task_id.slice(-8)} (${mbList[0].mode})`
+                                  },
+                                  {
+                                    task_id: taskDetail.task_id,
+                                    mode: mbList[1].mode,
+                                    label: `打擂 #${taskDetail.task_id.slice(-8)} (${mbList[1].mode})`
+                                  }
+                                ])
+                                setCompareModalOpen(true)
+                              }
+                            }}
+                            className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs flex items-center gap-1 transition-all cursor-pointer"
+                            title="对撞比对当前打擂的两种检索模式"
+                          >
+                            <ScaleIcon className="size-3" />
+                            <span>⚖️ 模式对撞深度比对</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -1413,8 +1519,35 @@ export default function EvaluationTaskCenter({
               </button>
             </div>
 
-            {/* 5. 刷新成果与发起新打擂 */}
+            {/* 5. 刷新成果、跨场次对比与发起新打擂 */}
             <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (runs && runs.length >= 2) {
+                    setCompareTargets([
+                      {
+                        task_id: runs[0].task_id,
+                        mode: runs[0].modes?.[0] || 'mix',
+                        label: `打擂 #${runs[0].task_id.slice(-8)} (${runs[0].modes?.[0] || 'mix'})`
+                      },
+                      {
+                        task_id: runs[1].task_id,
+                        mode: runs[1].modes?.[0] || 'hybrid',
+                        label: `打擂 #${runs[1].task_id.slice(-8)} (${runs[1].modes?.[0] || 'hybrid'})`
+                      }
+                    ])
+                  }
+                  setCompareModalOpen(true)
+                }}
+                className="h-7 px-2.5 text-xs gap-1 border-indigo-300 dark:border-indigo-700 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold hover:bg-indigo-100/80 cursor-pointer shadow-2xs"
+                title="开启不同场次打擂多维横向对撞与回溯工坊"
+              >
+                <ScaleIcon className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>⚖️ 跨场次自由对比</span>
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -1878,6 +2011,73 @@ export default function EvaluationTaskCenter({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 底部悬浮对比操作栏 */}
+      {compareTargets.length >= 1 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 dark:bg-slate-950/95 text-white backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl border border-slate-700/60 flex items-center gap-4 animate-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-2 text-xs">
+            <ScaleIcon className="size-4 text-indigo-400 shrink-0" />
+            <span className="font-semibold whitespace-nowrap">
+              {compareTargets.length >= 2
+                ? `已选 ${compareTargets.length} 组打擂:`
+                : '已选 1 组，请在左侧勾选第 2 个打擂进行对比:'}
+            </span>
+            <div className="flex items-center gap-1.5 max-w-md overflow-x-auto">
+              {compareTargets.map((t, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200 text-[11px] border border-slate-700 flex items-center gap-1 shrink-0"
+                >
+                  {t.label}
+                  <button
+                    type="button"
+                    onClick={() => setCompareTargets((prev) => prev.filter((_, i) => i !== idx))}
+                    className="hover:text-red-400 text-slate-400 ml-0.5 cursor-pointer"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setCompareTargets([])}
+              className="px-2.5 py-1 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              清空
+            </button>
+            <button
+              type="button"
+              onClick={() => setCompareModalOpen(true)}
+              className={cn(
+                'px-4 py-1.5 text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 transition-all cursor-pointer',
+                compareTargets.length >= 2
+                  ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/30'
+                  : 'bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-700/60'
+              )}
+            >
+              <SparklesIcon className="size-3.5 text-amber-300" />
+              <span>
+                {compareTargets.length >= 2
+                  ? `启动多维深度对比 (${compareTargets.length})`
+                  : '立即对比 (弹窗内选对比方)'}
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 多维对比工作台大屏弹窗 */}
+      <EvaluationComparisonModal
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+        targets={compareTargets}
+        availableRuns={runs}
+        onTargetsChange={setCompareTargets}
+      />
     </div>
   )
 }

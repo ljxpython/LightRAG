@@ -376,6 +376,16 @@ class MatrixRunRequest(BaseModel):
     mlflow: bool = True
 
 
+class CompareTargetItem(BaseModel):
+    task_id: str
+    mode: Optional[str] = None
+    label: Optional[str] = None
+
+
+class EvaluationCompareRequest(BaseModel):
+    targets: List[CompareTargetItem]
+
+
 
 class WorkspaceSelectRequest(BaseModel):
     tenant_id: str = "__default"
@@ -1587,19 +1597,14 @@ def _ensure_eval_mode_breakdown(base: Dict[str, Any]) -> List[Dict[str, Any]]:
                             except (ValueError, TypeError):
                                 pass
                 metrics_res = {k: round(sum(v) / len(v), 4) for k, v in m_sums.items() if v}
-                tot_dur = round(sum(c.get("total_duration_seconds", 0.0) for c in cases_data), 2)
-                rag_dur = round(sum(c.get("rag_duration_seconds", 0.0) for c in cases_data), 2)
-                judge_dur = round(sum(c.get("judge_duration_seconds", 0.0) for c in cases_data), 2)
-                # 针对历史报告未持久化单题耗时的智能自愈回填
-                if tot_dur <= 0:
-                    tot_dur = round(tot * 38.5, 2)
-                    rag_dur = round(tot_dur * 0.35, 2)
-                    judge_dur = round(tot_dur * 0.65, 2)
+                tot_dur = round(sum(c.get("total_duration_seconds", 0.0) for c in cases_data if c.get("total_duration_seconds")), 2)
+                rag_dur = round(sum(c.get("rag_duration_seconds", 0.0) for c in cases_data if c.get("rag_duration_seconds")), 2)
+                judge_dur = round(sum(c.get("judge_duration_seconds", 0.0) for c in cases_data if c.get("judge_duration_seconds")), 2)
                 timing_res = {
                     "total_duration_seconds": tot_dur,
-                    "avg_case_duration_seconds": round(tot_dur / tot, 2) if tot else 0.0,
-                    "avg_rag_duration_seconds": round(rag_dur / tot, 2) if tot else 0.0,
-                    "avg_judge_duration_seconds": round(judge_dur / tot, 2) if tot else 0.0,
+                    "avg_case_duration_seconds": round(tot_dur / tot, 2) if tot and tot_dur > 0 else 0.0,
+                    "avg_rag_duration_seconds": round(rag_dur / tot, 2) if tot and rag_dur > 0 else 0.0,
+                    "avg_judge_duration_seconds": round(judge_dur / tot, 2) if tot and judge_dur > 0 else 0.0,
                 }
                 runs_list = base.get("runs") or []
                 run_id = runs_list[i] if i < len(runs_list) else None
@@ -1724,13 +1729,10 @@ async def get_evaluation_run_detail(task_id: str, mode: Optional[str] = None):
                 # 注入 mode 属性与阶段耗时给每条测试用例
                 for idx, c in enumerate(raw_cases):
                     c["mode"] = target_mode
-                    if c.get("total_duration_seconds") is None or c.get("total_duration_seconds") == 0:
-                        avg_tot = 38.5
-                        if target_mb and target_mb.get("timing", {}).get("avg_case_duration_seconds"):
-                            avg_tot = target_mb["timing"]["avg_case_duration_seconds"]
-                        c["total_duration_seconds"] = round(avg_tot, 2)
-                        c["rag_duration_seconds"] = round(avg_tot * 0.35, 2)
-                        c["judge_duration_seconds"] = round(avg_tot * 0.65, 2)
+                    if c.get("total_duration_seconds") is None:
+                        c["total_duration_seconds"] = 0.0
+                        c["rag_duration_seconds"] = 0.0
+                        c["judge_duration_seconds"] = 0.0
 
                     # 若用例含 trace_id 但缺少 trace_url，做自愈构建
                     if c.get("trace_id") and not c.get("trace_url"):
@@ -1782,6 +1784,271 @@ async def get_evaluation_run_detail(task_id: str, mode: Optional[str] = None):
     base["traces_url"] = "http://49.233.222.54:9128/#/experiments/9/traces"
     base["cases"] = cases
     return base
+
+
+@ops_router.post("/evaluation/runs/compare")
+async def compare_evaluation_runs(req: EvaluationCompareRequest):
+    """Compares 2 or more evaluation battle runs or multi-mode subsets, producing macro metrics radar, performance timing breakdowns, and case-level side-by-side diffs."""
+    if not req.targets or len(req.targets) < 2:
+        raise HTTPException(status_code=400, detail="At least 2 targets are required for comparison.")
+
+    target_details = []
+    for t in req.targets:
+        try:
+            d = await get_evaluation_run_detail(t.task_id, mode=t.mode)
+            t_label = t.label or f"打擂 #{t.task_id[:8]} ({t.mode or d.get('current_mode', 'mix')})"
+            target_details.append({
+                "target": t.dict(),
+                "detail": d,
+                "display_label": t_label,
+            })
+        except Exception as ex:
+            logger.warning(f"Failed to fetch detail for target {t.task_id} mode {t.mode}: {ex}")
+
+    if len(target_details) < 2:
+        raise HTTPException(status_code=404, detail="Could not load valid evaluation run details for comparison targets.")
+
+    base = target_details[0]
+    comp = target_details[1]
+
+    base_detail = base["detail"]
+    comp_detail = comp["detail"]
+
+    base_metrics = base_detail.get("metrics_summary") or {}
+    comp_metrics = comp_detail.get("metrics_summary") or {}
+
+    metric_keys = ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision", "counterfactual"]
+    metrics_comparison = {}
+    for mk in metric_keys:
+        bv = float(base_metrics.get(mk) or 0.0)
+        cv = float(comp_metrics.get(mk) or 0.0)
+        delta = round(cv - bv, 4)
+        pct_delta = round((delta / bv * 100) if bv > 0 else 0.0, 1)
+        metrics_comparison[mk] = {
+            "baseline": round(bv, 4),
+            "comparison": round(cv, 4),
+            "delta": delta,
+            "percentage_delta": pct_delta,
+        }
+
+    base_score = float(base_detail.get("overall_score") or 0.0)
+    comp_score = float(comp_detail.get("overall_score") or 0.0)
+    base_pass = float(base_detail.get("pass_rate") or 0.0)
+    comp_pass = float(comp_detail.get("pass_rate") or 0.0)
+
+    base_timing = base_metrics.get("timing") or {}
+    comp_timing = comp_metrics.get("timing") or {}
+
+    # 用例对撞 (Case-level Diff)
+    base_cases = base_detail.get("cases") or []
+    comp_cases = comp_detail.get("cases") or []
+
+    comp_case_map = {}
+    for c in comp_cases:
+        q = (c.get("query") or "").strip()
+        if q:
+            comp_case_map[q] = c
+
+    case_diffs = []
+    win_count = 0
+    loss_count = 0
+    tie_count = 0
+    regressed_count = 0
+    improved_count = 0
+
+    for idx, b_case in enumerate(base_cases):
+        q = (b_case.get("question") or b_case.get("query") or "").strip()
+        c_case = comp_case_map.get(q)
+        if not c_case and idx < len(comp_cases):
+            c_case = comp_cases[idx]
+
+        b_score = float(b_case.get("overall_score") or 0.0)
+        b_pass = bool(b_case.get("all_passed"))
+        c_score = float((c_case or {}).get("overall_score") or 0.0)
+        c_pass = bool((c_case or {}).get("all_passed"))
+
+        score_delta = round(c_score - b_score, 4)
+
+        if b_pass and not c_pass:
+            verdict = "regressed"
+            regressed_count += 1
+            loss_count += 1
+        elif not b_pass and c_pass:
+            verdict = "improved"
+            improved_count += 1
+            win_count += 1
+        elif score_delta > 0.01:
+            verdict = "comparison_won"
+            win_count += 1
+        elif score_delta < -0.01:
+            verdict = "baseline_won"
+            loss_count += 1
+        else:
+            verdict = "tie"
+            tie_count += 1
+
+        # 兼容 answer 与 actual_output
+        b_ans = b_case.get("answer") or b_case.get("actual_output") or ""
+        c_ans = (c_case or {}).get("answer") or (c_case or {}).get("actual_output") or ""
+
+        # 兼容 contexts (字符串切片) 与 sources (对象切片)
+        raw_b_ctx = b_case.get("contexts") or b_case.get("sources") or []
+        raw_c_ctx = (c_case or {}).get("contexts") or (c_case or {}).get("sources") or []
+
+        def _normalize_sources(ctx_list):
+            norm = []
+            for i, item in enumerate(ctx_list):
+                if isinstance(item, dict):
+                    norm.append(item)
+                else:
+                    text_str = str(item)
+                    norm.append({
+                        "chunk_id": f"chunk-{i+1}",
+                        "title": f"切片 #{i+1}",
+                        "preview": text_str[:160] + ("..." if len(text_str) > 160 else ""),
+                        "content": text_str
+                    })
+            return norm
+
+        b_sources = _normalize_sources(raw_b_ctx)
+        c_sources = _normalize_sources(raw_c_ctx)
+
+        def _extract_source_key(s):
+            if isinstance(s, dict):
+                return s.get("chunk_id") or s.get("source_id") or s.get("title") or str(s.get("preview", ""))[:30]
+            return str(s)[:30]
+
+        b_keys = {_extract_source_key(s) for s in b_sources if s}
+        c_keys = {_extract_source_key(s) for s in c_sources if s}
+
+        intersection = b_keys & c_keys
+        union = b_keys | c_keys
+        jaccard = round(len(intersection) / len(union), 2) if union else 1.0
+
+        b_unique_sources = [s for s in b_sources if _extract_source_key(s) not in intersection]
+        c_unique_sources = [s for s in c_sources if _extract_source_key(s) not in intersection]
+        shared_sources = [s for s in b_sources if _extract_source_key(s) in intersection]
+
+        case_diffs.append({
+            "case_index": idx + 1,
+            "query": q,
+            "ground_truth": b_case.get("ground_truth") or (c_case or {}).get("ground_truth", ""),
+            "verdict": verdict,
+            "score_delta": score_delta,
+            "baseline": {
+                "mode": base_detail.get("current_mode"),
+                "score": b_score,
+                "all_passed": b_pass,
+                "actual_output": b_ans,
+                "answer": b_ans,
+                "scores": b_case.get("scores") or {},
+                "reasons": b_case.get("reasons") or {},
+                "sources_count": len(b_sources),
+                "sources": b_sources,
+                "durations": {
+                    "total": b_case.get("total_duration_seconds", 0.0),
+                    "rag": b_case.get("rag_duration_seconds", 0.0),
+                    "judge": b_case.get("judge_duration_seconds", 0.0),
+                },
+                "trace_url": b_case.get("trace_url"),
+            },
+            "comparison": {
+                "mode": comp_detail.get("current_mode"),
+                "score": c_score,
+                "all_passed": c_pass,
+                "actual_output": c_ans,
+                "answer": c_ans,
+                "scores": (c_case or {}).get("scores") or {},
+                "reasons": (c_case or {}).get("reasons") or {},
+                "sources_count": len(c_sources),
+                "sources": c_sources,
+                "durations": {
+                    "total": (c_case or {}).get("total_duration_seconds", 0.0),
+                    "rag": (c_case or {}).get("rag_duration_seconds", 0.0),
+                    "judge": (c_case or {}).get("judge_duration_seconds", 0.0),
+                },
+                "trace_url": (c_case or {}).get("trace_url"),
+            },
+            "diff_attribution": {
+                "jaccard_similarity": jaccard,
+                "shared_sources_count": len(shared_sources),
+                "baseline_unique_sources_count": len(b_unique_sources),
+                "comparison_unique_sources_count": len(c_unique_sources),
+                "baseline_unique_sources": b_unique_sources,
+                "comparison_unique_sources": c_unique_sources,
+                "shared_sources": shared_sources,
+            }
+        })
+
+    # AI 决策建议生成
+    b_score_100 = base_score * 100 if base_score <= 1.0 else base_score
+    c_score_100 = comp_score * 100 if comp_score <= 1.0 else comp_score
+    score_diff = round(c_score_100 - b_score_100, 1)
+    b_rag_dur = base_timing.get("avg_rag_duration_seconds", 0.0)
+    c_rag_dur = comp_timing.get("avg_rag_duration_seconds", 0.0)
+    rag_dur_diff = round(c_rag_dur - b_rag_dur, 2)
+
+    recommendation_lines = []
+    if score_diff > 3:
+        recommendation_lines.append(f"【质量显著领先】对比组 ({comp['display_label']}) 综合分高出 {score_diff} 分，在忠实度与召回率维度表现突出。")
+    elif score_diff < -3:
+        recommendation_lines.append(f"【质量明显退化】对比组 ({comp['display_label']}) 综合分落后 {abs(score_diff)} 分，需注意检查切片丢失或实体断联问题。")
+    else:
+        recommendation_lines.append(f"【质量旗鼓相当】两组综合得分相近 (差值 {abs(score_diff)}分)，建议重点关注耗时与成本差异。")
+
+    if rag_dur_diff > 1.0:
+        recommendation_lines.append(f"【时延开销】对比组 RAG 检索平均耗时多出 {rag_dur_diff}s（可能由于图谱深度遍历）；若用于高并发在线交互场景需权衡 SLA。")
+    elif rag_dur_diff < -1.0:
+        recommendation_lines.append(f"【吞吐优势】对比组 RAG 检索平均快出 {abs(rag_dur_diff)}s，性能优势明显。")
+
+    if regressed_count > 0:
+        recommendation_lines.append(f"⚠️ 警告：检测到 {regressed_count} 道题目出现严重退化（原先通过、对比未通过），请在用例对撞中排查原因！")
+
+    return {
+        "status": "success",
+        "baseline_target": base["display_label"],
+        "comparison_target": comp["display_label"],
+        "targets": [
+            {
+                "task_id": t["target"]["task_id"],
+                "mode": t["target"].get("mode"),
+                "label": t["display_label"],
+                "overall_score": t["detail"].get("overall_score"),
+                "pass_rate": t["detail"].get("pass_rate"),
+                "dataset_name": t["detail"].get("dataset_name"),
+                "timing": (t["detail"].get("metrics_summary") or {}).get("timing"),
+            }
+            for t in target_details
+        ],
+        "macro_summary": {
+            "overall_score": {
+                "baseline": base_score,
+                "comparison": comp_score,
+                "delta": round(comp_score - base_score, 4),
+            },
+            "pass_rate": {
+                "baseline": base_pass,
+                "comparison": comp_pass,
+                "delta": round(comp_pass - base_pass, 4),
+            },
+            "metrics": metrics_comparison,
+            "timing": {
+                "baseline": base_timing,
+                "comparison": comp_timing,
+            },
+            "win_tie_loss": {
+                "total_cases": len(base_cases),
+                "comparison_won": win_count,
+                "baseline_won": loss_count,
+                "tie": tie_count,
+                "regressed": regressed_count,
+                "improved": improved_count,
+            }
+        },
+        "case_comparisons": case_diffs,
+        "decision_recommendation": " ".join(recommendation_lines),
+    }
+
 
 
 @ops_router.delete("/evaluation/runs/{task_id}")
