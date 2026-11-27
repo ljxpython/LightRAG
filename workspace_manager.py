@@ -85,8 +85,39 @@ class TenantWorkspaceManager:
         self._active_versions: Dict[str, str] = {}
         self.lease_mgr = lease_manager or ReaderLeaseManager()
         self._lock = asyncio.Lock()
+
+    def resolve_physical_project_id(self, tenant_id: str, project_id: str) -> str:
+        """如果传入的 project_id 是展示名称或别名，自动解析为真实的底层物理 project_id。"""
+        direct_dir = self.storage_root / tenant_id / project_id
+        # 若物理目录直接存在且有真实的激活版本和切片数据，直接返回
+        if direct_dir.exists():
+            active_link = direct_dir / "active"
+            if active_link.exists() and any(active_link.glob("*.json")):
+                return project_id
+
+        # 扫描该租户下所有子目录的 meta.json 进行名称反向匹配
+        tenant_dir = self.storage_root / tenant_id
+        if tenant_dir.exists():
+            clean_input = project_id.replace("plantform", "platform").strip()
+            for sub in tenant_dir.iterdir():
+                if sub.is_dir() and sub.name != project_id:
+                    meta_path = sub / "meta.json"
+                    if meta_path.exists():
+                        try:
+                            with open(meta_path, "r", encoding="utf-8") as f:
+                                meta = json.load(f)
+                                m_name = (meta.get("name") or "").replace("plantform", "platform").strip()
+                                if m_name and m_name == clean_input:
+                                    sub_active = sub / "active"
+                                    if sub_active.exists() and any(sub_active.glob("*.json")):
+                                        return sub.name
+                        except Exception:
+                            pass
+        return project_id
+
     def get_project_dir(self, tenant_id: str, project_id: str) -> Path:
-        p_dir = self.storage_root / tenant_id / project_id
+        real_id = self.resolve_physical_project_id(tenant_id, project_id)
+        p_dir = self.storage_root / tenant_id / real_id
         p_dir.mkdir(parents=True, exist_ok=True)
         return p_dir
 

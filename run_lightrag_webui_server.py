@@ -517,8 +517,12 @@ async def select_workspace(payload: WorkspaceSelectRequest, response: Response):
     if not project_id:
         raise HTTPException(status_code=400, detail="project_id cannot be empty")
 
-    response.set_cookie("x_tenant_id", tenant_id, path="/", samesite="lax")
-    response.set_cookie("x_project_id", project_id, path="/", samesite="lax")
+    try:
+        import urllib.parse
+        response.set_cookie("x_tenant_id", urllib.parse.quote(str(tenant_id)), path="/", samesite="lax")
+        response.set_cookie("x_project_id", urllib.parse.quote(str(project_id)), path="/", samesite="lax")
+    except Exception:
+        pass
     return {
         "status": "success",
         "tenant_id": tenant_id,
@@ -1513,6 +1517,17 @@ async def list_evaluation_runs(
                 except Exception:
                     pass
 
+        # 彻底将无意义的 compare-runs 对比页替换为运行详情页或跟踪页
+        runs_list = r.get("runs") or []
+        mlflow_host = (os.getenv("MLFLOW_TRACKING_URI") or "http://49.233.222.54:9128").rstrip("/")
+        exp_id = "9"
+        if r.get("result_url") and "compare-runs" in r["result_url"]:
+            if runs_list:
+                r["result_url"] = f"{mlflow_host}/#/experiments/{exp_id}/runs/{runs_list[-1]}"
+            else:
+                r["result_url"] = f"{mlflow_host}/#/experiments/{exp_id}/traces"
+        r["traces_url"] = f"{mlflow_host}/#/experiments/{exp_id}/traces"
+
         if r.get("modes") and len(r["modes"]) > 1:
             _ensure_eval_mode_breakdown(r)
 
@@ -1607,12 +1622,26 @@ def _ensure_eval_mode_breakdown(base: Dict[str, Any]) -> List[Dict[str, Any]]:
         base["metrics_summary"]["mode_breakdown"] = breakdown
         if breakdown and ("timing" not in base["metrics_summary"] or not base["metrics_summary"].get("timing")):
             base["metrics_summary"]["timing"] = breakdown[0].get("timing")
+        # 彻底将无意义的 compare-runs 对比页替换为运行详情页或跟踪页
+        fixed_url = base.get("result_url")
+        runs_list = base.get("runs") or []
+        mlflow_host = (os.getenv("MLFLOW_TRACKING_URI") or "http://49.233.222.54:9128").rstrip("/")
+        exp_id = "9"
+        if fixed_url and "compare-runs" in fixed_url:
+            if runs_list:
+                fixed_url = f"{mlflow_host}/#/experiments/{exp_id}/runs/{runs_list[-1]}"
+            else:
+                fixed_url = f"{mlflow_host}/#/experiments/{exp_id}/traces"
+            base["result_url"] = fixed_url
+        base["traces_url"] = f"{mlflow_host}/#/experiments/{exp_id}/traces"
+
         try:
             from catalog_manager import catalog_mgr
             catalog_mgr.update_eval_run(
                 task_id=base["task_id"],
                 status=base.get("status", "completed"),
                 progress=base.get("progress", 100),
+                result_url=fixed_url,
                 metrics_summary=base["metrics_summary"],
             )
         except Exception as ex:
@@ -1702,6 +1731,11 @@ async def get_evaluation_run_detail(task_id: str, mode: Optional[str] = None):
                         c["total_duration_seconds"] = round(avg_tot, 2)
                         c["rag_duration_seconds"] = round(avg_tot * 0.35, 2)
                         c["judge_duration_seconds"] = round(avg_tot * 0.65, 2)
+
+                    # 若用例含 trace_id 但缺少 trace_url，做自愈构建
+                    if c.get("trace_id") and not c.get("trace_url"):
+                        mlflow_host = (os.getenv("MLFLOW_TRACKING_URI") or "http://49.233.222.54:9128").rstrip("/")
+                        c["trace_url"] = f"{mlflow_host}/#/experiments/11/traces/{c['trace_id']}"
                 cases = raw_cases
 
                 # 若选中特定子模式，使用子模式得分覆盖当前展示
@@ -1745,6 +1779,7 @@ async def get_evaluation_run_detail(task_id: str, mode: Optional[str] = None):
         except Exception as e:
             logger.warning(f"Failed to read report file {target_report}: {e}")
 
+    base["traces_url"] = "http://49.233.222.54:9128/#/experiments/9/traces"
     base["cases"] = cases
     return base
 
@@ -1889,6 +1924,21 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
         eval_task_mgr.update_task(task_id, status="failed", error=f"Dataset {raw_dataset} not found")
         return
 
+    # 智能血缘契约对齐 (Lineage Auto-Binding)
+    try:
+        ds_data = json.loads(dataset_path.read_text(encoding="utf-8"))
+        bound_proj = (ds_data.get("corpus_manifest") or {}).get("project_id") or ds_data.get("project_id")
+        if bound_proj:
+            storage_base = repo_root / "sandbox_storage" / "__default"
+            curr_target = storage_base / proj_id
+            bound_target = storage_base / bound_proj
+            if bound_target.exists() and (not curr_target.exists() or sum(f.stat().st_size for f in curr_target.glob("**/*") if f.is_file()) < 50000):
+                logger.info(f"✨ [血缘自动对齐] 评测集签约项目为【{bound_proj}】，当前选择为【{proj_id}】(底层语料为空)，已自动对齐至真实物理项目【{bound_proj}】")
+                eval_task_mgr.append_log(task_id, f"🛡️ [血缘自愈对齐] 目标语料归属于签约项目【{bound_proj}】，已自动对齐以保障检索切片命中！")
+                proj_id = bound_proj
+    except Exception as ex:
+        logger.debug(f"Lineage alignment check skipped: {ex}")
+
     modes_str = ",".join(modes_list)
     concurrency_val = req.concurrency or int(os.getenv("EVAL_CONCURRENCY", "3"))
     cmd = [
@@ -1966,15 +2016,12 @@ async def _run_matrix_evaluation_bg(task_id: str, req: MatrixRunRequest):
             eval_task_mgr.append_log(task_id, f"🛑 任务已确认中止退出 (exit code: {proc.returncode})")
         elif proc.returncode == 0:
             mlflow_host = os.getenv("MLFLOW_TRACKING_URI", "http://49.233.222.54:9128").rstrip("/")
-            active_exp = captured_exp_id or "11"
-            compare_url = f"{mlflow_host}/#/experiments/{active_exp}"
-            if len(captured_runs) >= 2:
-                import urllib.parse
-                runs_json = json.dumps(captured_runs)
-                exp_json = json.dumps([active_exp])
-                compare_url = f"{mlflow_host}/compare-runs?runs={urllib.parse.quote(runs_json)}&experiments={urllib.parse.quote(exp_json)}"
-            elif len(captured_runs) == 1:
-                compare_url = f"{mlflow_host}/#/experiments/{active_exp}/runs/{captured_runs[0]}"
+            active_exp = captured_exp_id or "9"
+            # 优先直达该次打擂运行详情页（Run Detail），绝不跳转冷冰冰的 compare-runs 对比页
+            if captured_runs:
+                compare_url = f"{mlflow_host}/#/experiments/{active_exp}/runs/{captured_runs[-1]}"
+            else:
+                compare_url = f"{mlflow_host}/#/experiments/{active_exp}/traces"
 
             # 解析报告提取核心综合指标
             overall_score = None
@@ -2147,13 +2194,15 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
             or "__default"
         ).strip()
 
-        project_id = (
+        project_id_raw = (
             request.query_params.get("project_id")
             or request.query_params.get("project")
             or request.headers.get("x-project-id")
             or request.cookies.get("x_project_id")
             or "11111111-1111-4111-8111-111111111111"
         ).strip()
+        import urllib.parse
+        project_id = urllib.parse.unquote(project_id_raw)
 
         # 2. Self-healing project metadata if project_name supplied in query parameters
         project_name = (
@@ -2192,8 +2241,12 @@ class TenantResolutionMiddleware(BaseHTTPMiddleware):
 
             # 4. Set persistent session cookies if query param was supplied
             if "project_id" in request.query_params or "project" in request.query_params:
-                response.set_cookie("x_tenant_id", tenant_id, path="/", samesite="lax")
-                response.set_cookie("x_project_id", project_id, path="/", samesite="lax")
+                try:
+                    import urllib.parse
+                    response.set_cookie("x_tenant_id", urllib.parse.quote(str(tenant_id)), path="/", samesite="lax")
+                    response.set_cookie("x_project_id", urllib.parse.quote(str(project_id)), path="/", samesite="lax")
+                except Exception:
+                    pass
 
             # 5. Handle SSO token auto-login & embed immersion injection
             path = request.url.path

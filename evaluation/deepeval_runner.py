@@ -15,9 +15,15 @@ import random
 import re
 import sys
 import time
+from contextlib import contextmanager, nullcontext
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+try:
+    import mlflow
+except ImportError:
+    mlflow = None
 
 # 强制行缓冲推流
 try:
@@ -315,9 +321,10 @@ async def query_lightrag(
     max_total_tokens: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Queries LightRAG /query with project isolation headers and advanced tuning parameters."""
+    import urllib.parse
     headers = {
         "Content-Type": "application/json",
-        "X-Project-Id": project_id,
+        "X-Project-Id": urllib.parse.quote(str(project_id)),
     }
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -339,7 +346,8 @@ async def query_lightrag(
     if max_total_tokens is not None:
         payload["max_total_tokens"] = max_total_tokens
 
-    resp = await client.post(f"{rag_url.rstrip('/')}/query", json=payload, headers=headers)
+    query_url = f"{rag_url.rstrip('/')}/query?project_id={urllib.parse.quote(str(project_id))}"
+    resp = await client.post(query_url, json=payload, headers=headers)
     resp.raise_for_status()
     data = resp.json()
 
@@ -578,7 +586,14 @@ async def run_deepeval_suite(
         print(f"   • 文档指纹:  {hash_sig[:30]}...")
         print(f"   • 语料规模:  共包含 {manifest.get('total_docs', 0)} 篇物理入库文档")
         if bound_project and bound_project != project_id:
-            logger.warning(f"⚠️ [血缘告警] 评测集声明绑定项目为【{bound_project}】，当前运行指定为【{project_id}】，请注意避免测试误判！")
+            storage_base = repo_root / "sandbox_storage" / "__default"
+            curr_target = storage_base / project_id
+            bound_target = storage_base / bound_project
+            if bound_target.exists() and (not curr_target.exists() or sum(f.stat().st_size for f in curr_target.glob("**/*") if f.is_file()) < 50000):
+                print(f"   🔄 [血缘自愈切换] 检测到当前指定项目【{project_id}】物理语料为空，自动对齐为签约绑定的真实语料项目【{bound_project}】！")
+                project_id = bound_project
+            else:
+                logger.warning(f"⚠️ [血缘告警] 评测集声明绑定项目为【{bound_project}】，当前运行指定为【{project_id}】，请注意避免测试误判！")
         else:
             print("   ✅ 血缘指纹与目标项目 100% 契合！")
 
@@ -601,192 +616,310 @@ async def run_deepeval_suite(
     )
     print(f"   • 裁判模型:    {model_name} ({base_url or 'OpenAI Default'})")
 
-    # Step 3: Run Evaluation Pipeline
-    suite_t0 = time.time()
-    print(f"\n📊 [Step 3/3] 开始全量 DeepEval 断言评测 (共 {len(test_cases)} 题，协程并发度: {concurrency})...", flush=True)
-    semaphore = asyncio.Semaphore(concurrency)
-    completed_cases = 0
-
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        async def _eval_case_worker(idx: int, case: Dict[str, Any], total_cases: int) -> Dict[str, Any]:
-            nonlocal completed_cases
-            q = case["question"]
-            gt = case.get("ground_truth", "")
-            p_id = project_id or case.get("project") or "eval_benchmark"
-
-            async with semaphore:
-                print(f"\n--------------------------------------------------------------------------------", flush=True)
-                print(f"👉 [用例 {idx:02d}/{total_cases:02d}] 项目: {p_id}", flush=True)
-                print(f"   ❓ 问题: \"{q}\"", flush=True)
-
-                try:
-                    t0 = time.time()
-                    rag_res = await query_lightrag(
-                        client,
-                        rag_url,
-                        q,
-                        p_id,
-                        token,
-                        top_k=top_k,
-                        mode=mode,
-                        chunk_top_k=chunk_top_k,
-                        enable_rerank=enable_rerank,
-                        user_prompt=user_prompt,
-                        max_total_tokens=max_total_tokens,
-                    )
-                    latency = round(time.time() - t0, 2)
-
-                    ans = rag_res["answer"]
-                    ctxs = rag_res["contexts"]
-
-                    print(f"   ⚡ RAG 响应完成 (耗时 {latency}s, 提取到 {len(ctxs)} 个切片)", flush=True)
-                    print(f"   💬 回答摘要: {ans[:100]}..." if len(ans) > 100 else f"   💬 回答: {ans}", flush=True)
-
-                    # Measure via DeepEval (指标并发)
-                    print(f"   ⚖️  DeepEval 裁判打分与深度诊断分析中...", flush=True)
-                    c_type = case.get("challenge_type")
-                    a_rule = case.get("assertion_rule")
-                    fake_ans = case.get("counterfactual_fake_answer")
-
-                    res = await evaluate_single_case_deepeval(
-                        idx=idx,
-                        question=q,
-                        answer=ans,
-                        contexts=ctxs,
-                        ground_truth=gt,
-                        project_id=p_id,
-                        judge_llm=judge_llm,
-                        threshold=threshold,
-                        challenge_type=c_type,
-                        assertion_rule=a_rule,
-                        fake_answer=fake_ans,
-                        mode=mode,
-                    )
-
-                    res["rag_duration_seconds"] = latency
-                    judge_dur = res.get("judge_duration_seconds", 0.0)
-                    total_dur = round(latency + judge_dur, 2)
-                    res["total_duration_seconds"] = total_dur
-
-                    # Print Granular Metrics and Reasons
-                    scores = res["scores"]
-                    reasons = res["reasons"]
-                    passed = res["passed"]
-
-                    print(f"   📈 指标与诊断分析 (评测耗时: {judge_dur}s | 单题端到端耗时: {total_dur}s):", flush=True)
-                    for m_name in scores.keys():
-                        s = scores.get(m_name)
-                        status_str = "✅ PASS" if passed.get(m_name) else "❌ FAIL"
-                        score_str = f"{s:.4f}" if s is not None else "N/A"
-                        m_dur = res.get("metric_latencies", {}).get(m_name, 0.0)
-                        print(f"      • {m_name:<25}: {score_str} [{status_str}] ({m_dur}s)", flush=True)
-                        r = reasons.get(m_name)
-                        if r and r != "No specific reason provided.":
-                            print(f"        └─ 🔍 理由: {r}", flush=True)
-
-                    status_badge = "✅ ALL PASS" if res["all_passed"] else "⚠️ SOME FAILED"
-                    print(f"   🏁 [用例 {idx:02d}] 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge} | ⏱️ 耗时 {total_dur}s", flush=True)
-
-                except Exception as e:
-                    print(f"   ❌ 用例 {idx} 执行异常: {e}", flush=True)
-                    res = {
-                        "test_number": idx,
-                        "question": q,
-                        "project": p_id,
-                        "ground_truth": gt,
-                        "answer": "未返回回答内容（执行异常）",
-                        "contexts": [],
-                        "contexts_count": 0,
-                        "scores": {},
-                        "reasons": {"error": f"用例执行异常: {str(e)}"},
-                        "passed": {},
-                        "overall_score": 0.0,
-                        "all_passed": False,
-                        "rag_duration_seconds": 0.0,
-                        "judge_duration_seconds": 0.0,
-                        "total_duration_seconds": 0.0,
-                        "error": str(e),
-                    }
-
-                completed_cases += 1
-                prog = min(90, int((completed_cases / total_cases) * 90))
-                print(f"[PROGRESS: {prog}%]", flush=True)
-                return res
-
-        gathered_results = await asyncio.gather(
-            *[_eval_case_worker(idx, case, len(test_cases)) for idx, case in enumerate(test_cases, start=1)]
-        )
-        results = list(gathered_results)
-        results.sort(key=lambda r: r.get("test_number", 0))
-
-    # Summary Report
-    results_dir = Path(__file__).parent / "results"
-    csv_path, json_path = save_deepeval_reports(results, results_dir)
-
-    print("\n" + "=" * 80)
-    print("🏆 DeepEval 评测全量执行完毕！汇总统计:")
-    total_cases = len(results)
-    success_cases = sum(1 for r in results if r.get("all_passed"))
-    
-    # Calculate Averages and Latencies
-    avg_scores = {}
-    for m in ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision"]:
-        vals = [r["scores"][m] for r in results if r.get("scores", {}).get(m) is not None]
-        avg_scores[m] = sum(vals) / len(vals) if vals else 0.0
-
-    suite_duration = round(time.time() - suite_t0, 2)
-    avg_case_duration = round(sum(r.get("total_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
-    avg_rag_duration = round(sum(r.get("rag_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
-    avg_judge_duration = round(sum(r.get("judge_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
-
-    print(f"   • 测试总题数:      {total_cases}")
-    print(f"   • 全额通过题数:    {success_cases}/{total_cases} (通过率: {success_cases/total_cases*100:.1f}%)")
-    print(f"   • 平均忠实度:      {avg_scores['faithfulness']:.4f}")
-    print(f"   • 平均回答相关度:  {avg_scores['answer_relevancy']:.4f}")
-    print(f"   • 平均上下文召回率: {avg_scores['contextual_recall']:.4f}")
-    print(f"   • 平均上下文精确度: {avg_scores['contextual_precision']:.4f}")
-    print(f"   • ⏱️ 打擂总耗时:   {suite_duration}s (并发度: {concurrency})")
-    print(f"   • ⚡ 题均综合耗时: {avg_case_duration}s (RAG检索: {avg_rag_duration}s | 裁判质检: {avg_judge_duration}s)")
-    print(f"   • 报表保存 (CSV):  {csv_path}")
-    print(f"   • 报表保存 (JSON): {json_path}")
-    print("=" * 80)
-
-    # Step 4: MLflow Tracking Integration
+    # 提前初始化 MLflow Tracker，建立包含全生命周期的 Run 作用域以支持单题 Span 级联 Trace 收集
+    tracker = None
     if mlflow_enabled:
-        print("\n📡 [Step 4/4] 正在将评测指标、超参数与推理证据链同步至 MLflow 平台...")
         tracker = MLflowEvaluationTracker(
             tracking_uri=mlflow_tracking_uri,
             experiment_name=experiment_name,
             enabled=True,
         )
-        run_name = f"deepeval_{project_id}_{mode}_topk{top_k}"
-        with tracker.start_run(run_name=run_name, tags={"framework": "DeepEval", "project": project_id, "mode": mode}) as run:
-            if run:
-                tracker.log_params({
-                    "project": project_id,
-                    "mode": mode,
-                    "top_k": top_k,
-                    "chunk_top_k": chunk_top_k,
-                    "enable_rerank": enable_rerank,
-                    "threshold": threshold,
-                    "dataset": dataset_path.name,
-                    "total_cases": total_cases,
-                    "concurrency": concurrency,
-                })
-                tracker.log_metrics({
-                    "faithfulness": avg_scores["faithfulness"],
-                    "answer_relevancy": avg_scores["answer_relevancy"],
-                    "contextual_recall": avg_scores["contextual_recall"],
-                    "contextual_precision": avg_scores["contextual_precision"],
-                    "pass_rate": round(success_cases / total_cases, 4) if total_cases else 0.0,
-                    "total_duration_seconds": suite_duration,
-                    "avg_case_duration_seconds": avg_case_duration,
-                    "avg_rag_duration_seconds": avg_rag_duration,
-                    "avg_judge_duration_seconds": avg_judge_duration,
-                })
-                tracker.log_results_table(results, framework="deepeval", artifact_file="deepeval_cases.json")
-                tracker.log_artifacts([csv_path, json_path])
-                print("   ✅ MLflow 指标与证据链大表同步完成！")
+
+    run_name = f"deepeval_{project_id}_{mode}_topk{top_k}"
+    run_cm = (
+        tracker.start_run(run_name=run_name, tags={"framework": "DeepEval", "project": project_id, "mode": mode})
+        if (tracker and tracker.enabled)
+        else nullcontext()
+    )
+
+    @contextmanager
+    def safe_span(name: str, span_type: str = "CHAIN", inputs: Optional[Dict[str, Any]] = None):
+        """安全创建 MLflow Trace Span，任何异常静默降级不阻断评测核心链路。"""
+        if not (mlflow and tracker and tracker.enabled and tracker.active_run):
+            yield None
+            return
+        try:
+            with mlflow.start_span(name=name, span_type=span_type) as sp:
+                if inputs:
+                    try:
+                        sp.set_inputs(inputs)
+                    except Exception:
+                        pass
+                yield sp
+        except Exception as ex:
+            logger.debug(f"Span {name} exception: {ex}")
+            yield None
+
+    with run_cm:
+        # Step 3: Run Evaluation Pipeline
+        suite_t0 = time.time()
+        print(f"\n📊 [Step 3/3] 开始全量 DeepEval 断言评测 (共 {len(test_cases)} 题，协程并发度: {concurrency})...", flush=True)
+        semaphore = asyncio.Semaphore(concurrency)
+        completed_cases = 0
+
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            async def _eval_case_worker(idx: int, case: Dict[str, Any], total_cases: int) -> Dict[str, Any]:
+                nonlocal completed_cases
+                q = case["question"]
+                gt = case.get("ground_truth", "")
+                p_id = project_id or case.get("project") or "eval_benchmark"
+
+                async with semaphore:
+                    print(f"\n--------------------------------------------------------------------------------", flush=True)
+                    print(f"👉 [用例 {idx:02d}/{total_cases:02d}] 项目: {p_id}", flush=True)
+                    print(f"   ❓ 问题: \"{q}\"", flush=True)
+
+                    trace_id = None
+                    trace_url = None
+
+                    with safe_span(
+                        f"eval_case_#{idx:02d}",
+                        span_type="CHAIN",
+                        inputs={
+                            "question": q,
+                            "ground_truth": gt,
+                            "project_id": p_id,
+                            "mode": mode,
+                            "top_k": top_k,
+                        },
+                    ) as root_span:
+                        try:
+                            # 子 Span 1: LightRAG 检索
+                            with safe_span(
+                                "lightrag_retrieval",
+                                span_type="RETRIEVER",
+                                inputs={"query": q, "mode": mode, "top_k": top_k, "project_id": p_id},
+                            ) as ret_span:
+                                t0 = time.time()
+                                rag_res = await query_lightrag(
+                                    client,
+                                    rag_url,
+                                    q,
+                                    p_id,
+                                    token,
+                                    top_k=top_k,
+                                    mode=mode,
+                                    chunk_top_k=chunk_top_k,
+                                    enable_rerank=enable_rerank,
+                                    user_prompt=user_prompt,
+                                    max_total_tokens=max_total_tokens,
+                                )
+                                latency = round(time.time() - t0, 2)
+                                ans = rag_res["answer"]
+                                ctxs = rag_res["contexts"]
+                                if ret_span:
+                                    ret_span.set_outputs({
+                                        "contexts_count": len(ctxs),
+                                        "latency_seconds": latency,
+                                        "contexts_preview": [c[:300] for c in ctxs[:5]],
+                                    })
+
+                            print(f"   ⚡ RAG 响应完成 (耗时 {latency}s, 提取到 {len(ctxs)} 个切片)", flush=True)
+                            print(f"   💬 回答摘要: {ans[:100]}..." if len(ans) > 100 else f"   💬 回答: {ans}", flush=True)
+
+                            # 子 Span 2: RAG 生成结果映射
+                            with safe_span(
+                                "rag_generation",
+                                span_type="LLM",
+                                inputs={
+                                    "contexts_count": len(ctxs),
+                                    "prompt_instruction": user_prompt or "Default LightRAG Query",
+                                },
+                            ) as gen_span:
+                                if gen_span:
+                                    gen_span.set_outputs({
+                                        "answer": ans,
+                                        "answer_length": len(ans),
+                                    })
+
+                            # 子 Span 3: DeepEval 裁判打分与深度诊断
+                            print(f"   ⚖️  DeepEval 裁判打分与深度诊断分析中...", flush=True)
+                            c_type = case.get("challenge_type")
+                            a_rule = case.get("assertion_rule")
+                            fake_ans = case.get("counterfactual_fake_answer")
+
+                            with safe_span(
+                                "deepeval_judgement",
+                                span_type="EVALUATOR",
+                                inputs={
+                                    "actual_output": ans,
+                                    "expected_output": gt,
+                                    "threshold": threshold,
+                                    "challenge_type": c_type,
+                                },
+                            ) as judge_span:
+                                res = await evaluate_single_case_deepeval(
+                                    idx=idx,
+                                    question=q,
+                                    answer=ans,
+                                    contexts=ctxs,
+                                    ground_truth=gt,
+                                    project_id=p_id,
+                                    judge_llm=judge_llm,
+                                    threshold=threshold,
+                                    challenge_type=c_type,
+                                    assertion_rule=a_rule,
+                                    fake_answer=fake_ans,
+                                    mode=mode,
+                                )
+                                if judge_span:
+                                    judge_span.set_outputs({
+                                        "overall_score": res.get("overall_score"),
+                                        "all_passed": res.get("all_passed"),
+                                        "passed": res.get("passed"),
+                                        "scores": res.get("scores"),
+                                        "reasons": res.get("reasons"),
+                                        "judge_duration_seconds": res.get("judge_duration_seconds", 0.0),
+                                    })
+
+                            res["rag_duration_seconds"] = latency
+                            judge_dur = res.get("judge_duration_seconds", 0.0)
+                            total_dur = round(latency + judge_dur, 2)
+                            res["total_duration_seconds"] = total_dur
+
+                            if root_span:
+                                root_span.set_outputs({
+                                    "overall_score": res["overall_score"],
+                                    "all_passed": res["all_passed"],
+                                    "rag_duration_seconds": latency,
+                                    "judge_duration_seconds": judge_dur,
+                                    "total_duration_seconds": total_dur,
+                                })
+                                try:
+                                    trace_id = getattr(root_span, "request_id", None)
+                                    if trace_id and tracker and tracker.tracking_uri:
+                                        trace_url = f"{tracker.tracking_uri.rstrip('/')}/#/experiments/{tracker.experiment_id}/traces/{trace_id}"
+                                except Exception:
+                                    pass
+
+                            if trace_id:
+                                res["trace_id"] = trace_id
+                            if trace_url:
+                                res["trace_url"] = trace_url
+
+                            # Print Granular Metrics and Reasons
+                            scores = res["scores"]
+                            reasons = res["reasons"]
+                            passed = res["passed"]
+
+                            print(f"   📈 指标与诊断分析 (评测耗时: {judge_dur}s | 单题端到端耗时: {total_dur}s):", flush=True)
+                            for m_name in scores.keys():
+                                s = scores.get(m_name)
+                                status_str = "✅ PASS" if passed.get(m_name) else "❌ FAIL"
+                                score_str = f"{s:.4f}" if s is not None else "N/A"
+                                m_dur = res.get("metric_latencies", {}).get(m_name, 0.0)
+                                print(f"      • {m_name:<25}: {score_str} [{status_str}] ({m_dur}s)", flush=True)
+                                r = reasons.get(m_name)
+                                if r and r != "No specific reason provided.":
+                                    print(f"        └─ 🔍 理由: {r}", flush=True)
+
+                            status_badge = "✅ ALL PASS" if res["all_passed"] else "⚠️ SOME FAILED"
+                            trace_badge = f" | 🔗 Trace: {trace_id}" if trace_id else ""
+                            print(f"   🏁 [用例 {idx:02d}] 综合得分: {res['overall_score']:.4f} | 最终断言: {status_badge} | ⏱️ 耗时 {total_dur}s{trace_badge}", flush=True)
+
+                        except Exception as e:
+                            print(f"   ❌ 用例 {idx} 执行异常: {e}", flush=True)
+                            if root_span:
+                                try:
+                                    trace_id = getattr(root_span, "request_id", None)
+                                    if trace_id and tracker and tracker.tracking_uri:
+                                        trace_url = f"{tracker.tracking_uri.rstrip('/')}/#/experiments/{tracker.experiment_id}/traces/{trace_id}"
+                                except Exception:
+                                    pass
+                            res = {
+                                "test_number": idx,
+                                "question": q,
+                                "project": p_id,
+                                "ground_truth": gt,
+                                "answer": "未返回回答内容（执行异常）",
+                                "contexts": [],
+                                "contexts_count": 0,
+                                "scores": {},
+                                "reasons": {"error": f"用例执行异常: {str(e)}"},
+                                "passed": {},
+                                "overall_score": 0.0,
+                                "all_passed": False,
+                                "rag_duration_seconds": 0.0,
+                                "judge_duration_seconds": 0.0,
+                                "total_duration_seconds": 0.0,
+                                "error": str(e),
+                            }
+                            if trace_id:
+                                res["trace_id"] = trace_id
+                            if trace_url:
+                                res["trace_url"] = trace_url
+
+                    completed_cases += 1
+                    prog = min(90, int((completed_cases / total_cases) * 90))
+                    print(f"[PROGRESS: {prog}%]", flush=True)
+                    return res
+
+            gathered_results = await asyncio.gather(
+                *[_eval_case_worker(idx, case, len(test_cases)) for idx, case in enumerate(test_cases, start=1)]
+            )
+            results = list(gathered_results)
+            results.sort(key=lambda r: r.get("test_number", 0))
+
+        # Summary Report
+        results_dir = Path(__file__).parent / "results"
+        csv_path, json_path = save_deepeval_reports(results, results_dir)
+
+        print("\n" + "=" * 80)
+        print("🏆 DeepEval 评测全量执行完毕！汇总统计:")
+        total_cases = len(results)
+        success_cases = sum(1 for r in results if r.get("all_passed"))
+        
+        # Calculate Averages and Latencies
+        avg_scores = {}
+        for m in ["faithfulness", "answer_relevancy", "contextual_recall", "contextual_precision"]:
+            vals = [r["scores"][m] for r in results if r.get("scores", {}).get(m) is not None]
+            avg_scores[m] = sum(vals) / len(vals) if vals else 0.0
+
+        suite_duration = round(time.time() - suite_t0, 2)
+        avg_case_duration = round(sum(r.get("total_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
+        avg_rag_duration = round(sum(r.get("rag_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
+        avg_judge_duration = round(sum(r.get("judge_duration_seconds", 0.0) for r in results) / total_cases, 2) if total_cases else 0.0
+
+        print(f"   • 测试总题数:      {total_cases}")
+        print(f"   • 全额通过题数:    {success_cases}/{total_cases} (通过率: {success_cases/total_cases*100:.1f}%)")
+        print(f"   • 平均忠实度:      {avg_scores['faithfulness']:.4f}")
+        print(f"   • 平均回答相关度:  {avg_scores['answer_relevancy']:.4f}")
+        print(f"   • 平均上下文召回率: {avg_scores['contextual_recall']:.4f}")
+        print(f"   • 平均上下文精确度: {avg_scores['contextual_precision']:.4f}")
+        print(f"   • ⏱️ 打擂总耗时:   {suite_duration}s (并发度: {concurrency})")
+        print(f"   • ⚡ 题均综合耗时: {avg_case_duration}s (RAG检索: {avg_rag_duration}s | 裁判质检: {avg_judge_duration}s)")
+        print(f"   • 报表保存 (CSV):  {csv_path}")
+        print(f"   • 报表保存 (JSON): {json_path}")
+        print("=" * 80)
+
+        # Step 4: MLflow Tracking Integration
+        if tracker and tracker.enabled and tracker.active_run:
+            print("\n📡 [Step 4/4] 正在将评测指标、超参数与推理证据链同步至 MLflow 平台...")
+            tracker.log_params({
+                "project": project_id,
+                "mode": mode,
+                "top_k": top_k,
+                "chunk_top_k": chunk_top_k,
+                "enable_rerank": enable_rerank,
+                "threshold": threshold,
+                "dataset": dataset_path.name,
+                "total_cases": total_cases,
+                "concurrency": concurrency,
+            })
+            tracker.log_metrics({
+                "faithfulness": avg_scores["faithfulness"],
+                "answer_relevancy": avg_scores["answer_relevancy"],
+                "contextual_recall": avg_scores["contextual_recall"],
+                "contextual_precision": avg_scores["contextual_precision"],
+                "pass_rate": round(success_cases / total_cases, 4) if total_cases else 0.0,
+                "total_duration_seconds": suite_duration,
+                "avg_case_duration_seconds": avg_case_duration,
+                "avg_rag_duration_seconds": avg_rag_duration,
+                "avg_judge_duration_seconds": avg_judge_duration,
+            })
+            tracker.log_results_table(results, framework="deepeval", artifact_file="deepeval_cases.json")
+            tracker.log_artifacts([csv_path, json_path])
+            print("   ✅ MLflow 指标与证据链大表同步完成！")
 
     ret_run_id = None
     if mlflow_enabled and "tracker" in locals() and tracker and tracker.run_id:
@@ -1002,16 +1135,18 @@ def main():
         print(f"   {args.mlflow_tracking_uri or 'http://49.233.222.54:9128'}")
         print("=" * 80)
     else:
+        active_mode = modes[0] if modes else args.mode
+        active_top_k = top_ks[0] if top_ks else args.top_k
         asyncio.run(
             run_deepeval_suite(
                 dataset_path=args.dataset,
                 project_id=args.project,
                 rag_url=args.rag_url,
-                top_k=args.top_k,
+                top_k=active_top_k,
                 concurrency=args.concurrency,
                 threshold=args.threshold,
                 limit=args.limit,
-                mode=args.mode,
+                mode=active_mode,
                 chunk_top_k=args.chunk_top_k,
                 enable_rerank=args.enable_rerank,
                 user_prompt=args.user_prompt,

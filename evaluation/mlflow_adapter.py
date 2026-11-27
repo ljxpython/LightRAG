@@ -170,6 +170,8 @@ class MLflowEvaluationTracker:
                 "overall_score": r.get("overall_score", r.get("ragas_score")),
                 "contexts_count": r.get("contexts_count", len(r.get("contexts", []))),
                 "status": "PASS" if r.get("all_passed") else ("FAIL" if r.get("all_passed") is False else "N/A"),
+                "trace_id": r.get("trace_id", "N/A"),
+                "trace_url": r.get("trace_url", "N/A"),
                 "answer": r.get("answer", "")[:300] + "..." if len(r.get("answer", "")) > 300 else r.get("answer", ""),
                 "contexts_preview": (r.get("contexts", [""])[0][:250] + "...") if r.get("contexts") else "N/A",
             }

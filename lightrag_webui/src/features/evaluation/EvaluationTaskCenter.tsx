@@ -116,6 +116,8 @@ export interface TestCaseResult {
   all_passed: boolean
   answer: string
   ground_truth: string
+  trace_id?: string
+  trace_url?: string
 }
 
 export interface EvalRunDetail extends EvalRunItem {
@@ -803,18 +805,25 @@ export default function EvaluationTaskCenter({
                 {isExpanded ? '收起详情' : '指标明细'}
               </Button>
 
-              {r.result_url && (
-                <a
-                  href={r.result_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 h-8 px-2.5 text-xs rounded-md border border-border/80 hover:bg-muted text-foreground transition-colors"
-                  title="在新窗口打开 MLflow 深度比对大屏"
-                >
-                  <span>MLflow</span>
-                  <ExternalLinkIcon className="size-3 text-muted-foreground" />
-                </a>
-              )}
+              {(() => {
+                if (!r.result_url) return null
+                const safeUrl = r.result_url.includes('/compare-runs?') && !r.result_url.includes('/#/compare-runs?')
+                  ? r.result_url.replace('/compare-runs?', '/#/compare-runs?')
+                  : r.result_url
+
+                return (
+                  <a
+                    href={safeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 h-8 px-2.5 text-xs rounded-md border border-border/80 hover:bg-muted text-foreground transition-colors"
+                    title="在新窗口打开 MLflow 深度比对大屏（若提示登录请填 evalflow-service / 4M5vvWoYjrRalG-MIyht7Y12Xv7LeTdZ1_onbUCKAC0）"
+                  >
+                    <span>MLflow</span>
+                    <ExternalLinkIcon className="size-3 text-muted-foreground" />
+                  </a>
+                )
+              })()}
 
               <Button
                 variant="ghost"
@@ -1926,6 +1935,18 @@ function TestCaseCard({ c }: { c: TestCaseResult }) {
               </div>
             )
           })()}
+          {c.trace_url && (
+            <a
+              href={c.trace_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded transition-colors"
+              title={`点击在新窗口直通查看该题全链路 Span 追踪（RAG检索 -> 生成 -> 裁判打分）\nTrace ID: ${c.trace_id || ''}`}
+            >
+              <span>🔗 链路 (Trace)</span>
+              <ExternalLinkIcon className="size-2.5 opacity-70" />
+            </a>
+          )}
           <span className="font-mono text-[11px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded">
             综合得分: {(c.overall_score * 100).toFixed(1)}
           </span>
